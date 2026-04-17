@@ -1,21 +1,52 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verify } from 'jsonwebtoken';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { jwtVerify } from 'jose';
 
-export function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
-  if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
-    const token = req.cookies.get('admin_token')?.value;
-    if (!token) {
-      return NextResponse.redirect(new URL('/admin/login', req.url));
-    }
-    try {
-      verify(token, process.env.JWT_SECRET!);
+export async function middleware(request: NextRequest) {
+  const path = request.nextUrl.pathname;
+
+  // Define protected routes
+  if (path.startsWith('/admin')) {
+    // Exclude login page from middleware
+    if (path === '/admin/login') {
       return NextResponse.next();
-    } catch {
-      return NextResponse.redirect(new URL('/admin/login', req.url));
+    }
+
+    const token = request.cookies.get('admin_token')?.value;
+
+    if (!token) {
+      return NextResponse.redirect(new URL('/admin/login', request.url));
+    }
+
+    try {
+      // jwtVerify requires a Uint8Array for the secret
+      const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'fallback-secret-for-dev');
+      
+      const { payload } = await jwtVerify(token, secret);
+      const userRole = payload.role as string;
+
+      // Role-based access control
+      // SEO team restricted from products and settings
+      if (userRole === 'seo' && (path.startsWith('/admin/products') || path.startsWith('/admin/settings'))) {
+        return NextResponse.redirect(new URL('/admin', request.url));
+      }
+
+      // Marketing team restricted from settings
+      if (userRole === 'marketing' && path.startsWith('/admin/settings')) {
+        return NextResponse.redirect(new URL('/admin', request.url));
+      }
+
+      return NextResponse.next();
+    } catch (err) {
+      console.error('Middleware JWT Error:', err);
+      // If token is invalid or expired, redirect to login
+      return NextResponse.redirect(new URL('/admin/login', request.url));
     }
   }
+
   return NextResponse.next();
 }
 
-export const config = { matcher: '/admin/:path*' };
+export const config = {
+  matcher: ['/admin/:path*'],
+};

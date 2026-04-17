@@ -24,13 +24,37 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-      <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-center">Admin Login</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input label="Username" value={form.username} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, username: e.target.value })} required />
-          <Input label="Password" type="password" value={form.password} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, password: e.target.value })} required />
-          <Button type="submit" className="w-full" disabled={loading}>{loading ? 'Logging in...' : 'Login'}</Button>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50/50">
+      <div className="bg-white p-10 border border-gray-100 shadow-2xl w-full max-w-md animate-in fade-in zoom-in duration-500">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-secondary text-white flex items-center justify-center text-3xl font-black mx-auto mb-4">L</div>
+          <h1 className="text-3xl font-black text-secondary tracking-tighter uppercase">Admin Registry</h1>
+          <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-2 font-display">Authorized Personnel Only</p>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <Input 
+            label="Personnel Identifier" 
+            value={form.username} 
+            onChange={(e: any) => setForm({ ...form, username: e.target.value })} 
+            required 
+            placeholder="Username"
+          />
+          <Input 
+            label="Access Protocol" 
+            type="password" 
+            value={form.password} 
+            onChange={(e: any) => setForm({ ...form, password: e.target.value })} 
+            required 
+            placeholder="••••••••"
+          />
+          <Button 
+            type="submit" 
+            className="w-full py-4 text-xs font-black uppercase tracking-widest" 
+            disabled={loading}
+          >
+            {loading ? 'Authenticating...' : 'Enter Console'}
+          </Button>
         </form>
       </div>
     </div>

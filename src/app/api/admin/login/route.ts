@@ -1,25 +1,75 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { serialize } from 'cookie';
+import dbConnect from '@/lib/dbConnect';
+import User from '@/models/User';
 
 export async function POST(req: NextRequest) {
-  const { username, password } = await req.json();
-  const adminUser = process.env.ADMIN_USERNAME;
-  const adminPass = process.env.ADMIN_PASSWORD;
+  try {
+    await dbConnect();
+    const { username, password } = await req.json();
 
-  if (username === adminUser && password === adminPass) {
-    const token = jwt.sign({ role: 'admin' }, process.env.JWT_SECRET!, { expiresIn: '8h' });
+    const user = await User.findOne({ username });
+    
+    // DUMMY LOGIN BYPASS (For development only)
+    if (!user && username === 'admin' && password === 'admin') {
+      const dummyToken = jwt.sign(
+        { id: 'dummy-id', role: 'admin', username: 'admin' }, 
+        process.env.JWT_SECRET!, 
+        { expiresIn: '12h' }
+      );
+
+      const cookie = serialize('admin_token', dummyToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        path: '/',
+        maxAge: 60 * 60 * 12,
+      });
+
+      return new NextResponse(JSON.stringify({ 
+        success: true, 
+        role: 'admin',
+        username: 'admin' 
+      }), {
+        status: 200,
+        headers: { 'Set-Cookie': cookie },
+      });
+    }
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 401 });
+    }
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+    }
+
+    const token = jwt.sign(
+      { id: user._id, role: user.role, username: user.username }, 
+      process.env.JWT_SECRET!, 
+      { expiresIn: '12h' }
+    );
+
     const cookie = serialize('admin_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: 'strict',
       path: '/',
-      maxAge: 60 * 60 * 8,
+      maxAge: 60 * 60 * 12, // 12 hours
     });
-    return new NextResponse(JSON.stringify({ success: true }), {
+
+    return new NextResponse(JSON.stringify({ 
+      success: true, 
+      role: user.role,
+      username: user.username 
+    }), {
       status: 200,
       headers: { 'Set-Cookie': cookie },
     });
+  } catch (error: any) {
+    console.error('Login error:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-  return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
 }

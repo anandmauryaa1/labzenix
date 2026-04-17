@@ -1,8 +1,70 @@
+'use client';
+
+import { useState } from 'react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { Phone, Mail, MapPin, Clock, Send } from 'lucide-react';
+import { Phone, Mail, MapPin, Clock, Send, CheckCircle2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function ContactPage() {
+  const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    subject: '',
+    message: ''
+  });
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/inquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form)
+      });
+
+      if (res.ok) {
+        setSubmitted(true);
+        toast.success('Inquiry sent successfully!');
+      } else {
+        toast.error('Failed to send inquiry. Please try again.');
+      }
+    } catch (err) {
+      toast.error('Something went wrong. Please check your connection.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (submitted) {
+    return (
+      <div className="bg-white min-h-[60vh] flex items-center justify-center p-4">
+        <div className="max-w-md w-full text-center space-y-8 animate-in zoom-in-95 duration-500">
+          <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-8">
+            <CheckCircle2 className="w-12 h-12 text-primary animate-in fade-in slide-in-from-bottom-2" />
+          </div>
+          <h2 className="text-4xl font-black text-secondary uppercase tracking-tighter">Message Received</h2>
+          <p className="text-gray-500 font-medium text-lg leading-relaxed">
+            Thank you for reaching out to **LabZenix**. Our technical sales team has been notified and will contact you via email or phone within 24 hours.
+          </p>
+          <div className="pt-4">
+            <button 
+              onClick={() => setSubmitted(false)}
+              className="px-8 py-4 bg-secondary text-white text-[10px] font-black uppercase tracking-widest hover:bg-gray-950 transition-all shadow-xl shadow-secondary/20"
+            >
+              Send Another Message
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white">
       {/* Header */}
@@ -82,23 +144,55 @@ export default function ContactPage() {
             <div className="lg:col-span-2 bg-gray-50 p-8 md:p-12 border border-gray-100 shadow-sm relative">
               <div className="absolute top-0 right-0 w-2 h-full bg-primary" />
               <h3 className="text-2xl font-bold text-secondary mb-8 uppercase tracking-wider">Inquiry Form</h3>
-              <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Input label="Your Name *" placeholder="Enter your full name" required />
-                <Input label="Email Address *" placeholder="Enter your business email" type="email" required />
-                <Input label="Phone Number *" placeholder="+91-0000000000" type="tel" required />
-                <Input label="Subject" placeholder="Inquiry about..." />
+              <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Input 
+                  label="Your Name *" 
+                  placeholder="Enter your full name" 
+                  value={form.name}
+                  onChange={(e) => setForm({...form, name: e.target.value})}
+                  required 
+                />
+                <Input 
+                  label="Email Address *" 
+                  placeholder="Enter your business email" 
+                  type="email" 
+                  value={form.email}
+                  onChange={(e) => setForm({...form, email: e.target.value})}
+                  required 
+                />
+                <Input 
+                  label="Phone Number *" 
+                  placeholder="+91-0000000000" 
+                  type="tel" 
+                  value={form.phone}
+                  onChange={(e) => setForm({...form, phone: e.target.value})}
+                  required 
+                />
+                <Input 
+                  label="Subject" 
+                  placeholder="Inquiry about..." 
+                  value={form.subject}
+                  onChange={(e) => setForm({...form, subject: e.target.value})}
+                />
                 <div className="md:col-span-2 space-y-2">
                   <label className="text-sm font-medium text-secondary">Your Message *</label>
                   <textarea 
                     className="w-full h-32 px-4 py-3 bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
                     placeholder="Tell us about your requirements..."
+                    value={form.message}
+                    onChange={(e) => setForm({...form, message: e.target.value})}
                     required
                   ></textarea>
                 </div>
                 <div className="md:col-span-2">
-                  <Button size="lg" className="w-full flex items-center justify-center space-x-2">
-                    <Send className="w-4 h-4" />
-                    <span>Send Message</span>
+                  <Button 
+                    type="submit"
+                    size="lg" 
+                    disabled={loading}
+                    className="w-full flex items-center justify-center space-x-2"
+                  >
+                    <Send className={`w-4 h-4 ${loading ? 'animate-pulse' : ''}`} />
+                    <span>{loading ? 'Sending Request...' : 'Send Message'}</span>
                   </Button>
                 </div>
               </form>
@@ -109,12 +203,12 @@ export default function ContactPage() {
 
       {/* Map Placeholder */}
       <section className="h-96 w-full bg-gray-200 mt-12 relative overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center text-gray-500 font-bold text-xl uppercase tracking-widest">
-           Interactive Map Integration Placeholder
+        <div className="absolute inset-0 flex items-center justify-center text-gray-500 font-bold text-xl uppercase tracking-widest bg-gray-100 z-10 pointer-events-none">
+           Interactive Map Integration
         </div>
         <iframe 
           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d11012.34567890123!2d76.7123456!3d30.7123456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390fef1234567890%3A0x1234567890abcdef!2sIndustrial%20Area%2C%20Phase%20II%2C%20SAS%20Nagar%2C%20Punjab%20160062!5e0!3m2!1sen!2sin!4v1612345678901"
-          className="w-full h-full border-0 grayscale"
+          className="w-full h-full border-0 grayscale opacity-50"
           allowFullScreen
           loading="lazy"
         ></iframe>

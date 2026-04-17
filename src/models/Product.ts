@@ -7,6 +7,8 @@ const ProductSchema = new mongoose.Schema({
   category: { type: String, required: true, enum: ['Tensile Testers', 'Compression Testers', 'Heat Sealers', 'Leak Detectors', 'Friction Testers', 'Drop Testers'] },
   usage: { type: String, required: true, enum: ['Laboratory', 'Production', 'R&D'] },
   images: [{ type: String }],
+  features: [{ type: String }],
+  specificationText: { type: String },
   specs: { type: mongoose.Schema.Types.Mixed, default: {} },
   price: { type: Number, required: true },
   createdAt: { type: Date, default: Date.now },

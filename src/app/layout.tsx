@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   description: "Manufacturer of high-quality laboratory testing instruments for Paper, Packaging, PET, Plastic, and Paint industries.",
 };
 
+import ConditionalWrapper from "@/components/layout/ConditionalWrapper";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -16,11 +18,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full scroll-smooth" suppressHydrationWarning>
       <body className="min-h-full flex flex-col font-display bg-white text-secondary" suppressHydrationWarning>
-        <Navbar />
-        <main className="flex-grow pt-[116px] md:pt-[132px]">
+        <ConditionalWrapper>
           {children}
-        </main>
-        <Footer />
+        </ConditionalWrapper>
       </body>
     </html>
   );

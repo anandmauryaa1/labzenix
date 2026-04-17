@@ -126,7 +126,7 @@ export default function ProductsPage() {
         <div className="max-w-5xl mx-auto px-4 text-center text-white">
           <h2 className="text-3xl font-bold mb-8 uppercase tracking-widest">Need a Detailed Product Guide?</h2>
           <p className="mb-10 text-gray-400">Download our latest 2024 Product Catalog to explore technical specifications and application guides for all our instruments.</p>
-          <Button size="lg" className="bg-white text-secondary font-black hover:bg-gray-100">Download Catalog (PDF)</Button>
+          <Button size="lg" className="bg-white  text-secondary font-black hover:bg-gray-100 cursor-pointer">Download Catalog (PDF)</Button>
         </div>
       </section>
     </div>

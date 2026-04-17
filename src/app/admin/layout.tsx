@@ -10,9 +10,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     fetch('/api/admin/check').catch(() => router.push('/admin/login'));
   }, []);
   return (
-    <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="flex min-h-screen bg-gray-50/50">
       <Sidebar />
-      <main className="flex-1 ml-64 p-6">{children}</main>
+      <main className="flex-1 ml-64 p-8">{children}</main>
     </div>
   );
 }
