@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import toast from 'react-hot-toast';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -55,6 +56,15 @@ export default function AdminLogin() {
           >
             {loading ? 'Authenticating...' : 'Enter Console'}
           </Button>
+
+          <div className="text-center pt-2">
+            <Link 
+              href="/admin/forgot-password" 
+              className="text-[10px] font-bold text-gray-400 uppercase tracking-widest hover:text-primary transition-colors"
+            >
+              Forgot Access Protocol?
+            </Link>
+          </div>
         </form>
       </div>
     </div>

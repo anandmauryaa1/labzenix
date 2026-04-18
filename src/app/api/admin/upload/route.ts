@@ -21,7 +21,12 @@ export async function POST(req: NextRequest) {
 
     const result = await new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
-        { resource_type: 'auto', folder: 'labzenix/products' },
+        { 
+          resource_type: 'auto', 
+          folder: 'labzenix/products',
+          access_mode: 'public',
+          type: 'upload'
+        },
         (error, result) => {
           if (error) reject(error);
           else resolve(result);

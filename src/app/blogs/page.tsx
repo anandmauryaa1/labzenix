@@ -1,42 +1,18 @@
+import dbConnect from '@/lib/dbConnect';
+import Blog from '@/models/Blog';
 import Button from '@/components/ui/Button';
-import { Calendar, User, ArrowRight, Tag } from 'lucide-react';
+import { Calendar, User, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { getPageMetadata } from '@/lib/seo';
 
-export default function BlogPage() {
-  const blogs = [
-    {
-      title: 'Importance of Proper Calibration in Laboratory Instruments',
-      excerpt: 'Calibration is a vital part of instrument maintenance. Learn why regular calibration is essential for maintaining accuracy and compliance.',
-      date: 'March 15, 2024',
-      author: 'Technical Team',
-      category: 'Maintenance',
-      image: 'https://images.unsplash.com/photo-1579154341098-e4e158cc7f55?auto=format&fit=crop&q=80&w=800'
-    },
-    {
-      title: 'How to Choose the Right Bursting Strength Tester',
-      excerpt: 'Not all testers are created equal. Discover the key factors to consider when selecting a bursting strength tester for your packaging line.',
-      date: 'March 10, 2024',
-      author: 'Industry Expert',
-      category: 'Product Guide',
-      image: 'https://images.unsplash.com/photo-1582719201990-25bc5eacc7fe?auto=format&fit=crop&q=80&w=800'
-    },
-    {
-      title: 'Advancements in PET Bottle Testing Technology',
-      excerpt: 'The PET industry is evolving rapidly. Explore the latest technological trends in bottle testing and quality control.',
-      date: 'March 05, 2024',
-      author: 'Innovation Lead',
-      category: 'Trends',
-      image: 'https://images.unsplash.com/photo-1599423300746-b62533397394?auto=format&fit=crop&q=80&w=800'
-    },
-    {
-      title: 'Quality Standards for Paint and Coating Industry',
-      excerpt: 'A deep dive into international quality standards for coatings and the instruments required to verify them.',
-      date: 'February 28, 2024',
-      author: 'Compliance Officer',
-      category: 'Standards',
-      image: 'https://images.unsplash.com/photo-1589939705384-5185138a04b9?auto=format&fit=crop&q=80&w=800'
-    }
-  ];
+export async function generateMetadata() {
+  return await getPageMetadata('blogs');
+}
+
+export default async function BlogPage() {
+  await dbConnect();
+  // Include legacy blogs (no status) and published ones
+  const blogs = await Blog.find({ status: { $ne: 'draft' } }).populate('author', 'name').sort({ createdAt: -1 });
 
   return (
     <div className="bg-white">
@@ -55,42 +31,48 @@ export default function BlogPage() {
       {/* Blog Feed */}
       <section className="py-24 px-4">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            {blogs.map((blog, idx) => (
-              <article key={idx} className="bg-white border border-gray-100 flex flex-col group overflow-hidden">
-                <div className="aspect-video relative overflow-hidden">
-                  <img 
-                    src={blog.image} 
-                    alt={blog.title} 
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale hover:grayscale-0"
-                  />
-                  <div className="absolute top-4 left-4 bg-primary text-white text-[10px] font-black uppercase tracking-widest px-3 py-1">
-                    {blog.category}
+          {blogs.length === 0 ? (
+            <div className="text-center py-20">
+               <p className="text-gray-400 font-bold uppercase tracking-widest text-sm">The Knowledge Center is currently being updated.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+              {blogs.map((blog: any) => (
+                <article key={blog._id} className="bg-white border border-gray-100 flex flex-col group overflow-hidden">
+                  <div className="aspect-video relative overflow-hidden">
+                    <img 
+                      src={blog.image || 'https://images.unsplash.com/photo-1579154341098-e4e158cc7f55?auto=format&fit=crop&q=80&w=800'} 
+                      alt={blog.title} 
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale hover:grayscale-0"
+                    />
+                    <div className="absolute top-4 left-4 bg-primary text-white text-[10px] font-black uppercase tracking-widest px-3 py-1">
+                      {blog.category}
+                    </div>
                   </div>
-                </div>
-                
-                <div className="p-8 flex flex-col flex-grow">
-                  <div className="flex items-center space-x-6 text-xs text-gray-400 font-bold uppercase tracking-widest mb-6">
-                    <span className="flex items-center"><Calendar className="w-3 h-3 mr-2" /> {blog.date}</span>
-                    <span className="flex items-center"><User className="w-3 h-3 mr-2" /> {blog.author}</span>
+                  
+                  <div className="p-8 flex flex-col flex-grow">
+                    <div className="flex items-center space-x-6 text-xs text-gray-400 font-bold uppercase tracking-widest mb-6">
+                      <span className="flex items-center"><Calendar className="w-3 h-3 mr-2" /> {new Date(blog.createdAt).toLocaleDateString()}</span>
+                      <span className="flex items-center"><User className="w-3 h-3 mr-2" /> {blog.author?.name || 'Technical Team'}</span>
+                    </div>
+                    
+                    <h2 className="text-2xl font-bold text-secondary mb-4 leading-tight group-hover:text-primary transition-colors">
+                      {blog.title}
+                    </h2>
+                    
+                    <p className="text-gray-600 leading-relaxed mb-8 flex-grow line-clamp-3">
+                      {blog.metaDescription || blog.content.replace(/<[^>]*>/g, '').substring(0, 160) + '...'}
+                    </p>
+                    
+                    <Link href={`/blogs/${blog.slug}`} className="inline-flex items-center text-secondary font-black uppercase text-xs tracking-[0.2em] group-hover:text-primary transition-all">
+                      Read Full Story
+                      <ArrowRight className="w-4 h-4 ml-4 transition-transform group-hover:translate-x-2" />
+                    </Link>
                   </div>
-                  
-                  <h2 className="text-2xl font-bold text-secondary mb-4 leading-tight group-hover:text-primary transition-colors">
-                    {blog.title}
-                  </h2>
-                  
-                  <p className="text-gray-600 leading-relaxed mb-8 flex-grow">
-                    {blog.excerpt}
-                  </p>
-                  
-                  <Link href="/blogs" className="inline-flex items-center text-secondary font-black uppercase text-xs tracking-[0.2em] group-hover:text-primary transition-all">
-                    Read Full Story
-                    <ArrowRight className="w-4 h-4 ml-4 transition-transform group-hover:translate-x-2" />
-                  </Link>
-                </div>
-              </article>
-            ))}
-          </div>
+                </article>
+              ))}
+            </div>
+          )}
 
           {/* Pagination Placeholder */}
           <div className="mt-20 flex justify-center space-x-2">

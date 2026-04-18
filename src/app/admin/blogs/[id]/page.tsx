@@ -13,9 +13,16 @@ import {
   ChevronRight,
   Sparkles,
   Plus,
-  Trash2
+  Trash2,
+  FileText,
+  Tag as TagIcon,
+  Eye,
+  AlertCircle
 } from 'lucide-react';
 import Link from 'next/link';
+import SEOMetrics from '@/components/admin/SEOMetrics';
+import Input from '@/components/ui/Input';
+import TextArea from '@/components/ui/TextArea';
 
 const RichTextEditor = dynamic(() => import('@/components/blog/RichTextEditor'), { ssr: false });
 
@@ -30,26 +37,77 @@ export default function BlogForm({ params: paramsPromise }: { params: Promise<{ 
     content: '', 
     image: '', 
     category: '', 
+    status: 'published',
     tags: '', 
     metaTitle: '', 
     metaDescription: ''
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'content' | 'seo'>('content');
+
+  const [categories, setCategories] = useState<any[]>([]);
 
   useEffect(() => {
+    fetch('/api/categories').then(res => res.json()).then(data => setCategories(data));
+    
     if (!isNew) {
       fetch(`/api/blogs/${params.id}`)
         .then(res => res.json())
         .then(data => setForm({ 
-          ...data, 
-          tags: data.tags?.join(', ') || '' 
+          title: data.title || '',
+          slug: data.slug || '',
+          content: data.content || '',
+          image: data.image || '',
+          category: data.category || '',
+          status: data.status || 'published',
+          tags: data.tags?.join(', ') || '',
+          metaTitle: data.metaTitle || '',
+          metaDescription: data.metaDescription || ''
         }));
     }
   }, [params.id, isNew]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!form.title.trim()) {
+      newErrors.title = 'Blog Title is mandatory';
+    }
+    if (!form.content.trim()) {
+      toast.error('Article content cannot be empty'); // Still toast for large editor missing content
+    }
+    if (!form.image) {
+      newErrors.image = 'Featured display image is required';
+    }
+    if (!form.category) {
+      newErrors.category = 'Classification must be selected';
+    }
+    if (!form.tags.trim()) {
+      newErrors.tags = 'At least one indexing tag is required';
+    }
+    if (!form.metaTitle.trim()) {
+      newErrors.metaTitle = 'SEO Title is required for search indexing';
+    }
+    if (!form.metaDescription.trim()) {
+      newErrors.metaDescription = 'SEO Meta Description is mandatory';
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      toast.error('Please refine the mandatory fields before deploying');
+      return false;
+    }
+    
+    if (!form.content.trim()) return false;
+
+    return true;
+  };
+
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!validateForm()) return;
+    
     setLoading(true);
     
     const payload = { 
@@ -93,7 +151,7 @@ export default function BlogForm({ params: paramsPromise }: { params: Promise<{ 
   };
 
   return (
-    <div className="max-w-6xl mx-auto pb-20 animate-in slide-in-from-bottom-4 duration-500">
+    <div className="max-w-[1400px] mx-auto pb-20 animate-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div className="flex items-center space-x-4">
@@ -104,7 +162,7 @@ export default function BlogForm({ params: paramsPromise }: { params: Promise<{ 
           </Link>
           <div>
             <h1 className="text-3xl font-black text-secondary tracking-tighter uppercase">
-              {isNew ? 'New Journal Entry' : 'Edit Analysis'}
+              {isNew ? 'New Entry' : 'Edit Analysis'}
             </h1>
             <div className="flex items-center text-xs space-x-2 text-gray-400 font-bold uppercase tracking-widest mt-1">
               <span>Journals</span>
@@ -115,228 +173,227 @@ export default function BlogForm({ params: paramsPromise }: { params: Promise<{ 
         </div>
         
         <div className="flex items-center space-x-3">
+           {!isNew && (
+             <Link href={`/blogs/${form.slug}`} target="_blank">
+                <button className="flex items-center space-x-2 px-6 py-4 bg-white border border-gray-200 text-secondary text-xs font-black uppercase tracking-widest hover:bg-gray-50 transition-all">
+                  <Eye className="w-4 h-4 text-primary" />
+                  <span>View Public</span>
+                </button>
+             </Link>
+           )}
           <button 
             type="button"
-            onClick={handleSubmit}
+            onClick={() => handleSubmit()}
             disabled={loading}
-            className="flex items-center space-x-2 px-8 py-4 bg-primary text-white text-xs font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-primary/20 disabled:opacity-50"
+            className="flex items-center space-x-2 px-10 py-4 bg-primary text-white text-xs font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-primary/20 disabled:opacity-50"
           >
             <Save className="w-4 h-4" />
-            <span>{loading ? 'Processing...' : 'Deploy Changes'}</span>
+            <span>{loading ? 'Processing...' : isNew ? 'Deploy Changes' : 'Update Analysis'}</span>
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Main Editor Section */}
-        <div className="lg:col-span-3 space-y-6">
-          <div className="bg-white border border-gray-100 overflow-hidden">
-            <div className="flex border-b border-gray-100">
-              <button 
-                onClick={() => setActiveTab('content')}
-                className={`px-6 py-4 text-xs font-black uppercase tracking-widest flex items-center space-x-2 transition-all ${
-                  activeTab === 'content' ? 'bg-secondary text-white' : 'text-gray-400 hover:text-secondary hover:bg-gray-50'
-                }`}
-              >
-                <FileText className="w-4 h-4" />
-                <span>Content</span>
-              </button>
-              <button 
-                onClick={() => setActiveTab('seo')}
-                className={`px-6 py-4 text-xs font-black uppercase tracking-widest flex items-center space-x-2 transition-all ${
-                  activeTab === 'seo' ? 'bg-secondary text-white' : 'text-gray-400 hover:text-secondary hover:bg-gray-50'
-                }`}
-              >
-                <Globe className="w-4 h-4" />
-                <span>SEO Metadata</span>
-              </button>
-            </div>
+        {/* Main Content (Left) */}
+        <div className="lg:col-span-3 space-y-8">
+          {/* Title Area */}
+          <div className="bg-white border border-gray-100 p-8 shadow-sm space-y-6">
+            <Input 
+              label="Journal Title"
+              value={form.title || ''} 
+              onChange={(e) => updateSlug(e.target.value)}
+              placeholder="Enter title here..."
+              error={errors.title}
+              info="The primary headline for this analysis. Keep it descriptive and technical."
+              className="text-3xl font-black !p-0 !bg-transparent !border-none"
+            />
 
-            <div className="p-8">
-              {activeTab === 'content' ? (
-                <div className="space-y-8">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Article Title</label>
-                    <input 
-                      type="text" 
-                      value={form.title || ''} 
-                      onChange={(e) => updateSlug(e.target.value)}
-                      placeholder="Enter a compelling industrial title..."
-                      className="w-full text-2xl font-black text-secondary border-b-2 border-gray-100 focus:border-primary outline-none py-2 transition-colors placeholder:text-gray-200"
-                      required 
+            <div className="flex flex-col space-y-2 pt-4 border-t border-gray-50">
+              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Public Protocol Path (Slug)</label>
+              <div className="flex items-center text-[10px] font-bold text-primary uppercase tracking-widest">
+                <span className="mr-2">labzenix.com/blogs/</span>
+                <input 
+                  type="text" 
+                  value={form.slug || ''} 
+                  onChange={(e) => setForm({...form, slug: e.target.value})}
+                  className="bg-transparent border-none outline-none text-primary ml-1 flex-1 font-black"
+                  required 
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Editor Area */}
+          <div className="bg-white border border-gray-100 shadow-sm min-h-[600px] flex flex-col">
+            <div className="p-1 bg-gray-50 border-b border-gray-100 flex items-center justify-between px-6 py-3">
+               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Visual Composer</span>
+               <Sparkles className="w-3 h-3 text-primary animate-pulse" />
+            </div>
+            <div className="flex-1 p-2">
+               <RichTextEditor value={form.content} onChange={(val: string) => setForm({ ...form, content: val })} />
+            </div>
+          </div>
+
+          {/* SEO Section (Bottom) */}
+          <div className="bg-white border border-gray-100 shadow-sm overflow-hidden">
+            <div className="bg-secondary p-6 flex items-center justify-between">
+              <h3 className="text-white text-xs font-black uppercase tracking-widest flex items-center">
+                <Globe className="w-4 h-4 mr-2 text-primary" />
+                Search Console Optimization
+              </h3>
+              <Sparkles className="w-4 h-4 text-primary/50" />
+            </div>
+            
+            <div className="p-10 space-y-10">
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                  <div className="space-y-4">
+                    <SEOMetrics label="Title Strength" text={form.metaTitle} min={40} max={60} />
+                    <Input 
+                      label="SEO Title Tag"
+                      value={form.metaTitle || ''} 
+                      onChange={(e) => setForm({...form, metaTitle: e.target.value})}
+                      placeholder="Heading in search results..."
+                      error={errors.metaTitle}
+                      info="This title appears in browser tabs and search engine results. Best to keep it between 40-60 characters."
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Permanent Link (Slug)</label>
-                    <div className="flex items-center text-sm font-medium text-gray-400 bg-gray-50 p-3">
-                      <span>labzenix.com/blogs/</span>
-                      <input 
-                        type="text" 
-                        value={form.slug || ''} 
-                        onChange={(e) => setForm({...form, slug: e.target.value})}
-                        className="bg-transparent border-none outline-none text-primary ml-1 flex-1 font-bold"
-                        required 
-                      />
-                    </div>
-                  </div>
-
-                  <div className="min-h-[500px]">
-                    <RichTextEditor value={form.content} onChange={(val: string) => setForm({ ...form, content: val })} />
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
-                  <div className="bg-primary/5 p-6 border-l-4 border-primary mb-8">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <Sparkles className="w-4 h-4 text-primary" />
-                      <h4 className="font-black text-xs uppercase tracking-widest text-primary">SEO Best Practices</h4>
-                    </div>
-                    <p className="text-sm text-secondary/60 font-medium">Keep your meta title under 60 characters and description under 160 for optimal search visibility.</p>
-                  </div>
-
                   <div className="space-y-4">
-                    <div className="space-y-2">
-                       <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">SEO Title Tag</label>
-                       <input 
-                        type="text" 
-                        value={form.metaTitle || ''} 
-                        onChange={(e) => setForm({...form, metaTitle: e.target.value})}
-                        placeholder="Search result heading..."
-                        className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary focus:bg-white outline-none transition-all font-bold text-secondary"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                       <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Meta Description</label>
-                       <textarea 
-                        value={form.metaDescription || ''} 
-                        onChange={(e) => setForm({...form, metaDescription: e.target.value})}
-                        placeholder="Concise summary for search engines..."
-                        rows={4}
-                        className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary focus:bg-white outline-none transition-all font-medium text-gray-600 resize-none"
-                      />
-                    </div>
+                    <SEOMetrics label="Description Strength" text={form.metaDescription} min={120} max={160} />
+                    <TextArea 
+                      label="Meta Description"
+                      value={form.metaDescription || ''} 
+                      onChange={(e) => setForm({...form, metaDescription: e.target.value})}
+                      placeholder="Brief summary for indexing engines..."
+                      rows={3}
+                      error={errors.metaDescription}
+                      info="A brief summary (120-160 chars) that appears beneath your link in search results."
+                    />
                   </div>
-                </div>
-              )}
+               </div>
             </div>
           </div>
         </div>
 
-        {/* Sidebar Settings Section */}
+        {/* Sidebar (Right) */}
         <div className="space-y-6">
-          <div className="bg-white border border-gray-100 p-6 space-y-6">
-            <h3 className="text-xs font-black uppercase tracking-widest text-secondary flex items-center border-b border-gray-100 pb-4">
+          {/* Status & Category */}
+          <div className="bg-white border border-gray-100 p-8 shadow-sm space-y-8">
+            <h3 className="text-[10px] font-black uppercase tracking-widest text-secondary flex items-center border-b border-gray-100 pb-5">
               <Settings className="w-4 h-4 mr-2 text-primary" />
-              Publishing Settings
+              Journal Status
             </h3>
 
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Category</label>
-              <select 
-                value={form.category || ''} 
-                onChange={(e) => setForm({...form, category: e.target.value})}
-                className="w-full p-3 bg-gray-50 border border-gray-100 outline-none text-sm font-bold text-secondary"
-                required
-              >
-                <option value="">Select Category</option>
-                <option value="Industrial Standards">Industrial Standards</option>
-                <option value="Lab Guides">Lab Guides</option>
-                <option value="Product News">Product News</option>
-                <option value="Case Studies">Case Studies</option>
-              </select>
-            </div>
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Visibility Control</label>
+                <select 
+                  value={form.status || 'published'} 
+                  onChange={(e) => setForm({...form, status: e.target.value})}
+                  className="w-full p-4 bg-gray-50 border border-gray-100 outline-none text-xs font-black uppercase tracking-widest text-secondary focus:border-primary transition-all"
+                >
+                  <option value="published">Published (Public)</option>
+                  <option value="draft">Draft (Private)</option>
+                </select>
+              </div>
 
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Tags (Comma Sep)</label>
-              <input 
-                type="text" 
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Classification</label>
+                  {errors.category && <AlertCircle className="w-3 h-3 text-red-500 animate-pulse" />}
+                </div>
+                <select 
+                  value={form.category || ''} 
+                  onChange={(e) => setForm({...form, category: e.target.value})}
+                  className={`w-full p-4 bg-gray-50 border ${errors.category ? 'border-red-500 bg-red-50/20' : 'border-gray-100'} outline-none text-xs font-black uppercase tracking-widest text-secondary focus:border-primary transition-all`}
+                  required
+                >
+                  <option value="">Select Category</option>
+                  {categories.map((cat: any) => (
+                    <option key={cat._id} value={cat.name}>{cat.name}</option>
+                  ))}
+                </select>
+                {errors.category && <p className="text-[9px] font-black uppercase text-red-500 tracking-widest">{errors.category}</p>}
+              </div>
+
+              <Input 
+                label="Index Tags"
                 value={form.tags || ''} 
                 onChange={(e) => setForm({...form, tags: e.target.value})}
                 placeholder="safety, calibration..."
-                className="w-full p-3 bg-gray-50 border border-gray-100 outline-none text-sm font-bold text-secondary"
+                error={errors.tags}
+                info="Keywords that help users find this article. Comma-separated."
               />
             </div>
           </div>
 
-          <div className="bg-white border border-gray-100 p-6 space-y-6">
-             <h3 className="text-xs font-black uppercase tracking-widest text-secondary flex items-center border-b border-gray-100 pb-4">
+          {/* Featured Image */}
+          <div className="bg-white border border-gray-100 p-8 shadow-sm space-y-6">
+             <h3 className="text-[10px] font-black uppercase tracking-widest text-secondary flex items-center border-b border-gray-100 pb-5">
               <ImageIcon className="w-4 h-4 mr-2 text-primary" />
-              Featured Media
+              Featured View
+              {errors.image && <AlertCircle className="w-3 h-3 ml-auto text-red-500 animate-pulse" />}
             </h3>
             
             <div className="space-y-4">
-            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block">Cover Media</label>
-            <div className="group relative aspect-video bg-gray-50 border-2 border-dashed border-gray-200 flex flex-col items-center justify-center overflow-hidden transition-all hover:border-primary hover:bg-primary/5 cursor-pointer">
-              {form.image ? (
-                <>
-                  <img src={form.image} className="w-full h-full object-cover" alt="" />
-                  <div className="absolute inset-0 bg-secondary/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <button 
-                      type="button"
-                      onClick={() => setForm({...form, image: ''})}
-                      className="p-3 bg-red-600 text-white shadow-xl hover:scale-110 transition-transform"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer">
-                  <input 
-                    type="file" 
-                    className="hidden" 
-                    accept="image/*"
-                    disabled={loading}
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      
-                      setLoading(true);
-                      const formData = new FormData();
-                      formData.append('file', file);
-                      
-                      try {
-                        const res = await fetch('/api/admin/upload', {
-                          method: 'POST',
-                          body: formData
-                        });
-                        if (res.ok) {
-                          const data = await res.json();
-                          setForm(prev => ({ ...prev, image: data.url }));
-                          toast.success('Cover asset synced');
-                        } else {
-                          toast.error('Upload protocol failed');
+              <div className="group relative aspect-square bg-gray-50 border-2 border-dashed border-gray-200 flex flex-col items-center justify-center overflow-hidden transition-all hover:border-primary hover:bg-primary/5 cursor-pointer">
+                {form.image ? (
+                  <>
+                    <img src={form.image} className="w-full h-full object-cover" alt="" />
+                    <div className="absolute inset-0 bg-secondary/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <button 
+                        type="button"
+                        onClick={() => setForm({...form, image: ''})}
+                        className="p-4 bg-red-600 text-white shadow-2xl hover:scale-110 transition-transform font-black text-[10px] uppercase tracking-widest flex items-center space-x-2"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        <span>Remove</span>
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer p-6 text-center">
+                    <input 
+                      type="file" 
+                      className="hidden" 
+                      accept="image/*"
+                      disabled={loading}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        
+                        setLoading(true);
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        
+                        try {
+                          const res = await fetch('/api/admin/upload', {
+                            method: 'POST',
+                            body: formData
+                          });
+                          if (res.ok) {
+                            const data = await res.json();
+                            setForm(prev => ({ ...prev, image: data.url }));
+                            toast.success('Asset Synced');
+                          }
+                        } catch (err) {
+                          toast.error('Sync Failed');
+                        } finally {
+                          setLoading(false);
                         }
-                      } catch (err) {
-                        toast.error('Network connectivity issues');
-                      } finally {
-                        setLoading(false);
-                      }
-                    }}
-                  />
-                  <div className="text-center p-8">
-                    <Plus className={`w-12 h-12 mx-auto mb-3 transition-transform ${loading ? 'animate-spin text-gray-300' : 'text-gray-300 group-hover:text-primary group-hover:scale-110'}`} />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-primary">
-                      {loading ? 'Processing...' : 'Upload Featured Image'}
+                      }}
+                    />
+                    <Plus className={`w-10 h-10 mx-auto mb-3 transition-transform ${loading ? 'animate-spin text-gray-200' : 'text-gray-200 group-hover:text-primary group-hover:scale-110'}`} />
+                    <p className="text-[8px] font-black uppercase tracking-[0.2em] text-gray-400 group-hover:text-primary leading-relaxed">
+                      {loading ? 'Processing...' : 'Upload Featured View'}
                     </p>
-                  </div>
-                </label>
-              )}
+                  </label>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-);
-}
-
-function FileText({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-    </svg>
   );
 }

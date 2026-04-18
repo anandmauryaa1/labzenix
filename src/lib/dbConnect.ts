@@ -10,10 +10,33 @@ if (!cached) (global as any).mongoose = { conn: null, promise: null };
 
 async function dbConnect() {
   if (cached.conn) return cached.conn;
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI).then(m => m);
+
+  if (!MONGODB_URI) {
+    console.error('CRITICAL: MONGODB_URI is not defined in environment variables');
+    throw new Error('MONGODB_URI not defined');
   }
-  cached.conn = await cached.promise;
+
+  if (!cached.promise) {
+    console.log('Attempting MongoDB connection...');
+    const opts = {
+      bufferCommands: false,
+    };
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then(m => {
+      console.log('MongoDB connection established successfully');
+      return m;
+    }).catch(err => {
+      console.error('MongoDB connection failed:', err);
+      cached.promise = null;
+      throw err;
+    });
+  }
+  
+  try {
+    cached.conn = await cached.promise;
+  } catch (e) {
+    cached.promise = null;
+    throw e;
+  }
   return cached.conn;
 }
 

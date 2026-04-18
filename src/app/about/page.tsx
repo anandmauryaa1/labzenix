@@ -1,5 +1,10 @@
 import Button from '@/components/ui/Button';
 import { Target, Users, Award, Shield } from 'lucide-react';
+import { getPageMetadata } from '@/lib/seo';
+
+export async function generateMetadata() {
+  return await getPageMetadata('about');
+}
 
 export default function AboutPage() {
   const stats = [

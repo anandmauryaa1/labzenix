@@ -9,18 +9,22 @@ import {
   Trash2, 
   Package, 
   Info, 
-  Tag, 
   Layers, 
-  DollarSign,
   ChevronRight,
   ShieldAlert,
   Settings,
   Zap,
   FileText,
-  AlertCircle
+  AlertCircle,
+  Globe,
+  CheckCircle2,
+  XCircle
 } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import SEOMetrics from '@/components/admin/SEOMetrics';
+import Input from '@/components/ui/Input';
+import TextArea from '@/components/ui/TextArea';
 
 export default function ProductForm({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
   const params = use(paramsPromise);
@@ -29,22 +33,34 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
 
   const [form, setForm] = useState({
     title: '',
+    modelNumber: '',
     slug: '',
     description: '',
     category: '',
     usage: 'Laboratory',
-    price: 0,
     images: [] as string[],
     features: [] as string[],
     specificationText: '',
-    specs: {} as Record<string, string>
+    specs: {} as Record<string, string>,
+    metaTitle: '',
+    metaDescription: ''
   });
-  
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [newSpec, setNewSpec] = useState({ key: '', value: '' });
   const [newFeature, setNewFeature] = useState('');
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
   const [fetching, setFetching] = useState(!isNew);
-  const [activeTab, setActiveTab] = useState<'details' | 'specs' | 'performance' | 'media'>('details');
+  const [activeTab, setActiveTab] = useState<'details' | 'specs' | 'performance' | 'media' | 'seo'>('details');
+  const [categories, setCategories] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch('/api/categories')
+      .then(res => res.json())
+      .then(data => setCategories(data))
+      .catch(() => toast.error('Failed to load categories'));
+  }, []);
 
   useEffect(() => {
     if (!isNew) {
@@ -53,11 +69,18 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
         .then(res => res.json())
         .then(data => {
           setForm({
-            ...data,
+            title: data.title || '',
+            modelNumber: data.modelNumber || '',
+            slug: data.slug || '',
+            description: data.description || '',
+            category: data.category || '',
+            usage: data.usage || 'Laboratory',
             features: data.features || [],
             specificationText: data.specificationText || '',
             specs: data.specs || {},
-            images: data.images || []
+            images: data.images || [],
+            metaTitle: data.metaTitle || '',
+            metaDescription: data.metaDescription || ''
           });
           setFetching(false);
         })
@@ -69,20 +92,48 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
   }, [params.id, isNew]);
 
   const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    // Basic Details
     if (!form.title.trim()) {
-      toast.error('Instrument Title is required');
-      setActiveTab('details');
-      return false;
+      newErrors.title = 'Instrument Title is required';
+    }
+    if (!form.modelNumber?.trim()) {
+      newErrors.modelNumber = 'Technical Model Number is required';
     }
     if (!form.category) {
-      toast.error('Industrial Category must be selected');
-      setActiveTab('details');
+      newErrors.category = 'Industrial Category must be selected';
+    }
+    if (!form.description.trim()) {
+      newErrors.description = 'Marketing Description is required';
+    }
+    
+    // Slug Validation (must not be empty)
+    if (!form.slug || !form.slug.trim()) {
+      newErrors.slug = 'Valid URL slug could not be generated from title. Please ensure title contains letters or numbers.';
+    }
+
+    // SEO Analysis
+    if (!form.metaTitle.trim()) {
+      newErrors.metaTitle = 'SEO Title is required for indexing';
+    }
+    if (!form.metaDescription.trim()) {
+      newErrors.metaDescription = 'SEO Description is required for indexing';
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      const errorCount = Object.keys(newErrors).length;
+      toast.error(`Protocols incomplete: ${errorCount} mandatory field(s) missing.`);
+      
+      // Auto-switch to the first tab with an error
+      if (newErrors.title || newErrors.modelNumber || newErrors.description || newErrors.slug) setActiveTab('details' as any); 
+      else if (newErrors.metaTitle || newErrors.metaDescription) setActiveTab('seo');
+      
       return false;
     }
-    if (form.price <= 0) {
-      toast.error('Valid Price is required for cataloging');
-      return false;
-    }
+
     return true;
   };
 
@@ -91,6 +142,7 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
     if (!validateForm()) return;
     
     setLoading(true);
+    setServerError(null);
     const method = isNew ? 'POST' : 'PUT';
     const url = isNew ? '/api/products' : `/api/products/${params.id}`;
 
@@ -102,15 +154,22 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
       });
 
       if (res.ok) {
-        toast.success(isNew ? 'Instrument added to catalog' : 'Configuration saved successfully');
-        router.push('/admin/products');
-        router.refresh();
+        setSuccess(true);
+        toast.success(isNew ? 'New instrument indexed successfully' : 'Configuration updated');
+        
+        // Brief delay for the user to see the success state
+        setTimeout(() => {
+          router.push('/admin/products');
+          router.refresh();
+        }, 1500);
       } else {
         const err = await res.json();
-        toast.error(err.error || 'Protocol synchronization failed');
+        setServerError(err.error || 'System Protocol Error: Synchronization Failed');
+        toast.error('Submission rejected by server');
       }
     } catch (error) {
-      toast.error('Network connectivity issues detected');
+      setServerError('Network integrity compromised. Check server connectivity.');
+      toast.error('Network Protocol Error');
     } finally {
       setLoading(false);
     }
@@ -154,7 +213,11 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
       .replace(/[^\w\s-]/g, '')
       .replace(/[\s_-]+/g, '-')
       .replace(/^-+|-+$/g, '');
-    setForm(prev => ({ ...prev, title, slug }));
+    
+    // If slug is empty after sanitization but title is not, use a fallback
+    const finalSlug = slug || title.replace(/\s+/g, '-').toLowerCase();
+    
+    setForm(prev => ({ ...prev, title, slug: finalSlug }));
   };
 
   if (fetching) {
@@ -167,7 +230,37 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
   }
 
   return (
-    <div className="max-w-6xl mx-auto pb-20 animate-in slide-in-from-bottom-4 duration-500">
+    <div className="min-h-screen bg-gray-50/50 pb-20 relative">
+      {/* Success Modal Overlay */}
+      {success && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-secondary/80 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white p-12 text-center max-w-sm w-full mx-4 shadow-2xl border-t-4 border-primary animate-in zoom-in-95 duration-300">
+            <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle2 className="w-10 h-10 text-green-500" />
+            </div>
+            <h2 className="text-2xl font-black text-secondary tracking-tighter uppercase mb-2">Protocol Success</h2>
+            <p className="text-sm text-gray-500 font-medium">The instrument has been successfully synchronized with the global catalog.</p>
+          </div>
+        </div>
+      )}
+
+      {/* Error Message Display */}
+      {serverError && (
+        <div className="max-w-6xl mx-auto mt-8 animate-in slide-in-from-top-4 duration-300">
+          <div className="bg-red-50 border-l-4 border-red-500 p-6 flex items-start space-x-4 shadow-sm">
+            <AlertCircle className="w-6 h-6 text-red-500 flex-shrink-0" />
+            <div>
+              <h3 className="text-sm font-black text-red-800 uppercase tracking-widest mb-1">Server Rejection</h3>
+              <p className="text-xs text-red-600 font-bold">{serverError}</p>
+            </div>
+            <button onClick={() => setServerError(null)} className="text-red-400 hover:text-red-600 transition-colors ml-auto">
+              <XCircle className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="max-w-6xl mx-auto pt-10 animate-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div className="flex items-center space-x-4">
@@ -203,7 +296,7 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
             ) : (
               <>
                 <Save className="w-4 h-4" />
-                <span>Commit to Catalog</span>
+                <span>{isNew ? 'Add Catalog' : 'Save Configuration'}</span>
               </>
             )}
           </button>
@@ -216,10 +309,11 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
           <div className="bg-white border border-gray-100 overflow-hidden shadow-sm">
             <div className="flex border-b border-gray-100 overflow-x-auto scrollbar-hide">
               {[
-                { id: 'details', label: 'Core Details', icon: Info },
+                { id: 'details', label: 'General Specs', icon: Info },
                 { id: 'performance', label: 'Technical Narrative', icon: Zap },
                 { id: 'specs', label: 'Engineering Array', icon: Settings },
-                { id: 'media', label: 'Visual Assets', icon: Package }
+                { id: 'media', label: 'Visual Assets', icon: Package },
+                { id: 'seo', label: 'SEO Analysis', icon: Globe }
               ].map((tab) => (
                 <button 
                   key={tab.id}
@@ -238,49 +332,44 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
               {activeTab === 'details' && (
                 <div className="space-y-10">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                    <div className="space-y-3">
-                       <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 flex items-center">
-                         <Info className="w-3 h-3 mr-2" />
-                         Instrument Model / Title
-                       </label>
-                       <input 
-                        type="text" 
-                        value={form.title || ''} 
-                        onChange={(e) => updateSlug(e.target.value)}
-                        placeholder="e.g. Tensile Tester LZX-500"
-                        className="w-full text-xl font-bold text-secondary border-b-2 border-gray-100 focus:border-primary outline-none py-3 transition-colors bg-transparent placeholder:text-gray-200"
-                        required 
-                      />
-                    </div>
-                    <div className="space-y-3">
-                       <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 flex items-center">
-                         <Tag className="w-3 h-3 mr-2" />
-                         Global URL Slug
-                       </label>
-                       <input 
-                        type="text" 
-                        value={form.slug || ''} 
-                        onChange={(e) => setForm({...form, slug: e.target.value})}
-                        className="w-full text-xl font-bold text-primary border-b-2 border-gray-100 focus:border-primary outline-none py-3 transition-colors bg-transparent"
-                        required 
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 flex items-center">
-                      <FileText className="w-3 h-3 mr-2" />
-                      Marketing Description
-                    </label>
-                    <textarea 
-                      value={form.description || ''} 
-                      onChange={(e) => setForm({...form, description: e.target.value})}
-                      placeholder="High-level overview for general inquiries..."
-                      rows={6}
-                      className="w-full p-5 bg-gray-50 border border-gray-100 focus:border-primary focus:bg-white outline-none transition-all font-medium text-secondary text-sm leading-relaxed"
-                      required
+                    <Input 
+                      label="Instrument Model / Title"
+                      value={form.title || ''} 
+                      onChange={(e) => updateSlug(e.target.value)}
+                      placeholder="e.g. Tensile Tester LZX-500"
+                      error={errors.title}
+                      info="The official commercial name of the instrument."
+                    />
+                    <Input 
+                      label="Global URL Slug"
+                      value={form.slug || ''} 
+                      onChange={(e) => setForm({...form, slug: e.target.value})}
+                      className="text-primary"
+                      error={errors.slug}
+                      info="The URL-friendly identifier. Auto-generated from title."
                     />
                   </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <Input 
+                      label="Technical Model Number"
+                      value={form.modelNumber || ''} 
+                      onChange={(e) => setForm({...form, modelNumber: e.target.value})}
+                      placeholder="e.g. LZX-500-REV2"
+                      error={errors.modelNumber}
+                      info="Unique manufacturing identifier (SKU/Model)."
+                    />
+                  </div>
+
+                  <TextArea 
+                    label="Marketing Description"
+                    value={form.description || ''} 
+                    onChange={(e) => setForm({...form, description: e.target.value})}
+                    placeholder="High-level overview for general inquiries..."
+                    rows={6}
+                    error={errors.description}
+                    info="A compelling summary for the product listing page."
+                  />
                 </div>
               )}
 
@@ -338,14 +427,15 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
                         <h3 className="text-secondary font-black uppercase tracking-tighter text-lg">Technical Specification</h3>
                         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Deep Narrative / Protocol Details</p>
                       </div>
-                      <FileText className="w-6 h-6 text-primary" />
+                      <FileText className={`w-6 h-6 ${errors.specificationText ? 'text-red-500 animate-pulse' : 'text-primary'}`} />
                     </div>
-                    <textarea 
+                    <TextArea 
                       value={form.specificationText || ''} 
-                      onChange={(e) => setForm({...form, specificationText: e.target.value})}
+                      onChange={(e: any) => setForm({...form, specificationText: e.target.value})}
                       placeholder="Enter detailed technical narrative, material compatibility, and engineering standards..."
                       rows={10}
-                      className="w-full p-5 bg-gray-50 border border-gray-100 focus:border-primary focus:bg-white outline-none transition-all font-medium text-secondary text-sm leading-relaxed"
+                      error={errors.specificationText}
+                      info="Detailed engineering standards and material compatibility analysis."
                     />
                   </div>
                 </div>
@@ -353,15 +443,16 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
 
               {activeTab === 'specs' && (
                 <div className="space-y-10 animate-in fade-in slide-in-from-right-4">
-                  <div className="bg-secondary p-8 text-white relative overflow-hidden group">
+                  <div className={`${errors.specs ? 'bg-red-50 border-red-200 shadow-[0_0_15px_rgba(239,68,68,0.1)]' : 'bg-secondary border-transparent'} p-8 text-white relative transition-all duration-500 overflow-hidden group`}>
                     <div className="relative z-10">
-                      <h4 className="font-black text-xs uppercase tracking-widest mb-2 flex items-center">
-                        <ShieldAlert className="w-4 h-4 mr-2 text-primary" />
+                      <h4 className={`font-black text-xs uppercase tracking-widest mb-2 flex items-center ${errors.specs ? 'text-red-600' : 'text-white'}`}>
+                        {errors.specs ? <AlertCircle className="w-4 h-4 mr-2" /> : <ShieldAlert className="w-4 h-4 mr-2 text-primary" />}
                         Engineering Matrix
+                        {errors.specs && <span className="ml-2">— Mandatory field</span>}
                       </h4>
-                      <p className="text-sm text-white/50 max-w-md">Define specific technical parameters that will appear in the quick comparison table.</p>
+                      <p className={`text-sm max-w-md ${errors.specs ? 'text-red-900/60' : 'text-white/50'}`}>Define specific technical parameters that will appear in the quick comparison table.</p>
                     </div>
-                    <Settings className="absolute -bottom-4 -right-4 w-32 h-32 text-white/5 group-hover:rotate-45 transition-transform duration-1000" />
+                    <Settings className={`absolute -bottom-4 -right-4 w-32 h-32 transition-transform duration-1000 ${errors.specs ? 'text-red-600/10' : 'text-white/5'}`} />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-gray-50 p-6 border border-gray-100">
@@ -486,6 +577,45 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
                     </div>
                  </div>
               )}
+
+              {activeTab === 'seo' && (
+                <div className="space-y-12 animate-in fade-in slide-in-from-right-4">
+                  <div className="bg-primary/5 p-8 border-l-4 border-primary">
+                    <div className="flex items-center space-x-3 mb-3">
+                      <Globe className="w-5 h-5 text-primary" />
+                      <h4 className="font-black text-xs uppercase tracking-widest text-primary">Search Engine Optimization</h4>
+                    </div>
+                    <p className="text-sm text-secondary/60 leading-relaxed font-medium">Fine-tune how this instrument appears in global search indices to maximize organic visibility.</p>
+                  </div>
+
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <div className="space-y-6">
+                      <SEOMetrics label="Meta Title Strength" text={form.metaTitle || ''} min={40} max={60} />
+                      <Input 
+                        label="SEO Title Tag"
+                        value={form.metaTitle || ''} 
+                        onChange={(e) => setForm({...form, metaTitle: e.target.value})}
+                        placeholder="Search result heading..."
+                        error={errors.metaTitle}
+                        info="This title appears in browser tabs and search engine results. Best between 40-60 characters."
+                      />
+                    </div>
+
+                    <div className="space-y-6">
+                      <SEOMetrics label="Description Strength" text={form.metaDescription || ''} min={120} max={160} />
+                      <TextArea 
+                        label="Meta Description"
+                        value={form.metaDescription || ''} 
+                        onChange={(e) => setForm({...form, metaDescription: e.target.value})}
+                        placeholder="Concise technical summary..."
+                        rows={4}
+                        error={errors.metaDescription}
+                        info="A brief summary (120-160 chars) that appears beneath your link in search results."
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -498,25 +628,23 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
               Categorization
             </h3>
 
-            <div className="space-y-3">
+             <div className="space-y-3">
               <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 flex justify-between">
                 <span>Instrument Category</span>
-                {!form.category && <AlertCircle className="w-3 h-3 text-red-500 animate-pulse" />}
+                {errors.category && <AlertCircle className="w-3 h-3 text-red-500 animate-pulse" />}
               </label>
               <select 
                 value={form.category || ''} 
                 onChange={(e) => setForm({...form, category: e.target.value})}
-                className={`w-full p-4 bg-gray-50 border ${!form.category ? 'border-red-100 focus:border-red-500' : 'border-gray-100 focus:border-primary'} outline-none text-xs font-black uppercase tracking-widest text-secondary transition-all`}
+                className={`w-full p-4 bg-gray-50 border ${errors.category ? 'border-red-500 bg-red-50/20' : 'border-gray-100 focus:border-primary'} outline-none text-xs font-black uppercase tracking-widest text-secondary transition-all`}
                 required
               >
                 <option value="">Select Domain</option>
-                <option value="Tensile Testers">Tensile Testers</option>
-                <option value="Compression Testers">Compression Testers</option>
-                <option value="Heat Sealers">Heat Sealers</option>
-                <option value="Leak Detectors">Leak Detectors</option>
-                <option value="Friction Testers">Friction Testers</option>
-                <option value="Drop Testers">Drop Testers</option>
+                {categories.map(cat => (
+                  <option key={cat._id} value={cat.name}>{cat.name}</option>
+                ))}
               </select>
+              {errors.category && <p className="text-[9px] font-black uppercase text-red-500 tracking-widest pt-1">{errors.category}</p>}
             </div>
 
             <div className="space-y-3">
@@ -537,30 +665,9 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
               </div>
             </div>
           </div>
-
-          <div className="bg-secondary p-8 text-white space-y-8 shadow-2xl relative overflow-hidden group">
-             <div className="relative z-10">
-               <h3 className="text-[10px] font-black uppercase tracking-widest text-white flex items-center border-b border-white/10 pb-5">
-                <DollarSign className="w-4 h-4 mr-2 text-primary" />
-                Global Valuation
-              </h3>
-              <div className="space-y-3 pt-6">
-                <label className="text-[10px] font-black uppercase tracking-widest text-white/40">Base Unit Value (USD)</label>
-                <div className="relative">
-                  <input 
-                    type="number" 
-                    value={form.price || 0} 
-                    onChange={(e) => setForm({...form, price: parseFloat(e.target.value)})}
-                    className="w-full p-5 bg-white/5 border border-white/10 outline-none text-3xl font-black text-white focus:border-primary transition-all placeholder:text-white/10"
-                  />
-                  <span className="absolute right-5 top-1/2 -translate-y-1/2 text-primary font-black text-xs italic">USD</span>
-                </div>
-              </div>
-            </div>
-            <DollarSign className="absolute -bottom-8 -right-8 w-40 h-40 text-white/5 group-hover:scale-110 transition-transform duration-700" />
-          </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }

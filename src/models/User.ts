@@ -1,7 +1,24 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
+// Force re-registration for HMR support
+if (mongoose.models && mongoose.models.User) {
+  delete mongoose.models.User;
+}
+
 const UserSchema = new mongoose.Schema({
+  name: { 
+    type: String, 
+    required: true,
+    trim: true
+  },
+  email: { 
+    type: String, 
+    required: true, 
+    unique: true,
+    trim: true,
+    lowercase: true
+  },
   username: { 
     type: String, 
     required: true, 
@@ -18,6 +35,13 @@ const UserSchema = new mongoose.Schema({
     default: 'marketing',
     required: true 
   },
+  permissions: {
+    type: [String],
+    default: ['blogs'],
+    required: true
+  },
+  resetPasswordToken: String,
+  resetPasswordExpires: Date,
   createdAt: { 
     type: Date, 
     default: Date.now 
@@ -25,10 +49,9 @@ const UserSchema = new mongoose.Schema({
 });
 
 // Hash password before saving
-UserSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
+UserSchema.pre('save', async function() {
+  if (!this.isModified('password')) return;
   this.password = await bcrypt.hash(this.password, 12);
-  next();
 });
 
 // Method to verify password
@@ -36,4 +59,4 @@ UserSchema.methods.comparePassword = async function(candidatePassword: string) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-export default mongoose.models.User || mongoose.model('User', UserSchema);
+export default mongoose.model('User', UserSchema);

@@ -23,17 +23,38 @@ export async function middleware(request: NextRequest) {
       const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'fallback-secret-for-dev');
       
       const { payload } = await jwtVerify(token, secret);
+      const permissions = (payload.permissions as string[]) || [];
       const userRole = payload.role as string;
 
-      // Role-based access control
-      // SEO team restricted from products and settings
-      if (userRole === 'seo' && (path.startsWith('/admin/products') || path.startsWith('/admin/settings'))) {
-        return NextResponse.redirect(new URL('/admin', request.url));
+      // Allow access to unauthorized page itself
+      if (path === '/admin/unauthorized') return NextResponse.next();
+
+      // Admins bypass all checks
+      if (userRole === 'admin') return NextResponse.next();
+
+      // Granular Permission Checks
+      if (path.startsWith('/admin/products') && !permissions.includes('products')) {
+        return NextResponse.redirect(new URL('/admin/unauthorized', request.url));
       }
 
-      // Marketing team restricted from settings
-      if (userRole === 'marketing' && path.startsWith('/admin/settings')) {
-        return NextResponse.redirect(new URL('/admin', request.url));
+      if (path.startsWith('/admin/blogs') && !permissions.includes('blogs')) {
+        return NextResponse.redirect(new URL('/admin/unauthorized', request.url));
+      }
+
+      if (path.startsWith('/admin/seo') && !permissions.includes('seo')) {
+        return NextResponse.redirect(new URL('/admin/unauthorized', request.url));
+      }
+
+      if (path.startsWith('/admin/inquiries') && !permissions.includes('inquiries')) {
+        return NextResponse.redirect(new URL('/admin/unauthorized', request.url));
+      }
+
+      if (path.startsWith('/admin/users') && !permissions.includes('users')) {
+        return NextResponse.redirect(new URL('/admin/unauthorized', request.url));
+      }
+
+      if (path.startsWith('/admin/settings') && !permissions.includes('settings')) {
+        return NextResponse.redirect(new URL('/admin/unauthorized', request.url));
       }
 
       return NextResponse.next();

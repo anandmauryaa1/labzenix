@@ -1,3 +1,4 @@
+import { getPageMetadata } from '@/lib/seo';
 import Hero from '@/components/home/Hero';
 import AboutSummary from '@/components/home/AboutSummary';
 import ProductCategories from '@/components/home/ProductCategories';
@@ -6,10 +7,10 @@ import ProductRange from '@/components/home/ProductRange';
 import Testimonials from '@/components/home/Testimonials';
 import CTABanner from '@/components/home/CTABanner';
 
-export const metadata = {
-  title: 'LabZenix – Redefining Quality in Laboratory Testing Instruments',
-  description: 'LabZenix is a leading manufacturer of high-quality laboratory testing instruments for paper, packaging, PET, polymer, and films. Certified ISO 9001:2015 & CE standards.',
-};
+export async function generateMetadata() {
+  return await getPageMetadata('home');
+}
+
 
 export default function Home() {
   return (

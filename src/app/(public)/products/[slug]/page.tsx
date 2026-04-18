@@ -5,16 +5,21 @@ import InquiryForm from '@/components/products/InquiryForm';
 import Image from 'next/image';
 import { Metadata } from 'next';
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
   await dbConnect();
-  const product = await Product.findOne({ slug: params.slug });
+  const product = await Product.findOne({ slug });
   if (!product) return { title: 'Not Found' };
-  return { title: product.title, description: product.description.substring(0, 160) };
+  return { 
+    title: `${product.title} - ${product.category} | LabZenix`, 
+    description: product.metaDescription || product.description.substring(0, 160) 
+  };
 }
 
-export default async function ProductDetailPage({ params }: { params: { slug: string } }) {
+export default async function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   await dbConnect();
-  const product = await Product.findOne({ slug: params.slug }).lean();
+  const product = await Product.findOne({ slug }).lean() as any;
   if (!product) notFound();
 
   return (
@@ -33,6 +38,11 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
           </div>
         </div>
         <div>
+          <div className="flex items-center space-x-2 text-primary font-bold uppercase tracking-widest text-xs mb-4">
+            <span>{product.category}</span>
+            <span className="text-gray-300">|</span>
+            <span className="text-gray-500">{product.usage} Range</span>
+          </div>
           <h1 className="text-4xl font-bold mb-4">{product.title}</h1>
           <p className="text-gray-600 dark:text-gray-300 mb-6">{product.description}</p>
           <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 mb-8">

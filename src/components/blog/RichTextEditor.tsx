@@ -1,6 +1,6 @@
-'use client';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import { useEffect } from 'react';
 
 interface RichTextEditorProps {
   value: string;
@@ -15,9 +15,16 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
     onUpdate: ({ editor }) => onChange(editor.getHTML()),
   });
 
+  // Sync content when value changes externally (e.g. after fetch)
+  useEffect(() => {
+    if (editor && value !== editor.getHTML()) {
+      editor.commands.setContent(value);
+    }
+  }, [value, editor]);
+
   return (
-    <div className="border rounded-lg p-4">
-      <EditorContent editor={editor} className="prose dark:prose-invert" />
+    <div className="border border-gray-100 rounded-none p-6 min-h-[500px] bg-white">
+      <EditorContent editor={editor} className="prose max-w-none focus:outline-none min-h-[450px]" />
     </div>
   );
 }

@@ -194,7 +194,6 @@ export default function ProductListing() {
                 <th className="px-6 py-4">Instrument / ID</th>
                 <th className="px-6 py-4">Classification</th>
                 <th className="px-6 py-4">Usage Layer</th>
-                <th className="px-6 py-4">Market Value</th>
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
@@ -241,7 +240,15 @@ export default function ProductListing() {
                       </div>
                       <div className="min-w-0">
                         <p className="font-bold text-secondary truncate max-w-[200px] uppercase tracking-tight">{product.title || 'Untitled'}</p>
-                        <p className="text-[10px] text-gray-400 font-medium truncate">ID: {product._id?.slice(-8).toUpperCase()}</p>
+                        <div className="flex items-center space-x-2 text-[10px] text-gray-400 font-medium">
+                          <span className="truncate">ID: {product._id?.slice(-8).toUpperCase()}</span>
+                          {product.modelNumber && (
+                            <>
+                              <span className="text-gray-200">|</span>
+                              <span className="text-primary font-black uppercase">{product.modelNumber}</span>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -259,12 +266,6 @@ export default function ProductListing() {
                       <Shield className="w-3 h-3 mr-1" />
                       {product.usage || 'N/A'}
                     </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center font-black text-secondary text-sm">
-                      <DollarSign className="w-3 h-3 text-gray-400" />
-                      {product.price?.toLocaleString() || '0'}
-                    </div>
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end space-x-2">

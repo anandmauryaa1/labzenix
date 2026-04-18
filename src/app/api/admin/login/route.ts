@@ -14,7 +14,14 @@ export async function POST(req: NextRequest) {
     // DUMMY LOGIN BYPASS (For development only)
     if (!user && username === 'admin' && password === 'admin') {
       const dummyToken = jwt.sign(
-        { id: 'dummy-id', role: 'admin', username: 'admin' }, 
+        { 
+          id: 'dummy-id', 
+          role: 'admin', 
+          username: 'admin', 
+          name: 'Super Admin', 
+          email: 'admin@labzenix.com',
+          permissions: ['blogs', 'products', 'categories', 'seo', 'inquiries', 'users', 'settings']
+        }, 
         process.env.JWT_SECRET!, 
         { expiresIn: '12h' }
       );
@@ -30,7 +37,10 @@ export async function POST(req: NextRequest) {
       return new NextResponse(JSON.stringify({ 
         success: true, 
         role: 'admin',
-        username: 'admin' 
+        username: 'admin',
+        name: 'Super Admin',
+        email: 'admin@labzenix.com',
+        permissions: ['blogs', 'products', 'categories', 'seo', 'inquiries', 'users', 'settings']
       }), {
         status: 200,
         headers: { 'Set-Cookie': cookie },
@@ -47,7 +57,14 @@ export async function POST(req: NextRequest) {
     }
 
     const token = jwt.sign(
-      { id: user._id, role: user.role, username: user.username }, 
+      { 
+        id: user._id, 
+        role: user.role, 
+        username: user.username, 
+        name: user.name, 
+        email: user.email,
+        permissions: user.permissions || []
+      }, 
       process.env.JWT_SECRET!, 
       { expiresIn: '12h' }
     );
@@ -63,7 +80,10 @@ export async function POST(req: NextRequest) {
     return new NextResponse(JSON.stringify({ 
       success: true, 
       role: user.role,
-      username: user.username 
+      username: user.username,
+      name: user.name,
+      email: user.email,
+      permissions: user.permissions || []
     }), {
       status: 200,
       headers: { 'Set-Cookie': cookie },

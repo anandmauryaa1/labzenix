@@ -1,6 +1,11 @@
 import Button from '@/components/ui/Button';
 import { Package, Droplets, FlaskConical, Beaker, FileText, Search } from 'lucide-react';
 import Link from 'next/link';
+import { getPageMetadata } from '@/lib/seo';
+
+export async function generateMetadata() {
+  return await getPageMetadata('products');
+}
 
 export default function ProductsPage() {
   const categories = [
@@ -123,10 +128,10 @@ export default function ProductsPage() {
 
       {/* Full Catalog Banner */}
       <section className="bg-secondary mb-24 py-16">
-        <div className="max-w-5xl mx-auto px-4 text-center text-white">
-          <h2 className="text-3xl font-bold mb-8 uppercase tracking-widest">Need a Detailed Product Guide?</h2>
+        <div className="max-w-5xl mx-auto px-4 text-center">
+          <h2 className="text-3xl text-white font-bold mb-8 uppercase tracking-widest">Need a Detailed Product Guide?</h2>
           <p className="mb-10 text-gray-400">Download our latest 2024 Product Catalog to explore technical specifications and application guides for all our instruments.</p>
-          <Button size="lg" className="bg-white  text-secondary font-black hover:bg-gray-100 cursor-pointer">Download Catalog (PDF)</Button>
+          <Button size="lg" className="bg-white hover:bg-gray-100 cursor-pointer">Download Catalog (PDF)</Button>
         </div>
       </section>
     </div>
