@@ -65,3 +65,37 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+export async function PATCH(req: NextRequest) {
+  try {
+    await dbConnect();
+
+    // Authorization check
+    const token = req.cookies.get('admin_token')?.value;
+    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+    if (decoded.role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+    const body = await req.json();
+    const { userId, active } = body;
+
+    if (!userId || typeof active !== 'boolean') {
+      return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { 
+        active,
+        lastLogin: active ? new Date() : null
+      },
+      { new: true }
+    ).select('-password');
+
+    return NextResponse.json(user);
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+

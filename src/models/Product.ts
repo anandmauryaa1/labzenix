@@ -17,11 +17,7 @@ const ProductSchema = new mongoose.Schema({
   },
   specificationText: { type: String, default: '' },
   specs: { type: mongoose.Schema.Types.Mixed, default: {} },
-
-  // Additional product details
-  leadTime: { type: String, default: '' },
-  brand: { type: String, default: '' },
-  certificate: { type: String, default: '' },
+  youtubeUrl: { type: String, default: '' },
 
   metaTitle: { type: String, required: [true, 'SEO title is required'] },
   metaDescription: { type: String, required: [true, 'SEO description is required'] },

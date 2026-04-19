@@ -11,14 +11,17 @@ import {
   ShieldCheck, 
   Database,
   Lock,
-  Share2
+  Share2,
+  Circle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function AdminSettings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [loadingUsers, setLoadingUsers] = useState(false);
   const [activeTab, setActiveTab] = useState<'general' | 'seo' | 'security'>('general');
+  const [users, setUsers] = useState<any[]>([]);
   
   const [config, setConfig] = useState({
     communication: {
@@ -85,6 +88,49 @@ export default function AdminSettings() {
       setSaving(false);
     }
   };
+
+  const fetchUsers = async () => {
+    setLoadingUsers(true);
+    try {
+      const res = await fetch('/api/admin/users');
+      if (res.ok) {
+        const data = await res.json();
+        setUsers(data);
+      } else {
+        toast.error('Failed to load users');
+      }
+    } catch (err) {
+      toast.error('Failed to load users');
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
+  const toggleUserStatus = async (userId: string, currentStatus: boolean) => {
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, active: !currentStatus })
+      });
+
+      if (res.ok) {
+        const updatedUser = await res.json();
+        setUsers(users.map(u => u._id === userId ? updatedUser : u));
+        toast.success(`User ${!currentStatus ? 'enabled' : 'disabled'} successfully`);
+      } else {
+        toast.error('Failed to update user status');
+      }
+    } catch (err) {
+      toast.error('Failed to update user status');
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'security') {
+      fetchUsers();
+    }
+  }, [activeTab]);
 
   if (loading) {
     return (
@@ -204,11 +250,12 @@ export default function AdminSettings() {
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                         <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">LinkedIn URL</label>
+                         <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Facebook URL</label>
                          <input 
                            type="text" 
-                           value={config.social.linkedin}
-                           onChange={(e) => setConfig({...config, social: {...config.social, linkedin: e.target.value}})}
+                           value={config.social.facebook}
+                           onChange={(e) => setConfig({...config, social: {...config.social, facebook: e.target.value}})}
+                           placeholder="https://facebook.com/yourpage"
                            className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary outline-none transition-all font-bold text-secondary" 
                          />
                       </div>
@@ -218,6 +265,27 @@ export default function AdminSettings() {
                            type="text" 
                            value={config.social.twitter}
                            onChange={(e) => setConfig({...config, social: {...config.social, twitter: e.target.value}})}
+                           placeholder="https://twitter.com/yourhandle"
+                           className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary outline-none transition-all font-bold text-secondary" 
+                         />
+                      </div>
+                      <div className="space-y-2">
+                         <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">LinkedIn URL</label>
+                         <input 
+                           type="text" 
+                           value={config.social.linkedin}
+                           onChange={(e) => setConfig({...config, social: {...config.social, linkedin: e.target.value}})}
+                           placeholder="https://linkedin.com/company/yourcompany"
+                           className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary outline-none transition-all font-bold text-secondary" 
+                         />
+                      </div>
+                      <div className="space-y-2">
+                         <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Instagram URL</label>
+                         <input 
+                           type="text" 
+                           value={config.social.instagram}
+                           onChange={(e) => setConfig({...config, social: {...config.social, instagram: e.target.value}})}
+                           placeholder="https://instagram.com/yourprofile"
                            className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary outline-none transition-all font-bold text-secondary" 
                          />
                       </div>
@@ -296,35 +364,68 @@ export default function AdminSettings() {
               {activeTab === 'security' && (
                 <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
                   <div className="bg-primary/5 p-6 border-l-4 border-primary">
-                    <h4 className="font-black text-xs uppercase tracking-widest text-primary mb-2">RBAC Control Panel</h4>
-                    <p className="text-sm text-secondary/70 font-medium whitespace-pre-line">
-                      Current Roles Defined:
-                      - Admin: Global Clearance
-                      - SEO Team: Catalog & Journal Metadata
-                      - Marketing: Inventory & Resource Acquisition
+                    <h4 className="font-black text-xs uppercase tracking-widest text-primary mb-2">Personnel & Access Control</h4>
+                    <p className="text-sm text-secondary/70 font-medium">
+                      Manage user accounts, enable/disable access, and monitor active sessions.
                     </p>
                   </div>
 
-                  <div className="space-y-4">
-                    <h3 className="text-xs font-black uppercase tracking-widest text-secondary flex items-center">
-                      <Lock className="w-4 h-4 mr-2 text-primary" />
-                      Active Staff Sessions
-                    </h3>
-                    <div className="divide-y divide-gray-100 border border-gray-100">
-                      {['Admin Official', 'SEO Specialist', 'Marketing Lead'].map((user) => (
-                        <div key={user} className="flex items-center justify-between p-4 bg-white hover:bg-gray-50 transition-all">
-                          <div className="flex items-center space-x-4">
-                            <div className="w-8 h-8 bg-secondary text-white flex items-center justify-center text-[10px] font-black">{user[0]}</div>
-                            <div>
-                              <p className="text-sm font-bold text-secondary">{user}</p>
-                              <p className="text-[10px] text-gray-400 uppercase tracking-widest">Active • Laboratory Network</p>
-                            </div>
-                          </div>
-                          <button className="text-[10px] font-black uppercase tracking-widest text-primary border border-primary/20 bg-primary/5 px-3 py-1">Rotate Key</button>
-                        </div>
-                      ))}
+                  {loadingUsers ? (
+                    <div className="flex items-center justify-center py-12">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                     </div>
-                  </div>
+                  ) : users.length > 0 ? (
+                    <div className="space-y-4">
+                      <h3 className="text-xs font-black uppercase tracking-widest text-secondary flex items-center">
+                        <Lock className="w-4 h-4 mr-2 text-primary" />
+                        Active Staff Directory ({users.length})
+                      </h3>
+                      <div className="divide-y divide-gray-100 border border-gray-100 overflow-hidden">
+                        {users.map((user) => {
+                          const isOnline = user.active && user.lastLogin && (Date.now() - new Date(user.lastLogin).getTime()) < 3600000; // 1 hour
+                          return (
+                            <div key={user._id} className="flex items-center justify-between p-4 bg-white hover:bg-gray-50 transition-all">
+                              <div className="flex items-center space-x-4 flex-1">
+                                <div className="w-10 h-10 bg-secondary text-white flex items-center justify-center text-[10px] font-black rounded-full">
+                                  {user.name[0].toUpperCase()}
+                                </div>
+                                <div className="flex-1">
+                                  <p className="text-sm font-bold text-secondary">{user.name}</p>
+                                  <div className="flex items-center space-x-2 text-[10px] text-gray-400 uppercase tracking-widest">
+                                    <span>{user.username}</span>
+                                    <span>•</span>
+                                    <span className={`font-bold ${user.active ? (isOnline ? 'text-green-600' : 'text-gray-400') : 'text-red-600'}`}>
+                                      {user.active ? (isOnline ? 'Online' : 'Offline') : 'Disabled'}
+                                    </span>
+                                    {user.active && (
+                                      <Circle className={`w-2 h-2 fill-current ${isOnline ? 'text-green-600' : 'text-gray-400'}`} />
+                                    )}
+                                  </div>
+                                </div>
+                                <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                                  {user.role}
+                                </div>
+                              </div>
+                              <button 
+                                onClick={() => toggleUserStatus(user._id, user.active)}
+                                className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-all ${
+                                  user.active 
+                                    ? 'bg-green-50 text-green-600 border border-green-200 hover:bg-green-100' 
+                                    : 'bg-red-50 text-red-600 border border-red-200 hover:bg-red-100'
+                                }`}
+                              >
+                                {user.active ? 'Disable' : 'Enable'}
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <p className="text-gray-400 font-medium">No users found</p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

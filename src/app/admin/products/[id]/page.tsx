@@ -42,9 +42,7 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
     features: [] as string[],
     specificationText: '',
     specs: {} as Record<string, string>,
-    leadTime: '',
-    brand: '',
-    certificate: '',
+    youtubeUrl: '',
     metaTitle: '',
     metaDescription: ''
   });
@@ -82,9 +80,7 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
             specificationText: data.specificationText || '',
             specs: data.specs || {},
             images: data.images || [],
-            leadTime: data.leadTime || '',
-            brand: data.brand || '',
-            certificate: data.certificate || '',
+            youtubeUrl: data.youtubeUrl || '',
             metaTitle: data.metaTitle || '',
             metaDescription: data.metaDescription || ''
           });
@@ -365,30 +361,6 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
                       error={errors.modelNumber}
                       info="Unique manufacturing identifier or SKU."
                     />
-                    <Input 
-                      label="Brand"
-                      value={form.brand || ''} 
-                      onChange={(e) => setForm({...form, brand: e.target.value})}
-                      placeholder="e.g. GESTER, LABTEST, etc."
-                      info="Product brand or manufacturer name."
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                    <Input 
-                      label="Lead Time"
-                      value={form.leadTime || ''} 
-                      onChange={(e) => setForm({...form, leadTime: e.target.value})}
-                      placeholder="e.g. 20-30 Days"
-                      info="Expected delivery timeframe."
-                    />
-                    <Input 
-                      label="Certificate / Standard"
-                      value={form.certificate || ''} 
-                      onChange={(e) => setForm({...form, certificate: e.target.value})}
-                      placeholder="e.g. ISO 9001, UKAS, CE"
-                      info="Certifications and standards compliance."
-                    />
                   </div>
 
                   <TextArea 
@@ -604,6 +576,20 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
                           </span>
                         </div>
                       </label>
+                    </div>
+
+                    <div className="pt-8 border-t border-gray-100">
+                      <div className="space-y-4">
+                        <h3 className="text-secondary font-black uppercase tracking-tighter text-lg">Product Video</h3>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">YouTube video URL displayed after features</p>
+                        <Input 
+                          label="YouTube URL"
+                          value={form.youtubeUrl || ''} 
+                          onChange={(e: any) => setForm({...form, youtubeUrl: e.target.value})}
+                          placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."
+                          info="Paste a full YouTube URL. It will be embedded as a video player on the product page."
+                        />
+                      </div>
                     </div>
                  </div>
               )}

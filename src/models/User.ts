@@ -40,6 +40,14 @@ const UserSchema = new mongoose.Schema({
     default: ['blogs'],
     required: true
   },
+  active: {
+    type: Boolean,
+    default: true
+  },
+  lastLogin: {
+    type: Date,
+    default: null
+  },
   resetPasswordToken: String,
   resetPasswordExpires: Date,
   createdAt: { 
