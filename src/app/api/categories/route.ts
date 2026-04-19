@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import dbConnect from '@/lib/dbConnect';
 import Category from '@/models/Category';
 import slugify from 'slugify';
@@ -21,6 +22,12 @@ export async function POST(req: NextRequest) {
       ...body,
       slug: currentSlug
     });
+    
+    // Revalidate cached pages
+    revalidatePath('/admin/products/categories');
+    revalidatePath('/products');
+    revalidateTag('categories');
+    
     return NextResponse.json(category, { status: 201 });
   } catch (error: any) {
     return handleProductionError(error);

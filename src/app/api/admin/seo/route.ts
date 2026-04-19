@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import dbConnect from '@/lib/dbConnect';
 import PageMeta from '@/models/PageMeta';
 import jwt from 'jsonwebtoken';
@@ -17,7 +18,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const token = req.cookies.get('admin_token')?.value;
-    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!token) return NextResponse.json({ error: 'Unauthorized access' }, { status: 401 });
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
     if (decoded.role !== 'admin' && decoded.role !== 'seo') {
@@ -31,8 +32,14 @@ export async function POST(req: NextRequest) {
     const seo = await PageMeta.findOneAndUpdate(
       { pageKey },
       { metaTitle, metaDescription, h1, keywords, updatedAt: new Date() },
-      { new: true, upsert: true, runValidators: true }
+      { returnDocument: 'after', upsert: true, runValidators: true }
     );
+
+    // Revalidate cached pages based on pageKey
+    revalidatePath('/admin/seo');
+    revalidatePath(`/${pageKey}`);
+    revalidateTag('seo');
+    revalidateTag(pageKey);
 
     return NextResponse.json(seo);
   } catch (error: any) {

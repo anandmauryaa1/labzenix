@@ -59,7 +59,7 @@ export default function AdminSettings() {
         });
       }
     } catch (err) {
-      toast.error('Failed to sync protocol parameters');
+      toast.error('Failed to load settings');
     } finally {
       setLoading(false);
     }
@@ -75,12 +75,12 @@ export default function AdminSettings() {
       });
       
       if (res.ok) {
-        toast.success('System configuration synchronized');
+        toast.success('Settings saved successfully');
       } else {
-        toast.error('Protocol update failed');
+        toast.error('Failed to save settings');
       }
     } catch (err) {
-      toast.error('Network protocol error');
+      toast.error('Network error');
     } finally {
       setSaving(false);
     }
@@ -107,7 +107,7 @@ export default function AdminSettings() {
           className="flex items-center space-x-2 px-8 py-4 bg-primary text-white text-xs font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-primary/20 disabled:opacity-50"
         >
           <Save className="w-4 h-4" />
-          <span>{saving ? 'Synchronizing...' : 'Save Configuration'}</span>
+          <span>{saving ? 'Saving...' : 'Save Settings'}</span>
         </button>
       </div>
 

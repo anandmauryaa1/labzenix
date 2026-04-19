@@ -122,7 +122,7 @@ export default function Sidebar() {
       permission: 'inquiries'
     },
     { 
-      title: 'Global SEO', 
+      title: 'Page SEO', 
       href: '/admin/seo', 
       icon: Globe,
       roles: ['admin', 'seo'],
@@ -188,15 +188,15 @@ export default function Sidebar() {
         )}
 
         <div className={`h-full flex flex-col ${isCollapsed && !isMobile ? 'p-4' : 'p-8'}`}>
-          {/* Logo section */}
-          <div className={`flex items-center mb-10 ${isCollapsed && !isMobile ? 'flex-col space-y-2' : 'space-x-3'}`}>
-            <div className="w-10 h-10 bg-secondary text-white flex items-center justify-center rounded-none font-black text-xl shadow-lg shadow-secondary/10 flex-shrink-0">
+          {/* Logo section with professional accent */}
+          <div className={`flex items-center mb-10 pb-8 border-b-2 border-primary/10 ${isCollapsed && !isMobile ? 'flex-col space-y-2' : 'space-x-3'}`}>
+            <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center font-black text-lg shadow-lg shadow-primary/20 flex-shrink-0 border-2 border-primary/30">
               L
             </div>
             {(!isCollapsed || isMobile) && (
               <div>
-                <h2 className="font-black text-lg leading-none tracking-tight text-secondary">LABZENIX</h2>
-                <span className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Admin Panel</span>
+                <h2 className="font-black text-lg leading-none tracking-tighter text-secondary\">LABZENIX</h2>
+                <span className="text-[10px] text-primary font-black uppercase tracking-widest\">Admin Control</span>
               </div>
             )}
           </div>
@@ -218,10 +218,10 @@ export default function Sidebar() {
                   key={item.href}
                   href={item.href}
                   onClick={closeSidebarOnMobile}
-                  className={`flex items-center justify-between group px-4 py-3 transition-all duration-200 border-l-4 ${
+                  className={`flex items-center justify-between group px-4 py-3 transition-all duration-200 border-l-4 relative overflow-hidden ${
                     isActive
-                      ? 'border-primary bg-primary/5 text-primary font-bold'
-                      : 'border-transparent text-gray-400 hover:text-secondary hover:bg-gray-50'
+                      ? 'border-primary bg-primary/8 text-primary font-bold'
+                      : 'border-transparent text-gray-400 hover:text-secondary hover:bg-gray-50 hover:border-gray-300'
                   } ${isCollapsed && !isMobile ? 'px-2' : ''}`}
                   title={isCollapsed && !isMobile ? item.title : ''}
                 >

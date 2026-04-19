@@ -53,8 +53,8 @@ export default function CategoryManagement() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.name.trim()) return toast.error('Domain Name is required');
-    if (!form.description.trim()) return toast.error('Industrial Scope description is mandatory');
+    if (!form.name.trim()) return toast.error('Category name is required');
+    if (!form.description.trim()) return toast.error('Category description is required');
     setServerError(null);
     try {
       const url = editingId ? `/api/categories/${editingId}` : '/api/categories';
@@ -68,7 +68,7 @@ export default function CategoryManagement() {
 
       if (res.ok) {
         setSuccess(true);
-        toast.success(editingId ? 'Domain parameters refined' : 'New domain synchronized');
+        toast.success(editingId ? 'Category updated successfully' : 'Category created successfully');
         
         setTimeout(() => {
           setSuccess(false);
@@ -79,12 +79,12 @@ export default function CategoryManagement() {
         }, 1500);
       } else {
         const data = await res.json();
-        setServerError(data.error || 'Protocol Error: Sync failed at the master node.');
-        toast.error('Deployment Rejected');
+        setServerError(data.error || 'Failed to save category.');
+        toast.error('Failed to save category');
       }
     } catch (err) {
-      setServerError('System Offline: Check your local uplink connectivity.');
-      toast.error('Network Protocol Error');
+      setServerError('Network error. Please check your connection.');
+      toast.error('Network error');
     }
   }
 
@@ -138,12 +138,12 @@ export default function CategoryManagement() {
           catalogUrl: data.url,
           catalogPublicId: data.public_id 
         }));
-        toast.success('Catalog asset synchronized');
+        toast.success('File uploaded successfully');
       } else {
-        toast.error('Upload rejected by edge server');
+        toast.error('Upload failed. Please try again.');
       }
     } catch (err) {
-      toast.error('Network protocol failure');
+      toast.error('Network error');
     } finally {
       setIsUploading(false);
     }
@@ -151,7 +151,7 @@ export default function CategoryManagement() {
 
   const removeCatalog = () => {
     setForm(prev => ({ ...prev, catalogUrl: '', catalogPublicId: '' }));
-    toast.success('Asset reference removed from local state');
+    toast.success('File removed');
   };
 
   return (
@@ -163,8 +163,8 @@ export default function CategoryManagement() {
             <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle2 className="w-10 h-10 text-green-500" />
             </div>
-            <h2 className="text-2xl font-black text-secondary tracking-tighter uppercase mb-2">Protocol Success</h2>
-            <p className="text-sm text-gray-500 font-medium">Global parameters synchronized. Catalog indexing complete.</p>
+            <h2 className="text-2xl font-black text-secondary tracking-tighter uppercase mb-2">Success</h2>
+            <p className="text-sm text-gray-500 font-medium">Category saved successfully.</p>
           </div>
         </div>
       )}
@@ -175,7 +175,7 @@ export default function CategoryManagement() {
           <div className="bg-red-50 border-l-4 border-red-500 p-6 flex items-start space-x-4 shadow-sm">
             <AlertCircle className="w-6 h-6 text-red-500 flex-shrink-0" />
             <div>
-              <h3 className="text-sm font-black text-red-800 uppercase tracking-widest mb-1">System Rejection</h3>
+              <h3 className="text-sm font-black text-red-800 uppercase tracking-widest mb-1">Error</h3>
               <p className="text-xs text-red-600 font-bold">{serverError}</p>
             </div>
             <button onClick={() => setServerError(null)} className="text-red-400 hover:text-red-600 transition-colors ml-auto">
@@ -193,8 +193,8 @@ export default function CategoryManagement() {
             </button>
           </Link>
           <div>
-            <h1 className="text-3xl font-black text-secondary tracking-tighter uppercase mb-2">Product Domains</h1>
-            <p className="text-gray-500 font-medium text-sm">Manage high-level industrial classifications for the laboratory catalog.</p>
+            <h1 className="text-3xl font-black text-secondary tracking-tighter uppercase mb-2">Categories</h1>
+            <p className="text-gray-500 font-medium text-sm">Organize and manage product categories.</p>
           </div>
         </div>
         {!isAdding && (

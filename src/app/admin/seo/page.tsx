@@ -19,7 +19,7 @@ const PAGES = [
   { key: 'about', name: 'About Us', path: '/about' },
   { key: 'products', name: 'Global Products', path: '/products' },
   { key: 'blogs', name: 'Knowledge Center', path: '/blogs' },
-  { key: 'contact', name: 'Contact Protocol', path: '/contact' },
+  { key: 'contact', name: 'Contact Us', path: '/contact' },
 ];
 
 export default function SEOManagement() {
@@ -67,10 +67,10 @@ export default function SEOManagement() {
   }
 
   async function handleSave() {
-    if (!form.metaTitle.trim()) return toast.error('Browser Title is mandatory');
-    if (!form.metaDescription.trim()) return toast.error('Search Snippet Description is required');
-    if (!form.h1.trim()) return toast.error('Primary Page Heading (H1) is required');
-    if (!form.keywords.trim()) return toast.error('At least one indexing keyword is required');
+    if (!form.metaTitle.trim()) return toast.error('Title is required');
+    if (!form.metaDescription.trim()) return toast.error('Description is required');
+    if (!form.h1.trim()) return toast.error('Primary heading is required');
+    if (!form.keywords.trim()) return toast.error('At least one keyword is required');
 
     setSaving(true);
     try {
@@ -87,14 +87,14 @@ export default function SEOManagement() {
       });
 
       if (res.ok) {
-        toast.success(`${activePage.name} SEO Synced`);
+        toast.success(`${activePage.name} SEO settings updated`);
         fetchMetaData();
       } else {
         const errorData = await res.json();
-        toast.error(errorData.error || 'SEO sync failure');
+        toast.error(errorData.error || 'Failed to save SEO settings');
       }
     } catch (err) {
-      toast.error('Global SEO node connection failure');
+      toast.error('Network error');
     } finally {
       setSaving(false);
     }
@@ -104,8 +104,11 @@ export default function SEOManagement() {
     <div className="max-w-[1400px] mx-auto pb-20 animate-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-black text-secondary tracking-tighter uppercase mb-1">Search Engine Console</h1>
-          <p className="text-gray-500 font-medium">Calibrate global visibility parameters for root system pages.</p>
+          <h1 className="text-3xl font-black text-secondary tracking-tighter uppercase mb-2 flex items-center space-x-3">
+            <div className="w-1 h-10 bg-primary" />
+            <span>Page SEO Management</span>
+          </h1>
+          <p className="text-gray-500 font-medium text-sm max-w-2xl ml-4">Optimize individual page metadata, titles, descriptions, and keywords. <span className="text-primary font-semibold">Note:</span> Global site configuration is in Settings.</p>
         </div>
         
         <button 
@@ -114,14 +117,14 @@ export default function SEOManagement() {
           className="flex items-center space-x-2 px-10 py-4 bg-primary text-white text-xs font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-primary/20 disabled:opacity-50"
         >
           <Save className="w-4 h-4" />
-          <span>{saving ? 'Syncing...' : 'Deploy SEO Headers'}</span>
+          <span>{saving ? 'Saving...' : 'Save SEO Settings'}</span>
         </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Navigation Sidebar */}
         <div className="lg:col-span-1 space-y-2">
-          <div className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-4 px-4">System Nodes</div>
+          <div className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-4 px-4">Select Page</div>
           {PAGES.map((page) => {
             const isActive = activePage.key === page.key;
             return (
@@ -153,7 +156,7 @@ export default function SEOManagement() {
                       <Globe className="w-4 h-4 text-primary" />
                    </div>
                    <div>
-                      <h3 className="text-white text-xs font-black uppercase tracking-widest">Header Configuration: {activePage.name}</h3>
+                      <h3 className="text-white text-xs font-black uppercase tracking-widest">SEO Settings: {activePage.name}</h3>
                       <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">Path: {activePage.path}</p>
                    </div>
                 </div>
@@ -221,13 +224,12 @@ export default function SEOManagement() {
                    </div>
                 </div>
 
-                <div className="bg-primary/5 p-6 border-l-4 border-primary flex items-start space-x-4">
+                   <div className="bg-primary/5 p-6 border-l-4 border-primary flex items-start space-x-4">
                    <AlertCircle className="w-5 h-5 text-primary mt-1" />
                    <div>
-                      <p className="text-xs font-black uppercase tracking-widest text-secondary mb-1">Optimization Note</p>
+                      <p className="text-xs font-black uppercase tracking-widest text-secondary mb-1">Page SEO Tip</p>
                       <p className="text-[10px] text-gray-500 leading-relaxed font-medium">
-                        Changes to root headers will propagate to search engines on the next crawl. 
-                        Ensure your visibility index is above 80% for optimal ranking performance.
+                        Each page can have unique SEO metadata. These settings optimize individual pages for search engines. For site-wide settings, use the Settings page.
                       </p>
                    </div>
                 </div>

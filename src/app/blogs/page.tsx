@@ -53,7 +53,7 @@ export default async function BlogPage() {
                   <div className="p-8 flex flex-col flex-grow">
                     <div className="flex items-center space-x-6 text-xs text-gray-400 font-bold uppercase tracking-widest mb-6">
                       <span className="flex items-center"><Calendar className="w-3 h-3 mr-2" /> {new Date(blog.createdAt).toLocaleDateString()}</span>
-                      <span className="flex items-center"><User className="w-3 h-3 mr-2" /> {blog.author?.name || 'Technical Team'}</span>
+                      <span className="flex items-center"><User className="w-3 h-3 mr-2" /> {blog.author?.name || 'Editorial Team'}</span>
                     </div>
                     
                     <h2 className="text-2xl font-bold text-secondary mb-4 leading-tight group-hover:text-primary transition-colors">

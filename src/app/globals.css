@@ -26,7 +26,7 @@
 
 @layer utilities {
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-linear-to-r from-[#004aad] to-[#000000];
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#004aad] to-[#000000];
   }
   .glass {
     @apply bg-white/90 backdrop-blur-sm border-b border-gray-100;
@@ -34,5 +34,134 @@
   .section-padding {
     @apply py-16 md:py-24;
   }
+  
+  /* Professional LabZenix Design System */
+  .professional-border {
+    @apply border border-gray-200 transition-all duration-300 hover:border-primary/50;
+  }
+  
+  .professional-card {
+    @apply bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 hover:border-primary/50;
+  }
+  
+  .accent-line {
+    @apply w-1 h-full bg-gradient-to-b from-primary via-primary/60 to-transparent;
+  }
+  
+  .accent-line-h {
+    @apply h-1 w-full bg-gradient-to-r from-primary via-primary/60 to-transparent;
+  }
+  
+  .section-title {
+    @apply text-3xl md:text-4xl font-black text-secondary tracking-tighter uppercase;
+  }
+  
+  .section-subtitle {
+    @apply text-gray-500 font-medium text-sm md:text-base leading-relaxed;
+  }
+  
+  .btn-primary {
+    @apply px-6 md:px-8 py-3 md:py-4 bg-primary text-white font-black uppercase tracking-widest text-xs md:text-sm hover:bg-secondary transition-all duration-300 shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105;
+  }
+  
+  .btn-secondary {
+    @apply px-6 md:px-8 py-3 md:py-4 bg-secondary text-white font-black uppercase tracking-widest text-xs md:text-sm hover:bg-primary transition-all duration-300;
+  }
+  
+  .input-professional {
+    @apply w-full px-4 py-3 bg-white border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-all duration-300 text-secondary font-medium;
+  }
+  
+  .badge-professional {
+    @apply inline-block px-3 py-1 bg-primary/10 text-primary border border-primary/20 text-xs font-black uppercase tracking-widest rounded-none;
+  }
+}
+
+/* Blog Content Styling */
+.blog-content h1 {
+  @apply text-4xl md:text-5xl font-black text-secondary mb-6 mt-8 uppercase tracking-tighter leading-tight;
+}
+
+.blog-content h2 {
+  @apply text-3xl md:text-4xl font-black text-secondary mb-4 mt-8 uppercase tracking-tighter leading-tight;
+}
+
+.blog-content h3 {
+  @apply text-2xl md:text-3xl font-bold text-secondary mb-4 mt-6 uppercase tracking-tight;
+}
+
+.blog-content h4 {
+  @apply text-xl font-bold text-secondary mb-3 mt-5 uppercase tracking-wide;
+}
+
+.blog-content p {
+  @apply text-gray-700 leading-8 mb-6 text-base;
+}
+
+.blog-content a {
+  @apply text-primary hover:text-secondary underline transition-colors;
+}
+
+.blog-content strong,
+.blog-content b {
+  @apply font-black text-secondary;
+}
+
+.blog-content em,
+.blog-content i {
+  @apply italic text-gray-600;
+}
+
+.blog-content ul,
+.blog-content ol {
+  @apply mb-6 ml-6;
+}
+
+.blog-content li {
+  @apply mb-3 text-gray-700 leading-7;
+}
+
+.blog-content ul li {
+  @apply list-disc list-outside;
+}
+
+.blog-content ol li {
+  @apply list-decimal list-outside;
+}
+
+.blog-content blockquote {
+  @apply border-l-4 border-primary pl-6 py-2 my-6 italic text-gray-600 bg-blue-50 py-4;
+}
+
+.blog-content code {
+  @apply bg-gray-100 text-secondary px-2 py-1 rounded font-mono text-sm;
+}
+
+.blog-content pre {
+  @apply bg-gray-900 text-gray-100 p-6 rounded-lg overflow-x-auto mb-6;
+}
+
+.blog-content pre code {
+  @apply bg-transparent text-inherit px-0 py-0;
+}
+
+.blog-content img {
+  @apply w-full rounded-lg shadow-lg my-8;
+}
+
+.blog-content table {
+  @apply w-full border-collapse my-6;
+}
+
+.blog-content th {
+  @apply bg-secondary text-white px-4 py-2 text-left font-bold;
+}
+
+.blog-content td {
+  @apply border border-gray-200 px-4 py-2;
+}
+
+.blog-content hr {
+  @apply border-t border-gray-300 my-8;
 }
 

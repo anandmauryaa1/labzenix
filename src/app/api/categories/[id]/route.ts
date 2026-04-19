@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import dbConnect from '@/lib/dbConnect';
 import Category from '@/models/Category';
 import slugify from 'slugify';
@@ -23,9 +24,15 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const category = await Category.findByIdAndUpdate(id, { 
       ...body,
       slug: currentSlug
-    }, { new: true, runValidators: true });
+    }, { returnDocument: 'after', runValidators: true });
     
     if (!category) return NextResponse.json({ error: 'Domain not found' }, { status: 404 });
+    
+    // Revalidate cached pages
+    revalidatePath('/admin/products/categories');
+    revalidatePath('/products');
+    revalidateTag('categories');
+    
     return NextResponse.json(category);
   } catch (error: any) {
     return handleProductionError(error);
@@ -38,6 +45,12 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     const { id } = await params;
     const category = await Category.findByIdAndDelete(id);
     if (!category) return NextResponse.json({ error: 'Domain not found' }, { status: 404 });
+    
+    // Revalidate cached pages
+    revalidatePath('/admin/products/categories');
+    revalidatePath('/products');
+    revalidateTag('categories');
+    
     return NextResponse.json({ message: 'Domain decommissioned' });
   } catch (error: any) {
     return handleProductionError(error);

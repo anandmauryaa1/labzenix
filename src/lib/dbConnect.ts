@@ -6,7 +6,10 @@ if (!MONGODB_URI) throw new Error('MONGODB_URI not defined');
 
 let cached = (global as any).mongoose;
 
-if (!cached) (global as any).mongoose = { conn: null, promise: null };
+if (!cached) {
+  (global as any).mongoose = { conn: null, promise: null };
+  cached = (global as any).mongoose;
+}
 
 async function dbConnect() {
   if (cached.conn) return cached.conn;

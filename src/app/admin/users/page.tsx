@@ -108,7 +108,7 @@ export default function UsersPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to revoke this personnel access? This action is permanent.')) return;
+    if (!confirm('Remove this user? This action is permanent.')) return;
     
     try {
       const res = await fetch(`/api/admin/users/${id}`, { method: 'DELETE' });

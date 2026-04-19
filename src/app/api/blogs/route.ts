@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import dbConnect from '@/lib/dbConnect';
 import Blog from '@/models/Blog';
 import User from '@/models/User';
@@ -21,7 +22,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const token = req.cookies.get('admin_token')?.value;
-    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!token) return NextResponse.json({ error: 'Unauthorized access' }, { status: 401 });
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
     
@@ -45,6 +46,11 @@ export async function POST(req: NextRequest) {
       author: authorId
     });
 
+    // Revalidate cached pages
+    revalidatePath('/admin/blogs');
+    revalidatePath('/blogs');
+    revalidateTag('blogs');
+    
     return NextResponse.json(blog, { status: 201 });
   } catch (error: any) {
     return handleProductionError(error);

@@ -65,17 +65,17 @@ export default function ProductListing() {
   };
 
   async function deleteProduct(id: string) {
-    if (!confirm('Warning: This will remove the instrument from the catalog. Proceed?')) return;
+    if (!confirm('Delete this product? This action cannot be undone.')) return;
     
     try {
       const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
       if (res.ok) {
-        toast.success('Product decommissioned');
+        toast.success('Product deleted successfully');
         setProducts(products.filter(p => p._id !== id));
         setSelectedIds(prev => prev.filter(i => i !== id));
       } else {
         const err = await res.json();
-        toast.error(err.error || 'Decommission failed');
+        toast.error(err.error || 'Failed to delete product');
       }
     } catch (err) {
       toast.error('Operation failed');
@@ -83,7 +83,7 @@ export default function ProductListing() {
   }
 
   async function bulkDelete() {
-    if (!confirm(`Permanently decommission ${selectedIds.length} selected instruments?`)) return;
+    if (!confirm(`Delete ${selectedIds.length} selected products? This action cannot be undone.`)) return;
     
     setLoading(true);
     try {
@@ -94,11 +94,11 @@ export default function ProductListing() {
       });
       
       if (res.ok) {
-        toast.success('Batch operation complete');
+        toast.success('Products deleted successfully');
         setProducts(products.filter(p => !selectedIds.includes(p._id)));
         setSelectedIds([]);
       } else {
-        toast.error('Batch deletion failed');
+        toast.error('Failed to delete selected products');
       }
     } catch (err) {
       toast.error('Network protocol error');
@@ -127,13 +127,13 @@ export default function ProductListing() {
     <div className="space-y-8 animate-in fade-in duration-500 relative pb-20">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black text-secondary tracking-tighter uppercase mb-2">Instrument Catalog</h1>
-          <p className="text-gray-500 font-medium text-sm">Manage precision laboratory instruments, technical specifications, and usage classifications.</p>
+          <h1 className="text-3xl font-black text-secondary tracking-tighter uppercase mb-2">Products</h1>
+          <p className="text-gray-500 font-medium text-sm">Manage all laboratory testing instruments and technical specifications.</p>
         </div>
         <Link href="/admin/products/new">
           <button className="flex items-center space-x-2 px-6 py-4 bg-secondary text-white text-xs font-black uppercase tracking-widest hover:bg-primary transition-all shadow-lg active:scale-95">
             <Plus className="w-4 h-4" />
-            <span>Add New Instrument</span>
+              <span>Add Product</span>
           </button>
         </Link>
       </div>
@@ -158,7 +158,7 @@ export default function ProductListing() {
               className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-red-700 transition-all border border-red-500/20"
             >
               <Trash2 className="w-4 h-4" />
-              <span>Decommission All</span>
+              <span>Delete All</span>
             </button>
           </div>
         )}
@@ -269,7 +269,7 @@ export default function ProductListing() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end space-x-2">
-                       <Link href={`/products`}>
+                       <Link href={`/products/${product.slug}`} target="_blank">
                         <button className="p-2 text-gray-300 hover:text-primary transition-colors tooltip" title="View Public Page">
                           <Eye className="w-4 h-4" />
                         </button>
@@ -282,7 +282,7 @@ export default function ProductListing() {
                       <button 
                         onClick={() => deleteProduct(product._id)}
                         className="p-2 text-gray-300 hover:text-red-500 transition-colors"
-                        title="Decommission"
+                        title="Delete"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>

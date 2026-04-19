@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     const settings = await Settings.findOneAndUpdate(
       { configKey: 'global' },
       { $set: body },
-      { new: true, upsert: true }
+      { returnDocument: 'after', upsert: true }
     );
 
     return NextResponse.json(settings);

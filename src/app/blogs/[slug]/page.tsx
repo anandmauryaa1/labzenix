@@ -41,7 +41,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
       ]
     },
     { $inc: { views: 1 } },
-    { new: true }
+    { returnDocument: 'after' }
   ).populate('author', 'name');
 
   if (!blog || (blog.status === 'draft')) {
@@ -50,7 +50,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
 
   // Fetch Sidebar Data
   const recentBlogs = await Blog.find({ 
-    status: 'published', 
+    status: { $ne: 'draft' }, 
     _id: { $ne: blog._id } 
   })
   .sort({ createdAt: -1 })
@@ -58,7 +58,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
   .lean();
 
   const popularBlogs = await Blog.find({ 
-    status: 'published', 
+    status: { $ne: 'draft' }, 
     _id: { $ne: blog._id } 
   })
   .sort({ views: -1 })
@@ -82,10 +82,10 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
       <section className="relative h-[50vh] min-h-[400px] overflow-hidden bg-secondary">
         <img 
           src={blog.image} 
-          className="absolute inset-0 w-full h-full object-cover opacity-60 grayscale hover:grayscale-0 transition-all duration-1000"
+          className="absolute inset-0 w-full h-full object-cover opacity-40"
           alt={blog.title} 
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-secondary via-secondary/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-secondary via-secondary/60 to-secondary/40" />
         
         <div className="absolute inset-0 flex items-end">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pb-16">
@@ -93,17 +93,17 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
               <span className="inline-block px-4 py-1 bg-primary text-white text-[10px] font-black uppercase tracking-[0.3em] mb-6">
                 {blog.category}
               </span>
-              <h1 className="text-4xl md:text-6xl font-black text-white leading-tight uppercase tracking-tighter mb-8">
+              <h1 className="text-4xl md:text-6xl font-black text-white leading-tight uppercase tracking-tighter mb-8 drop-shadow-lg">
                 {blog.title}
               </h1>
-              <div className="flex flex-wrap items-center gap-8 text-[10px] font-black uppercase tracking-[0.2em] text-gray-300">
+              <div className="flex flex-wrap items-center gap-8 text-[14px] font-black uppercase tracking-[0.2em] text-white drop-shadow">
                 <span className="flex items-center">
                   <Calendar className="w-4 h-4 mr-3 text-primary" />
                   {new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                 </span>
                 <span className="flex items-center">
                   <User className="w-4 h-4 mr-3 text-primary" />
-                  By {blog.author?.name || 'Technical Division'}
+                  By {blog.author?.name || 'Editorial Team'}
                 </span>
               </div>
             </div>
@@ -118,34 +118,39 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
             
             {/* Article Body */}
             <div className="lg:col-span-8">
-              <div 
-                className="prose prose-lg max-w-none prose-headings:text-secondary prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tighter prose-p:text-gray-600 prose-p:leading-relaxed prose-img:rounded-none prose-a:text-primary prose-strong:text-secondary"
-                dangerouslySetInnerHTML={{ __html: blog.content }}
-              />
+              <article className="space-y-6 text-gray-700 leading-relaxed">
+                <div 
+                  className="blog-content space-y-6"
+                  dangerouslySetInnerHTML={{ __html: blog.content }}
+                />
+              </article>
 
-              <div className="mt-20 pt-12 border-t border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-8">
-                <div>
-                    <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 mb-4">Share this Protocol</h4>
-                    <div className="flex items-center space-x-4">
-                        <button className="w-10 h-10 flex items-center justify-center bg-gray-50 text-secondary hover:bg-primary hover:text-white transition-all">
-                            <Globe className="w-4 h-4" />
-                        </button>
-                        <button className="w-10 h-10 flex items-center justify-center bg-gray-50 text-secondary hover:bg-primary hover:text-white transition-all">
-                            <MessageSquare className="w-4 h-4" />
-                        </button>
-                        <button className="w-10 h-10 flex items-center justify-center bg-gray-50 text-secondary hover:bg-primary hover:text-white transition-all">
-                            <LinkIcon className="w-4 h-4" />
-                        </button>
-                        <button className="w-10 h-10 flex items-center justify-center bg-gray-50 text-secondary hover:bg-primary hover:text-white transition-all">
-                            <Mail className="w-4 h-4" />
-                        </button>
+              <div className="mt-20 pt-12 border-t border-gray-200 space-y-8">
+                {/* Share Section */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+                  <div>
+                    <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 mb-4">Share this Article</h4>
+                    <div className="flex items-center space-x-3">
+                      <button className="w-10 h-10 flex items-center justify-center bg-gray-100 text-secondary hover:bg-primary hover:text-white transition-all duration-300 rounded">
+                        <Globe className="w-4 h-4" />
+                      </button>
+                      <button className="w-10 h-10 flex items-center justify-center bg-gray-100 text-secondary hover:bg-primary hover:text-white transition-all duration-300 rounded">
+                        <MessageSquare className="w-4 h-4" />
+                      </button>
+                      <button className="w-10 h-10 flex items-center justify-center bg-gray-100 text-secondary hover:bg-primary hover:text-white transition-all duration-300 rounded">
+                        <LinkIcon className="w-4 h-4" />
+                      </button>
+                      <button className="w-10 h-10 flex items-center justify-center bg-gray-100 text-secondary hover:bg-primary hover:text-white transition-all duration-300 rounded">
+                        <Mail className="w-4 h-4" />
+                      </button>
                     </div>
-                </div>
-                
-                <div className="px-8 py-6 bg-gray-50 border-l-4 border-primary max-w-md">
-                    <p className="text-xs font-bold text-secondary italic leading-relaxed">
-                        "Technical integrity is the foundation of scientific advancement. Our knowledge center is dedicated to preserving laboratory standards globally."
+                  </div>
+                  
+                  <div className="px-6 py-5 bg-blue-50 border-l-4 border-primary">
+                    <p className="text-xs font-medium text-secondary italic leading-relaxed">
+                      "Technical integrity is the foundation of scientific advancement."
                     </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -180,7 +185,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
               {/* Popular Posts Section */}
               <div>
                 <h3 className="text-sm font-black text-secondary uppercase tracking-[0.3em] mb-10 pb-4 border-b-2 border-primary inline-block">
-                    Popular Protocols
+                    Popular Articles
                 </h3>
                 <div className="space-y-10">
                   {popularBlogs.map((post: any) => (
@@ -199,22 +204,6 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
                           </h4>
                         </div>
                       </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
-              {/* Categories Section */}
-              <div>
-                <h3 className="text-sm font-black text-secondary uppercase tracking-[0.3em] mb-10 pb-4 border-b-2 border-primary inline-block">
-                    Classifications
-                </h3>
-                <div className="flex flex-wrap gap-3">
-                  {categories.map((cat: string) => (
-                    <Link key={cat} href={`/blogs?category=${cat}`}>
-                        <span className="px-4 py-2 border border-gray-100 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:border-primary hover:text-primary transition-all cursor-pointer">
-                            {cat}
-                        </span>
                     </Link>
                   ))}
                 </div>
@@ -251,7 +240,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
                 <div className="flex items-center justify-between mb-16 px-4">
                     <div>
                         <h3 className="text-2xl font-black text-secondary uppercase tracking-tight mb-2">Related Scientific Insights</h3>
-                        <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Similar Protocol Classifications</p>
+                        <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Similar Categories</p>
                     </div>
                 </div>
                 

@@ -46,12 +46,12 @@ export default function BlogListing() {
     try {
       const res = await fetch(`/api/blogs/${deleteId}`, { method: 'DELETE' });
       if (res.ok) {
-        toast.success('Journal entry decommissioned');
+        toast.success('Blog post deleted successfully');
         setBlogs(blogs.filter(b => b._id !== deleteId));
         setDeleteId(null);
       } else {
         const errorData = await res.json();
-        toast.error(errorData.error || 'System Protocol: Decommission Failed');
+        toast.error(errorData.error || 'Failed to delete blog post');
       }
     } catch (err) {
       toast.error('Network protocol interrupted');
@@ -204,7 +204,7 @@ export default function BlogListing() {
         </div>
       </div>
 
-      {/* Decommission Modal */}
+      {/* Delete Confirmation Modal */}
       {deleteId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-secondary/80 backdrop-blur-sm animate-in fade-in duration-300">
           <div className="bg-white max-w-md w-full p-8 shadow-2xl border border-gray-100 animate-in zoom-in-95 duration-300">
@@ -213,7 +213,7 @@ export default function BlogListing() {
                 <Trash2 className="w-6 h-6 text-red-600" />
               </div>
               <div>
-                <h3 className="text-lg font-black text-secondary uppercase tracking-tight">Decommission Entry</h3>
+                <h3 className="text-lg font-black text-secondary uppercase tracking-tight">Delete Blog Post</h3>
                 <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Protocol Override Required</p>
               </div>
             </div>

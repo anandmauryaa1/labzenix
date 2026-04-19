@@ -6,54 +6,33 @@ import User from '@/models/User';
 
 export async function POST(req: NextRequest) {
   try {
+    // Validate JWT_SECRET is set
+    if (!process.env.JWT_SECRET) {
+      console.error('CRITICAL: JWT_SECRET not set in environment variables');
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+    }
+
     await dbConnect();
     const { username, password } = await req.json();
 
-    const user = await User.findOne({ username });
-    
-    // DUMMY LOGIN BYPASS (For development only)
-    if (!user && username === 'admin' && password === 'admin') {
-      const dummyToken = jwt.sign(
-        { 
-          id: 'dummy-id', 
-          role: 'admin', 
-          username: 'admin', 
-          name: 'Super Admin', 
-          email: 'admin@labzenix.com',
-          permissions: ['blogs', 'products', 'categories', 'seo', 'inquiries', 'users', 'settings']
-        }, 
-        process.env.JWT_SECRET!, 
-        { expiresIn: '12h' }
-      );
-
-      const cookie = serialize('admin_token', dummyToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        path: '/',
-        maxAge: 60 * 60 * 12,
-      });
-
-      return new NextResponse(JSON.stringify({ 
-        success: true, 
-        role: 'admin',
-        username: 'admin',
-        name: 'Super Admin',
-        email: 'admin@labzenix.com',
-        permissions: ['blogs', 'products', 'categories', 'seo', 'inquiries', 'users', 'settings']
-      }), {
-        status: 200,
-        headers: { 'Set-Cookie': cookie },
-      });
+    // Validate input
+    if (!username || !password) {
+      return NextResponse.json({ error: 'Username and password are required' }, { status: 400 });
     }
 
+    if (username.trim().length === 0 || password.trim().length === 0) {
+      return NextResponse.json({ error: 'Username and password cannot be empty' }, { status: 400 });
+    }
+
+    const user = await User.findOne({ username: username.trim() });
+    
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 401 });
+      return NextResponse.json({ error: 'Invalid username or password' }, { status: 401 });
     }
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+      return NextResponse.json({ error: 'Invalid username or password' }, { status: 401 });
     }
 
     const token = jwt.sign(
@@ -65,7 +44,7 @@ export async function POST(req: NextRequest) {
         email: user.email,
         permissions: user.permissions || []
       }, 
-      process.env.JWT_SECRET!, 
+      process.env.JWT_SECRET, 
       { expiresIn: '12h' }
     );
 
@@ -90,6 +69,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (error: any) {
     console.error('Login error:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: 'Server error. Please try again.' }, { status: 500 });
   }
 }

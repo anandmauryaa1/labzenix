@@ -42,6 +42,9 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
     features: [] as string[],
     specificationText: '',
     specs: {} as Record<string, string>,
+    leadTime: '',
+    brand: '',
+    certificate: '',
     metaTitle: '',
     metaDescription: ''
   });
@@ -79,6 +82,9 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
             specificationText: data.specificationText || '',
             specs: data.specs || {},
             images: data.images || [],
+            leadTime: data.leadTime || '',
+            brand: data.brand || '',
+            certificate: data.certificate || '',
             metaTitle: data.metaTitle || '',
             metaDescription: data.metaDescription || ''
           });
@@ -96,36 +102,36 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
 
     // Basic Details
     if (!form.title.trim()) {
-      newErrors.title = 'Instrument Title is required';
+      newErrors.title = 'Product title is required';
     }
     if (!form.modelNumber?.trim()) {
-      newErrors.modelNumber = 'Technical Model Number is required';
+      newErrors.modelNumber = 'Model number is required';
     }
     if (!form.category) {
-      newErrors.category = 'Industrial Category must be selected';
+      newErrors.category = 'Category must be selected';
     }
     if (!form.description.trim()) {
-      newErrors.description = 'Marketing Description is required';
+      newErrors.description = 'Product description is required';
     }
     
     // Slug Validation (must not be empty)
     if (!form.slug || !form.slug.trim()) {
-      newErrors.slug = 'Valid URL slug could not be generated from title. Please ensure title contains letters or numbers.';
+      newErrors.slug = 'Product URL slug could not be generated. Please ensure title contains letters or numbers.';
     }
 
     // SEO Analysis
     if (!form.metaTitle.trim()) {
-      newErrors.metaTitle = 'SEO Title is required for indexing';
+      newErrors.metaTitle = 'SEO title is required';
     }
     if (!form.metaDescription.trim()) {
-      newErrors.metaDescription = 'SEO Description is required for indexing';
+      newErrors.metaDescription = 'SEO description is required';
     }
 
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length > 0) {
       const errorCount = Object.keys(newErrors).length;
-      toast.error(`Protocols incomplete: ${errorCount} mandatory field(s) missing.`);
+      toast.error(`${errorCount} required field(s) missing. Please fill in all required information.`);
       
       // Auto-switch to the first tab with an error
       if (newErrors.title || newErrors.modelNumber || newErrors.description || newErrors.slug) setActiveTab('details' as any); 
@@ -155,7 +161,7 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
 
       if (res.ok) {
         setSuccess(true);
-        toast.success(isNew ? 'New instrument indexed successfully' : 'Configuration updated');
+        toast.success(isNew ? 'Product created successfully' : 'Product updated successfully');
         
         // Brief delay for the user to see the success state
         setTimeout(() => {
@@ -164,12 +170,12 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
         }, 1500);
       } else {
         const err = await res.json();
-        setServerError(err.error || 'System Protocol Error: Synchronization Failed');
-        toast.error('Submission rejected by server');
+        setServerError(err.error || 'Failed to save product. Please try again.');
+        toast.error('Failed to save product');
       }
     } catch (error) {
-      setServerError('Network integrity compromised. Check server connectivity.');
-      toast.error('Network Protocol Error');
+      setServerError('Network error. Please check your connection.');
+        toast.error('Network error');
     } finally {
       setLoading(false);
     }
@@ -224,7 +230,7 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        <p className="text-xs font-black uppercase tracking-widest text-gray-400">Initializing Secure Connection...</p>
+        <p className="text-xs font-black uppercase tracking-widest text-gray-400">Loading...</p>
       </div>
     );
   }
@@ -238,8 +244,8 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
             <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle2 className="w-10 h-10 text-green-500" />
             </div>
-            <h2 className="text-2xl font-black text-secondary tracking-tighter uppercase mb-2">Protocol Success</h2>
-            <p className="text-sm text-gray-500 font-medium">The instrument has been successfully synchronized with the global catalog.</p>
+            <h2 className="text-2xl font-black text-secondary tracking-tighter uppercase mb-2">Success</h2>
+            <p className="text-sm text-gray-500 font-medium">Product saved successfully.</p>
           </div>
         </div>
       )}
@@ -250,7 +256,7 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
           <div className="bg-red-50 border-l-4 border-red-500 p-6 flex items-start space-x-4 shadow-sm">
             <AlertCircle className="w-6 h-6 text-red-500 flex-shrink-0" />
             <div>
-              <h3 className="text-sm font-black text-red-800 uppercase tracking-widest mb-1">Server Rejection</h3>
+              <h3 className="text-sm font-black text-red-800 uppercase tracking-widest mb-1">Error</h3>
               <p className="text-xs text-red-600 font-bold">{serverError}</p>
             </div>
             <button onClick={() => setServerError(null)} className="text-red-400 hover:text-red-600 transition-colors ml-auto">
@@ -271,7 +277,7 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
           </Link>
           <div>
             <h1 className="text-3xl font-black text-secondary tracking-tighter uppercase">
-              {isNew ? 'New Catalog Entry' : 'Refining Configuration'}
+              {isNew ? 'Add Product' : 'Edit Product'}
             </h1>
             <div className="flex items-center text-[10px] space-x-2 text-gray-400 font-bold uppercase tracking-widest mt-1">
               <span>Inventory</span>
@@ -296,7 +302,7 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
             ) : (
               <>
                 <Save className="w-4 h-4" />
-                <span>{isNew ? 'Add Catalog' : 'Save Configuration'}</span>
+                <span>{isNew ? 'Create Product' : 'Save Changes'}</span>
               </>
             )}
           </button>
@@ -333,12 +339,12 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
                 <div className="space-y-10">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                     <Input 
-                      label="Instrument Model / Title"
+                      label="Product Title"
                       value={form.title || ''} 
                       onChange={(e) => updateSlug(e.target.value)}
                       placeholder="e.g. Tensile Tester LZX-500"
                       error={errors.title}
-                      info="The official commercial name of the instrument."
+                      info="The product name displayed to customers."
                     />
                     <Input 
                       label="Global URL Slug"
@@ -357,18 +363,42 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
                       onChange={(e) => setForm({...form, modelNumber: e.target.value})}
                       placeholder="e.g. LZX-500-REV2"
                       error={errors.modelNumber}
-                      info="Unique manufacturing identifier (SKU/Model)."
+                      info="Unique manufacturing identifier or SKU."
+                    />
+                    <Input 
+                      label="Brand"
+                      value={form.brand || ''} 
+                      onChange={(e) => setForm({...form, brand: e.target.value})}
+                      placeholder="e.g. GESTER, LABTEST, etc."
+                      info="Product brand or manufacturer name."
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <Input 
+                      label="Lead Time"
+                      value={form.leadTime || ''} 
+                      onChange={(e) => setForm({...form, leadTime: e.target.value})}
+                      placeholder="e.g. 20-30 Days"
+                      info="Expected delivery timeframe."
+                    />
+                    <Input 
+                      label="Certificate / Standard"
+                      value={form.certificate || ''} 
+                      onChange={(e) => setForm({...form, certificate: e.target.value})}
+                      placeholder="e.g. ISO 9001, UKAS, CE"
+                      info="Certifications and standards compliance."
                     />
                   </div>
 
                   <TextArea 
-                    label="Marketing Description"
+                    label="Product Description"
                     value={form.description || ''} 
                     onChange={(e) => setForm({...form, description: e.target.value})}
-                    placeholder="High-level overview for general inquiries..."
+                    placeholder="Provide a detailed description of the product, its features, and applications..."
                     rows={6}
                     error={errors.description}
-                    info="A compelling summary for the product listing page."
+                    info="This description appears on product listing and detail pages."
                   />
                 </div>
               )}
@@ -379,7 +409,7 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
                     <div className="flex items-center justify-between border-b border-gray-100 pb-4">
                       <div>
                         <h3 className="text-secondary font-black uppercase tracking-tighter text-lg">Key Features</h3>
-                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Instrument Value Propositions</p>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Highlight main selling points</p>
                       </div>
                       <Zap className="w-6 h-6 text-primary" />
                     </div>
@@ -447,10 +477,10 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
                     <div className="relative z-10">
                       <h4 className={`font-black text-xs uppercase tracking-widest mb-2 flex items-center ${errors.specs ? 'text-red-600' : 'text-white'}`}>
                         {errors.specs ? <AlertCircle className="w-4 h-4 mr-2" /> : <ShieldAlert className="w-4 h-4 mr-2 text-primary" />}
-                        Engineering Matrix
-                        {errors.specs && <span className="ml-2">— Mandatory field</span>}
+                        Technical Specifications
+                        {errors.specs && <span className="ml-2">— Required</span>}
                       </h4>
-                      <p className={`text-sm max-w-md ${errors.specs ? 'text-red-900/60' : 'text-white/50'}`}>Define specific technical parameters that will appear in the quick comparison table.</p>
+                      <p className={`text-sm max-w-md ${errors.specs ? 'text-red-900/60' : 'text-white/50'}`}>Define specific technical parameters that will appear in product comparisons.</p>
                     </div>
                     <Settings className={`absolute -bottom-4 -right-4 w-32 h-32 transition-transform duration-1000 ${errors.specs ? 'text-red-600/10' : 'text-white/5'}`} />
                   </div>
@@ -623,14 +653,14 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
         {/* Info Sidebar */}
         <div className="space-y-8">
           <div className="bg-white border border-gray-100 p-8 space-y-8 shadow-sm">
-            <h3 className="text-[10px] font-black uppercase tracking-widest text-secondary flex items-center border-b border-gray-100 pb-5">
+              <h3 className="text-[10px] font-black uppercase tracking-widest text-secondary flex items-center border-b border-gray-100 pb-5">
               <Layers className="w-4 h-4 mr-2 text-primary" />
-              Categorization
+              Product Settings
             </h3>
 
              <div className="space-y-3">
               <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 flex justify-between">
-                <span>Instrument Category</span>
+                <span>Product Category</span>
                 {errors.category && <AlertCircle className="w-3 h-3 text-red-500 animate-pulse" />}
               </label>
               <select 
@@ -648,7 +678,7 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
             </div>
 
             <div className="space-y-3">
-              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Application Layer</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Application Type</label>
               <div className="flex flex-col space-y-2">
                 {['Laboratory', 'Production', 'R&D'].map((u) => (
                   <button

@@ -15,7 +15,7 @@ export async function DELETE(req: NextRequest) {
     
     return NextResponse.json({ 
       success: true, 
-      message: `${result.deletedCount} products decommissioned`,
+      message: `${result.deletedCount} products deleted successfully`,
       count: result.deletedCount 
     });
   } catch (error) {

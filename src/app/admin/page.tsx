@@ -30,10 +30,10 @@ export default function AdminDashboard() {
           const result = await res.json();
           setData(result);
         } else {
-          toast.error('Dashboard synchronization failed');
+          toast.error('Failed to load dashboard');
         }
       } catch (err) {
-        toast.error('Network protocol error');
+        toast.error('Network error');
       } finally {
         setLoading(false);
       }
@@ -45,7 +45,7 @@ export default function AdminDashboard() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Loading Intelligence Hub...</p>
+        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Loading dashboard...</p>
       </div>
     );
   }
@@ -78,7 +78,7 @@ export default function AdminDashboard() {
       link: '/admin/inquiries' 
     },
     { 
-      label: 'Domains', 
+      label: 'Categories', 
       value: stats?.categories || 0,
       icon: Layers, 
       color: 'bg-orange-500', 
@@ -191,7 +191,7 @@ export default function AdminDashboard() {
                   </div>
                   <h4 className="text-[11px] font-black text-secondary uppercase tracking-tight leading-tight mb-2 line-clamp-2">{blog.title}</h4>
                   <div className="flex items-center justify-between text-[8px] font-bold text-gray-400 uppercase tracking-widest">
-                    <span>{blog.author?.name || 'Technical Team'}</span>
+                    <span>{blog.author?.name || 'Editorial Team'}</span>
                     <Link href={`/admin/blogs/${blog._id}`} className="hover:text-primary transition-colors">
                       Edit
                     </Link>

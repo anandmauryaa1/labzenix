@@ -1,6 +1,7 @@
 import { getPageMetadata } from '@/lib/seo';
 import Hero from '@/components/home/Hero';
 import AboutSummary from '@/components/home/AboutSummary';
+import ProductCarousel from '@/components/home/ProductCarousel';
 import ProductCategories from '@/components/home/ProductCategories';
 import WhyChooseUs from '@/components/home/WhyChooseUs';
 import ProductRange from '@/components/home/ProductRange';
@@ -17,6 +18,7 @@ export default function Home() {
     <main className="overflow-hidden">
       <Hero />
       <AboutSummary />
+      <ProductCarousel />
       <ProductCategories />
       <WhyChooseUs />
       <ProductRange />

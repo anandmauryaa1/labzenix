@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import dbConnect from '@/lib/dbConnect';
 import Blog from '@/models/Blog';
 import User from '@/models/User';
@@ -32,8 +33,14 @@ export async function PUT(
     await dbConnect();
     const body = await req.json();
     
-    const blog = await Blog.findByIdAndUpdate(params.id, body, { new: true, runValidators: true });
+    const blog = await Blog.findByIdAndUpdate(params.id, body, { returnDocument: 'after', runValidators: true });
     if (!blog) return NextResponse.json({ error: 'Blog post not found' }, { status: 404 });
+
+    // Revalidate cached pages
+    revalidatePath('/admin/blogs');
+    revalidatePath('/blogs');
+    revalidatePath(`/blogs/${blog.slug}`);
+    revalidateTag('blogs');
 
     return NextResponse.json(blog);
   } catch (error: any) {
@@ -54,7 +61,7 @@ export async function DELETE(
     }
 
     await dbConnect();
-    console.log('Decommissioning Journal Entry:', params.id);
+    console.log('Deleting blog post:', params.id);
     const blog = await Blog.findByIdAndDelete(params.id);
     
     if (!blog) {
@@ -62,8 +69,15 @@ export async function DELETE(
       return NextResponse.json({ error: 'Blog post not found' }, { status: 404 });
     }
 
-    console.log('System Protocol: Entry decommissioned successfully:', params.id);
-    return NextResponse.json({ message: 'Journal entry decommissioned' });
+    console.log('Blog post deleted successfully:', params.id);
+    
+    // Revalidate cached pages
+    revalidatePath('/admin/blogs');
+    revalidatePath('/blogs');
+    revalidatePath(`/blogs/${blog.slug}`);
+    revalidateTag('blogs');
+    
+    return NextResponse.json({ message: 'Blog post deleted successfully' });
   } catch (error: any) {
     console.error('Delete Protocol Failure:', error);
     return handleProductionError(error);
