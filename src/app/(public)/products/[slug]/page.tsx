@@ -2,38 +2,36 @@ import { notFound } from 'next/navigation';
 import { revalidateTag } from 'next/cache';
 import dbConnect from '@/lib/dbConnect';
 import Product from '@/models/Product';
+import Review from '@/models/Review';
+import Faq from '@/models/Faq';
 import Category from '@/models/Category';
 import Settings from '@/models/Settings';
-import InquiryForm from '@/components/products/InquiryForm';
 import ImageCarousel from '@/components/products/ImageCarousel';
+import ProductTabs from '@/components/products/ProductTabs';
 import { Metadata } from 'next';
-import { Download, ChevronRight, CheckCircle2, Hash, ShieldCheck, Box, Zap, Settings as SettingsIcon, Link as LinkIcon } from 'lucide-react';
+import { Download, ChevronRight, Hash, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import * as motion from 'framer-motion/client';
 
-// Revalidate this page every 3600 seconds (1 hour)
-export const revalidate = 3600;
+// Always fetch fresh — reviews and FAQs must appear immediately after admin saves
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
-// Use cache tag for on-demand revalidation
-export async function generateStaticParams() {
-  await dbConnect();
-  const products = await Product.find({}, 'slug').lean();
-  return products.map(p => ({ slug: p.slug }));
-}
+
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   await dbConnect();
-  const product = await Product.findOne({ slug });
+  const product = await Product.findOne({ slug }).lean() as any;
   if (!product) return { title: 'Not Found' };
   return { 
     title: `${product.metaTitle} | LabZenix`, 
-    description: product.metaDescription || product.description.substring(0, 160),
+    description: product.metaDescription || product.description?.substring(0, 160),
     keywords: [product.category, product.title, product.modelNumber],
     openGraph: {
       title: product.metaTitle,
       description: product.metaDescription,
-      images: [product.images[0] || '/og-image.jpg'],
+      images: [product.images?.[0] || '/og-image.jpg'],
     }
   };
 }
@@ -50,8 +48,99 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   // Fetch social media settings
   const settings = await Settings.findOne({ configKey: 'global' }).lean() as any;
 
+  // Explicitly fetch reviews and FAQs from new collections
+  const rawReviews = await Review.find({ product: product._id }).lean() as any[];
+  const rawFaqs    = await Faq.find({ product: product._id }).lean() as any[];
+
+  /* ─── JSON-LD Structured Data ─────────────────────────── */
+  const reviews: { author: string; rating: number; comment: string; date?: string; images?: string[] }[] = JSON.parse(JSON.stringify(rawReviews ?? []));
+  const faqs:    { question: string; answer: string }[]                                 = JSON.parse(JSON.stringify(rawFaqs ?? []));
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://labzenix.com';
+  const productUrl = `${siteUrl}/products/${product.slug}`;
+
+  // Product schema
+  const productSchema: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.title,
+    description: product.description,
+    sku: product.modelNumber,
+    brand: {
+      '@type': 'Brand',
+      name: 'LabZenix',
+    },
+    image: (product.images ?? []).map((img: string) =>
+      img.startsWith('http') ? img : `${siteUrl}${img}`
+    ),
+    url: productUrl,
+    offers: {
+      '@type': 'Offer',
+      url: productUrl,
+      priceCurrency: 'INR',
+      availability: 'https://schema.org/InStock',
+      seller: {
+        '@type': 'Organization',
+        name: 'LabZenix',
+      },
+    },
+  };
+
+  // AggregateRating — only if there are reviews
+  if (reviews.length > 0) {
+    const totalRating = reviews.reduce((sum, r) => sum + (r.rating ?? 0), 0);
+    const avgRating   = totalRating / reviews.length;
+    productSchema.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: parseFloat(avgRating.toFixed(1)),
+      bestRating: 5,
+      worstRating: 1,
+      reviewCount: reviews.length,
+    };
+    productSchema.review = reviews.map((r) => ({
+      '@type': 'Review',
+      author: { '@type': 'Person', name: r.author },
+      reviewRating: {
+        '@type': 'Rating',
+        ratingValue: r.rating,
+        bestRating: 5,
+        worstRating: 1,
+      },
+      reviewBody: r.comment,
+      ...(r.date ? { datePublished: new Date(r.date).toISOString().split('T')[0] } : {}),
+    }));
+  }
+
+  // FAQPage schema — only if FAQs exist
+  const faqSchema = faqs.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faqs.map((f) => ({
+          '@type': 'Question',
+          name: f.question,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: f.answer,
+          },
+        })),
+      }
+    : null;
+
   return (
     <div className="bg-white">
+      {/* ── JSON-LD Structured Data (in <head> via Next.js) ── */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+      />
+      {faqSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+      )}
+
       {/* Breadcrumb */}
       <div className="max-w-7xl mx-auto px-4 py-6 border-b border-gray-100">
         <div className="flex items-center space-x-2 text-sm">
@@ -195,109 +284,21 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         </div>
       </div>
 
-      {/* Description Section */}
-      <div className="bg-gray-50 border-y border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-16">
-          <div className="space-y-8">
-            {/* Applications */}
-            <div>
-              <div className="flex items-center space-x-3 mb-6">
-                 <div className="w-10 h-10 bg-primary text-white flex items-center justify-center font-black">
-                    <Box className="w-5 h-5" />
-                 </div>
-                 <h2 className="text-2xl font-black text-secondary uppercase tracking-tighter">Product Overview & Applications</h2>
-              </div>
-              <p className="text-gray-700 leading-relaxed font-medium text-lg border-l-4 border-primary/20 pl-6 italic">
-                {product.description}
-              </p>
-            </div>
-
-            {/* Standards */}
-            {product.specificationText && (
-              <div>
-                <h3 className="text-lg font-black text-secondary uppercase tracking-tight mb-4">Standards</h3>
-                <p className="text-gray-700 leading-relaxed">{product.specificationText}</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Specifications Table */}
-      {product.specs && Object.keys(product.specs).length > 0 && (
-        <div className="max-w-7xl mx-auto px-4 py-16">
-          <h2 className="text-2xl font-black text-secondary uppercase tracking-tighter mb-8">Key Specifications</h2>
-          
-          <div className="overflow-x-auto border border-gray-200">
-            <table className="w-full">
-              <thead className="bg-[#004aad]/5 border-b-2 border-[#004aad]/20">
-                <tr>
-                  <th className="px-6 py-5 text-left text-[10px] font-black text-secondary uppercase tracking-[0.2em] flex items-center gap-2">
-                    <SettingsIcon className="w-3.5 h-3.5 text-primary" />
-                    Technical Parameter
-                  </th>
-                  <th className="px-6 py-5 text-left text-[10px] font-black text-secondary uppercase tracking-[0.2em]">Metric Value</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {Object.entries(product.specs).map(([key, value]) => (
-                  <tr key={key} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 font-bold text-gray-700">{key}</td>
-                    <td className="px-4 py-3 text-gray-600">{String(value)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* Features Section - List */}
-      {(product.features && product.features.length > 0) && (
-        <div className="bg-white border-y border-gray-200 py-16">
-          <div className="max-w-7xl mx-auto px-4">
-            <h2 className="text-2xl font-black text-secondary uppercase tracking-tighter mb-8">Features</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {product.features.map((feature: string, i: number) => (
-                <li key={i} className="flex items-center space-x-4 p-6 bg-gray-50 border border-gray-100 hover:border-primary/30 transition-all duration-300 hover:shadow-lg group">
-                  <div className="w-10 h-10 rounded-none bg-white border border-gray-200 flex items-center justify-center flex-shrink-0 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300">
-                    <CheckCircle2 className="w-5 h-5" />
-                  </div>
-                  <span className="text-secondary font-bold text-sm tracking-tight">{feature}</span>
-                </li>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* YouTube Video Section */}
-      {product.youtubeUrl && (
-        <div className="bg-gray-50 border-y border-gray-200 py-16">
-          <div className="max-w-7xl mx-auto px-4">
-            <h2 className="text-2xl font-black text-secondary uppercase tracking-tighter mb-8">Product Video</h2>
-            <div className="relative w-full bg-black rounded-lg overflow-hidden">
-              <div className="relative pt-[56.25%]">
-                <iframe
-                  className="absolute top-0 left-0 w-full h-full"
-                  src={product.youtubeUrl.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')}
-                  title="Product Video"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Inquiry Form Section */}
-      <div className="bg-gray-50 border-t border-gray-200 py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-2xl font-black text-secondary uppercase tracking-tighter mb-8">Get in Touch</h2>
-          <InquiryForm productId={product._id.toString()} productName={product.title} />
-        </div>
+      {/* Product Tabs Section */}
+      <div className="border-t border-gray-200">
+        <ProductTabs
+          product={{
+            _id: product._id.toString(),
+            title: product.title,
+            description: product.description,
+            specificationText: product.specificationText,
+            specs: product.specs,
+            features: product.features,
+            youtubeUrl: product.youtubeUrl,
+            reviews: reviews,
+            faqs: faqs,
+          }}
+        />
       </div>
 
       {/* Related Products */}

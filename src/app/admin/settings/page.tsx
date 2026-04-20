@@ -26,7 +26,13 @@ export default function AdminSettings() {
   const [config, setConfig] = useState({
     communication: {
       supportEmail: '',
-      salesHotline: '',
+      supportPhone: '',
+      salesEmail: '',
+      salesPhone: '',
+      marketingEmail: '',
+      marketingPhone: '',
+      seoEmail: '',
+      seoPhone: '',
       address: '',
     },
     social: {
@@ -54,12 +60,12 @@ export default function AdminSettings() {
       const res = await fetch('/api/admin/settings');
       if (res.ok) {
         const data = await res.json();
-        setConfig({
-          communication: data.communication || config.communication,
-          social: data.social || config.social,
-          seo: data.seo || config.seo,
-          integrations: data.integrations || config.integrations,
-        });
+        setConfig(prev => ({
+          communication: { ...prev.communication, ...(data.communication || {}) },
+          social: { ...prev.social, ...(data.social || {}) },
+          seo: { ...prev.seo, ...(data.seo || {}) },
+          integrations: { ...prev.integrations, ...(data.integrations || {}) },
+        }));
       }
     } catch (err) {
       toast.error('Failed to load settings');
@@ -202,26 +208,96 @@ export default function AdminSettings() {
                         Communication Protocol
                       </h3>
                       <div className="space-y-4">
-                        <div className="space-y-2">
-                           <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Support Email</label>
-                           <input 
-                             type="email" 
-                             value={config.communication.supportEmail}
-                             onChange={(e) => setConfig({...config, communication: {...config.communication, supportEmail: e.target.value}})}
-                             placeholder="support@labzenix.com" 
-                             className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary outline-none transition-all font-bold text-secondary" 
-                           />
-                        </div>
-                        <div className="space-y-2">
-                           <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Sales Hotline</label>
-                           <input 
-                             type="text" 
-                             value={config.communication.salesHotline}
-                             onChange={(e) => setConfig({...config, communication: {...config.communication, salesHotline: e.target.value}})}
-                             placeholder="+91 98765 43210" 
-                             className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary outline-none transition-all font-bold text-secondary" 
-                           />
-                        </div>
+                         <div className="grid grid-cols-2 gap-4">
+                           <div className="space-y-2">
+                              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Support Email</label>
+                              <input 
+                                type="email" 
+                                value={config.communication.supportEmail}
+                                onChange={(e) => setConfig({...config, communication: {...config.communication, supportEmail: e.target.value}})}
+                                placeholder="support@labzenix.com" 
+                                className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary outline-none transition-all font-bold text-secondary" 
+                              />
+                           </div>
+                           <div className="space-y-2">
+                              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Support Phone</label>
+                              <input 
+                                type="text" 
+                                value={config.communication.supportPhone}
+                                onChange={(e) => setConfig({...config, communication: {...config.communication, supportPhone: e.target.value}})}
+                                placeholder="+91 98765 00001" 
+                                className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary outline-none transition-all font-bold text-secondary" 
+                              />
+                           </div>
+                         </div>
+                         <div className="grid grid-cols-2 gap-4">
+                           <div className="space-y-2">
+                              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Sales Email</label>
+                              <input 
+                                type="email" 
+                                value={config.communication.salesEmail}
+                                onChange={(e) => setConfig({...config, communication: {...config.communication, salesEmail: e.target.value}})}
+                                placeholder="sales@labzenix.com" 
+                                className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary outline-none transition-all font-bold text-secondary" 
+                              />
+                           </div>
+                           <div className="space-y-2">
+                              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Sales Hotline</label>
+                              <input 
+                                type="text" 
+                                value={config.communication.salesPhone}
+                                onChange={(e) => setConfig({...config, communication: {...config.communication, salesPhone: e.target.value}})}
+                                placeholder="+91 98765 00002" 
+                                className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary outline-none transition-all font-bold text-secondary" 
+                              />
+                           </div>
+                         </div>
+                         
+                         <div className="grid grid-cols-2 gap-4">
+                           <div className="space-y-2">
+                              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Marketing Email</label>
+                              <input 
+                                type="email" 
+                                value={config.communication.marketingEmail}
+                                onChange={(e) => setConfig({...config, communication: {...config.communication, marketingEmail: e.target.value}})}
+                                placeholder="marketing@labzenix.com" 
+                                className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary outline-none transition-all font-bold text-secondary" 
+                              />
+                           </div>
+                           <div className="space-y-2">
+                              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Marketing Phone</label>
+                              <input 
+                                type="text" 
+                                value={config.communication.marketingPhone}
+                                onChange={(e) => setConfig({...config, communication: {...config.communication, marketingPhone: e.target.value}})}
+                                placeholder="+91 98765 00003" 
+                                className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary outline-none transition-all font-bold text-secondary" 
+                              />
+                           </div>
+                         </div>
+                         
+                         <div className="grid grid-cols-2 gap-4">
+                           <div className="space-y-2">
+                              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">SEO Team Email</label>
+                              <input 
+                                type="email" 
+                                value={config.communication.seoEmail}
+                                onChange={(e) => setConfig({...config, communication: {...config.communication, seoEmail: e.target.value}})}
+                                placeholder="seo@labzenix.com" 
+                                className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary outline-none transition-all font-bold text-secondary" 
+                              />
+                           </div>
+                           <div className="space-y-2">
+                              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">SEO Team Phone</label>
+                              <input 
+                                type="text" 
+                                value={config.communication.seoPhone}
+                                onChange={(e) => setConfig({...config, communication: {...config.communication, seoPhone: e.target.value}})}
+                                placeholder="+91 98765 00004" 
+                                className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary outline-none transition-all font-bold text-secondary" 
+                              />
+                           </div>
+                         </div>
                       </div>
                     </div>
 
@@ -331,7 +407,7 @@ export default function AdminSettings() {
                 <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
                   <div className="bg-secondary p-8 text-white relative overflow-hidden">
                     <div className="relative z-10">
-                      <h3 className="text-xl font-black uppercase tracking-tight mb-2">Global Meta Architecture</h3>
+                      <h3 className="text-xl text-white uppercase tracking-tight mb-2">Global Meta Architecture</h3>
                       <p className="text-sm text-white/60 font-medium">These settings apply site-wide when individual pages lack specific metadata.</p>
                     </div>
                     <Globe className="absolute -bottom-10 -right-10 w-40 h-40 text-white/5" />

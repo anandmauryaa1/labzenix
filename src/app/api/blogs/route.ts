@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     // Revalidate cached pages
     revalidatePath('/admin/blogs');
     revalidatePath('/blogs');
-    revalidateTag('blogs');
+    revalidateTag('blogs', "default");
     
     return NextResponse.json(blog, { status: 201 });
   } catch (error: any) {

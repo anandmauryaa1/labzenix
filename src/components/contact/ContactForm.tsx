@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { Phone, Mail, MapPin, Clock, Send, CheckCircle2 } from 'lucide-react';
@@ -16,6 +16,11 @@ export default function ContactForm() {
     subject: '',
     message: ''
   });
+  const [settings, setSettings] = useState<any>(null);
+
+  useEffect(() => {
+    fetch('/api/settings').then(res => res.json()).then(data => setSettings(data)).catch(console.error);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -93,7 +98,7 @@ export default function ContactForm() {
                     </div>
                     <div className="ml-6">
                       <p className="text-sm font-bold text-secondary uppercase tracking-widest mb-1">Call Us</p>
-                      <a href="tel:+919565453120" className="text-lg text-gray-600 hover:text-primary transition-colors font-semibold">+91-9565453120</a>
+                      <a href={`tel:${settings?.communication?.supportPhone || '+919565453120'}`} className="text-lg text-gray-600 hover:text-primary transition-colors font-semibold">{settings?.communication?.supportPhone || '+91-9565453120'}</a>
                     </div>
                   </div>
                   <div className="flex items-start">
@@ -102,7 +107,7 @@ export default function ContactForm() {
                     </div>
                     <div className="ml-6">
                       <p className="text-sm font-bold text-secondary uppercase tracking-widest mb-1">Email Us</p>
-                      <a href="mailto:info@labzenix.com" className="text-lg text-gray-600 hover:text-primary transition-colors font-semibold">info@labzenix.com</a>
+                      <a href={`mailto:${settings?.communication?.supportEmail || 'info@labzenix.com'}`} className="text-lg text-gray-600 hover:text-primary transition-colors font-semibold">{settings?.communication?.supportEmail || 'info@labzenix.com'}</a>
                     </div>
                   </div>
                 </div>
@@ -116,10 +121,8 @@ export default function ContactForm() {
                   </div>
                   <div className="ml-6">
                     <p className="text-sm font-bold text-secondary uppercase tracking-widest mb-1">Location</p>
-                    <p className="text-gray-600 leading-relaxed">
-                      123, Instrument Square,<br />
-                      Industrial Area Phase II, Mohali,<br />
-                      Punjab - 160062, India
+                    <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                      {settings?.communication?.address || '123, Instrument Square,\nIndustrial Area Phase II, Mohali,\nPunjab - 160062, India'}
                     </p>
                   </div>
                 </div>

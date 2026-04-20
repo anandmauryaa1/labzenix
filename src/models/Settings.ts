@@ -4,7 +4,13 @@ const SettingsSchema = new mongoose.Schema({
   configKey: { type: String, default: 'global', unique: true }, // Singleton pattern
   communication: {
     supportEmail: { type: String, default: 'support@labzenix.com' },
-    salesHotline: { type: String, default: '+91 98765 43210' },
+    supportPhone: { type: String, default: '+91 98765 00001' },
+    salesEmail: { type: String, default: 'sales@labzenix.com' },
+    salesPhone: { type: String, default: '+91 98765 00002' },
+    marketingEmail: { type: String, default: 'marketing@labzenix.com' },
+    marketingPhone: { type: String, default: '+91 98765 00003' },
+    seoEmail: { type: String, default: 'seo@labzenix.com' },
+    seoPhone: { type: String, default: '+91 98765 00004' },
     address: { type: String, default: 'Industrial Park, Sector 4, New Delhi' },
   },
   social: {
@@ -24,7 +30,7 @@ const SettingsSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
-SettingsSchema.pre('save', function(next) {
+SettingsSchema.pre('save', function(this: any, next: any) {
   this.updatedAt = new Date();
   next();
 });

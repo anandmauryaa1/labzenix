@@ -17,38 +17,38 @@ export async function invalidateAdminCaches() {
   revalidatePath('/');
   
   // Cache tags
-  revalidateTag('products');
-  revalidateTag('blogs');
-  revalidateTag('categories');
-  revalidateTag('seo');
+  revalidateTag('products', "default");
+  revalidateTag('blogs', "default");
+  revalidateTag('categories', "default");
+  revalidateTag('seo', "default");
 }
 
 export async function invalidateProductCaches(slug?: string) {
   revalidatePath('/admin/products');
   revalidatePath('/products');
   if (slug) revalidatePath(`/products/${slug}`);
-  revalidateTag('products');
-  revalidateTag('categories');
+  revalidateTag('products', "default");
+  revalidateTag('categories', "default");
 }
 
 export async function invalidateBlogCaches(slug?: string) {
   revalidatePath('/admin/blogs');
   revalidatePath('/blogs');
   if (slug) revalidatePath(`/blogs/${slug}`);
-  revalidateTag('blogs');
+  revalidateTag('blogs', "default");
 }
 
 export async function invalidateCategoryCaches() {
   revalidatePath('/admin/products/categories');
   revalidatePath('/products');
-  revalidateTag('categories');
+  revalidateTag('categories', "default");
 }
 
 export async function invalidateSEOCaches(pageKey?: string) {
   revalidatePath('/admin/seo');
   if (pageKey) {
     revalidatePath(`/${pageKey}`);
-    revalidateTag(pageKey);
+    revalidateTag(pageKey, "default");
   }
-  revalidateTag('seo');
+  revalidateTag('seo', "default");
 }

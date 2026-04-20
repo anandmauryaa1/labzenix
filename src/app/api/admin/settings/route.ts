@@ -33,10 +33,22 @@ export async function POST(req: NextRequest) {
     await dbConnect();
     const body = await req.json();
     
+    // Flatten the body to properly update nested Mongoose paths using dot notation
+    const flattenedBody: Record<string, any> = {};
+    for (const [key, value] of Object.entries(body)) {
+      if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+        for (const [subKey, subValue] of Object.entries(value)) {
+          flattenedBody[`${key}.${subKey}`] = subValue;
+        }
+      } else {
+        flattenedBody[key] = value;
+      }
+    }
+    
     const settings = await Settings.findOneAndUpdate(
       { configKey: 'global' },
-      { $set: body },
-      { returnDocument: 'after', upsert: true }
+      { $set: flattenedBody },
+      { new: true, upsert: true, strict: false }
     );
 
     return NextResponse.json(settings);

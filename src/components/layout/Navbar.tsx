@@ -26,6 +26,11 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
+  const [settings, setSettings] = useState<any>(null);
+
+  useEffect(() => {
+    fetch('/api/settings').then(res => res.json()).then(data => setSettings(data)).catch(console.error);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40);
@@ -39,13 +44,13 @@ export default function Navbar() {
       <div className="bg-primary text-white py-2 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex justify-between items-center text-sm font-medium">
           <div className="flex items-center space-x-6">
-            <a href="tel:+919565453120" className="flex items-center hover:text-gray-200 transition-colors">
+            <a href={`tel:${settings?.communication?.supportPhone || '+919565453120'}`} className="flex items-center hover:text-gray-200 transition-colors">
               <Phone className="w-3.5 h-3.5 mr-2" />
-              <span>+91-9565453120</span>
+              <span>{settings?.communication?.supportPhone || '+91-9565453120'}</span>
             </a>
-            <a href="mailto:info@labzenix.com" className="hidden lg:flex items-center hover:text-gray-200 transition-colors">
+            <a href={`mailto:${settings?.communication?.supportEmail || 'info@labzenix.com'}`} className="hidden lg:flex items-center hover:text-gray-200 transition-colors">
               <Mail className="w-3.5 h-3.5 mr-2" />
-              <span>info@labzenix.com</span>
+              <span>{settings?.communication?.supportEmail || 'info@labzenix.com'}</span>
             </a>
           </div>
           <div className="flex items-center space-x-4">
@@ -178,13 +183,13 @@ export default function Navbar() {
                 </div>
               ))}
               <div className="pt-4 px-3 flex flex-col space-y-4">
-                <a href="tel:+919565453120" className="flex items-center text-gray-600">
+                <a href={`tel:${settings?.communication?.supportPhone || '+919565453120'}`} className="flex items-center text-gray-600">
                   <Phone className="w-4 h-4 mr-3" />
-                  <span>+91-9565453120</span>
+                  <span>{settings?.communication?.supportPhone || '+91-9565453120'}</span>
                 </a>
-                <a href="mailto:info@labzenix.com" className="flex items-center text-gray-600">
+                <a href={`mailto:${settings?.communication?.supportEmail || 'info@labzenix.com'}`} className="flex items-center text-gray-600">
                   <Mail className="w-4 h-4 mr-3" />
-                  <span>info@labzenix.com</span>
+                  <span>{settings?.communication?.supportEmail || 'info@labzenix.com'}</span>
                 </a>
               </div>
             </div>

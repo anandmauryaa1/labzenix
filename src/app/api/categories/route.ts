@@ -6,9 +6,14 @@ import slugify from 'slugify';
 import { handleProductionError } from '@/lib/errorHandler';
 
 export async function GET() {
-  await dbConnect();
-  const categories = await Category.find({}).sort({ name: 1 });
-  return NextResponse.json(categories);
+  try {
+    await dbConnect();
+    const categories = await Category.find({}).sort({ name: 1 }).lean();
+    return NextResponse.json(JSON.parse(JSON.stringify(categories)));
+  } catch (error) {
+    console.error('[API] GET categories error:', error);
+    return NextResponse.json({ error: 'Failed to fetch categories' }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -26,9 +31,9 @@ export async function POST(req: NextRequest) {
     // Revalidate cached pages
     revalidatePath('/admin/products/categories');
     revalidatePath('/products');
-    revalidateTag('categories');
+    revalidateTag('categories', "default");
     
-    return NextResponse.json(category, { status: 201 });
+    return NextResponse.json(JSON.parse(JSON.stringify(category)), { status: 201 });
   } catch (error: any) {
     return handleProductionError(error);
   }

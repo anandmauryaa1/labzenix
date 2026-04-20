@@ -2,17 +2,26 @@ import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import dbConnect from '@/lib/dbConnect';
 import Product from '@/models/Product';
+import Review from '@/models/Review';
+import Faq from '@/models/Faq';
 import User from '@/models/User';
 import jwt from 'jsonwebtoken';
 import { handleProductionError } from '@/lib/errorHandler';
 
 export async function GET() {
-  await dbConnect();
-  const products = await Product.find({})
-    .populate({ path: 'author', model: User, select: 'name' })
-    .sort({ createdAt: -1 });
-  return NextResponse.json(products);
+  try {
+    await dbConnect();
+    const products = await Product.find({})
+      .populate({ path: 'author', model: User, select: 'name' })
+      .sort({ createdAt: -1 })
+      .lean();
+    return NextResponse.json(JSON.parse(JSON.stringify(products)));
+  } catch (error) {
+    console.error('[API] GET products error:', error);
+    return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
+  }
 }
+
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,7 +31,7 @@ export async function POST(req: NextRequest) {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
     
     await dbConnect();
-    const body = await req.json();
+    const { reviews, faqs, ...body } = await req.json();
     
     console.log('[API] Processing Authenticated Product Insertion...');
     
@@ -66,15 +75,31 @@ export async function POST(req: NextRequest) {
     });
 
     console.log('[API] Product created successfully - ID:', product._id);
+
+    // Save reviews and FAQs referencing the newly created product
+    if (Array.isArray(reviews) && reviews.length > 0) {
+      const reviewsToInsert = reviews.map(({ _id, ...r }: any) => ({ ...r, product: product._id }));
+      await Review.insertMany(reviewsToInsert);
+    }
+    
+    if (Array.isArray(faqs) && faqs.length > 0) {
+      const faqsToInsert = faqs.map(({ _id, ...f }: any) => ({ ...f, product: product._id }));
+      await Faq.insertMany(faqsToInsert);
+    }
+
+    // Attach them back for the JSON response
+    const productJson = product.toJSON();
+    productJson.reviews = Array.isArray(reviews) ? reviews : [];
+    productJson.faqs = Array.isArray(faqs) ? faqs : [];
     
     // Revalidate cached pages
     revalidatePath('/admin/products');
     revalidatePath('/products');
     revalidatePath(`/products/${product.slug}`);
-    revalidateTag('products');
-    revalidateTag('categories');
+    revalidateTag('products', "default");
+    revalidateTag('categories', "default");
     
-    return NextResponse.json(product, { status: 201 });
+    return NextResponse.json(JSON.parse(JSON.stringify(productJson)), { status: 201 });
   } catch (error: any) {
     console.error('[API] FATAL: Product Creation Interrupted');
     console.error(error);

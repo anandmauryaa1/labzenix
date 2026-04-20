@@ -21,7 +21,7 @@ const PageMetaSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
-PageMetaSchema.pre('save', function(next) {
+PageMetaSchema.pre('save', function(this: any, next: any) {
   this.updatedAt = new Date();
   next();
 });
