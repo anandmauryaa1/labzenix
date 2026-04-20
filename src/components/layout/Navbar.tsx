@@ -60,7 +60,11 @@ export default function Navbar() {
       </div>
 
       {/* Main Header */}
-      <div className={`transition-all duration-300 ${scrolled ? 'bg-white shadow-md py-2' : 'bg-white/95 py-4'}`}>
+      <div className={`transition-all duration-500 ${
+        scrolled 
+          ? 'bg-white/80 backdrop-blur-md shadow-lg py-2 border-b border-gray-100' 
+          : 'bg-white/95 py-5'
+      }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
             {/* Logo */}

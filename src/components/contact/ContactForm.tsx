@@ -5,6 +5,7 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { Phone, Mail, MapPin, Clock, Send, CheckCircle2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import FadeIn from '@/components/ui/FadeIn';
 
 export default function ContactForm() {
   const [loading, setLoading] = useState(false);
@@ -77,7 +78,7 @@ export default function ContactForm() {
         <div className="absolute inset-0 bg-primary/5 pattern-grid opacity-20" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <span className="text-primary font-bold tracking-[0.3em] uppercase text-xs mb-4 block">Availability</span>
-          <h1 className="text-4xl md:text-6xl font-black mb-6 uppercase tracking-tighter leading-none">Connect With Us</h1>
+          <h1 className="text-4xl md:text-6xl font-black text-white mb-6 uppercase tracking-tighter leading-none">Connect With Us</h1>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto font-medium">
             Have questions about our laboratory instruments or need a custom quote? Our technical experts are here to assist you.
           </p>
@@ -204,18 +205,18 @@ export default function ContactForm() {
         </div>
       </section>
 
-      {/* Map Placeholder */}
-      <section className="h-96 w-full bg-gray-200 mt-12 relative overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center text-gray-500 font-bold text-xl uppercase tracking-widest bg-gray-100 z-10 pointer-events-none">
-           Interactive Map Integration
-        </div>
-        <iframe 
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d11012.34567890123!2d76.7123456!3d30.7123456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390fef1234567890%3A0x1234567890abcdef!2sIndustrial%20Area%2C%20Phase%20II%2C%20SAS%20Nagar%2C%20Punjab%20160062!5e0!3m2!1sen!2sin!4v1612345678901"
-          className="w-full h-full border-0 grayscale opacity-50"
-          allowFullScreen
-          loading="lazy"
-        ></iframe>
-      </section>
+      {/* Map Section */}
+      <FadeIn direction="up">
+        <section className="h-[500px] w-full bg-gray-100 mt-12 relative overflow-hidden group">
+          <iframe 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3430.2!2d76.7!3d30.7!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390fef!2sIndustrial%20Area%2C%20Phase%20II%2C%20SAS%20Nagar%2C%20Punjab!5e0!3m2!1sen!2sin!4v1612345678901"
+            className="w-full h-full border-0 transition-all duration-700 group-hover:scale-105"
+            allowFullScreen
+            loading="lazy"
+            title="LabZenix Location"
+          ></iframe>
+        </section>
+      </FadeIn>
     </div>
   );
 }

@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import FadeIn from '../ui/FadeIn';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Product {
   _id: string;
@@ -55,7 +57,7 @@ export default function ProductCarousel() {
       <section className="py-24 px-4 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto">
           <div className="h-96 flex items-center justify-center">
-            <p className="text-gray-500">Loading products...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
           </div>
         </div>
       </section>
@@ -69,102 +71,126 @@ export default function ProductCarousel() {
   const visibleProducts = products.slice(currentIndex, currentIndex + itemsPerSlide);
   const canScrollNext = currentIndex + itemsPerSlide < products.length;
 
+  const itemVariant = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0 }
+  };
+
   return (
-    <section className="py-24 px-4 bg-gradient-to-b from-gray-50 to-white border-b border-gray-100">
+    <section className="py-24 px-4 bg-gradient-to-b from-gray-50 to-white border-b border-gray-100 overflow-hidden">
       <div className="max-w-7xl mx-auto">
-        <span className="block text-primary font-bold tracking-[0.3em] uppercase text-xs text-center mb-4">
-          Featured Products
-        </span>
-        <h2 className="text-4xl md:text-5xl font-black mb-4 text-center text-secondary uppercase tracking-tighter">
-          Premium Testing Solutions
-        </h2>
-        <p className="text-center text-gray-600 mb-16 max-w-2xl mx-auto">
-          Explore our collection of cutting-edge laboratory and production equipment designed for precision testing.
-        </p>
+        <FadeIn direction="up">
+          <span className="block text-primary font-bold tracking-[0.3em] uppercase text-xs text-center mb-4">
+            Featured Products
+          </span>
+          <h2 className="text-4xl md:text-5xl font-black mb-4 text-center text-secondary uppercase tracking-tighter">
+            Premium Testing Solutions
+          </h2>
+          <p className="text-center text-gray-600 mb-16 max-w-2xl mx-auto font-medium">
+            Explore our collection of cutting-edge laboratory and production equipment designed for precision testing.
+          </p>
+        </FadeIn>
 
         <div className="relative">
           {/* Product Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {visibleProducts.map((product) => (
-              <Link key={product._id} href={`/products/${product.slug}`}>
-                <div className="h-full bg-white border border-gray-200 hover:border-primary hover:shadow-2xl transition-all duration-300 group cursor-pointer overflow-hidden">
-                  {/* Image Container */}
-                  <div className="relative w-full h-48 bg-gray-100 overflow-hidden">
-                    {product.images && product.images.length > 0 ? (
-                      <Image
-                        src={product.images[0]}
-                        alt={product.title}
-                        fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400">
-                        No Image
-                      </div>
-                    )}
-                    <div className="absolute top-2 right-2 bg-primary text-white px-3 py-1 text-xs font-bold uppercase tracking-wider">
-                      {product.category}
-                    </div>
-                  </div>
+          <FadeIn stagger direction="none" delay={0.2}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <AnimatePresence mode="popLayout">
+                {visibleProducts.map((product) => (
+                  <motion.div
+                    layout
+                    key={product._id}
+                    variants={itemVariant}
+                    initial="hidden"
+                    animate="visible"
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <Link href={`/products/${product.slug}`}>
+                      <div className="h-full bg-white border border-gray-200 hover:border-primary hover:shadow-2xl transition-all duration-500 group cursor-pointer overflow-hidden flex flex-col">
+                        {/* Image Container */}
+                        <div className="relative w-full h-52 bg-gray-100 overflow-hidden">
+                          {product.images && product.images.length > 0 ? (
+                            <Image
+                              src={product.images[0]}
+                              alt={product.title}
+                              fill
+                              className="object-cover group-hover:scale-110 transition-transform duration-700"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400 font-bold uppercase tracking-widest text-[10px]">
+                              No Product Image
+                            </div>
+                          )}
+                          <div className="absolute top-0 right-0 bg-primary text-white px-4 py-2 text-[10px] font-black uppercase tracking-widest z-20">
+                            {product.category}
+                          </div>
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500 z-10" />
+                        </div>
 
-                  {/* Content */}
-                  <div className="p-6">
-                    <p className="text-xs text-primary font-bold uppercase tracking-widest mb-2">
-                      {product.modelNumber}
-                    </p>
-                    <h3 className="text-lg font-bold text-secondary mb-2 line-clamp-2 group-hover:text-primary transition-colors">
-                      {product.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 line-clamp-3 mb-4">
-                      {product.description}
-                    </p>
-                    <div className="inline-block border-b-2 border-primary text-primary font-bold text-sm uppercase tracking-wider group-hover:translate-x-2 transition-transform">
-                      View Details →
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+                        {/* Content */}
+                        <div className="p-6 flex flex-col flex-grow">
+                          <p className="text-[10px] text-primary font-black uppercase tracking-[0.2em] mb-2">
+                            {product.modelNumber}
+                          </p>
+                          <h3 className="text-lg font-black text-secondary mb-3 line-clamp-2 group-hover:text-primary transition-colors leading-tight uppercase tracking-tight">
+                            {product.title}
+                          </h3>
+                          <p className="text-sm text-gray-500 font-medium line-clamp-3 mb-6 flex-grow">
+                            {product.description}
+                          </p>
+                          <div className="inline-flex items-center text-primary font-black text-[10px] uppercase tracking-widest group-hover:translate-x-3 transition-transform duration-300">
+                             Explore Details <span className="ml-2 text-sm">→</span>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          </FadeIn>
 
           {/* Navigation Buttons */}
-          <div className="flex justify-center items-center gap-4 mt-12">
-            <button
-              onClick={handlePrev}
-              disabled={currentIndex === 0}
-              className="p-3 rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              aria-label="Previous products"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
+          <FadeIn direction="up" delay={0.4}>
+            <div className="flex justify-center items-center gap-6 mt-16">
+              <button
+                onClick={handlePrev}
+                disabled={currentIndex === 0}
+                className="p-4 rounded-none border border-gray-200 text-secondary hover:bg-secondary hover:text-white transition-all disabled:opacity-20 disabled:cursor-not-allowed group cursor-pointer"
+                aria-label="Previous products"
+              >
+                <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+              </button>
 
-            {/* Indicator Dots */}
-            <div className="flex gap-2">
-              {Array.from({ length: Math.ceil(products.length / itemsPerSlide) }).map(
-                (_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentIndex(index * itemsPerSlide)}
-                    className={`w-2 h-2 rounded-full transition-all ${
-                      index === Math.floor(currentIndex / itemsPerSlide)
-                        ? 'bg-primary w-8'
-                        : 'bg-gray-300 hover:bg-gray-400'
-                    }`}
-                    aria-label={`Go to slide ${index + 1}`}
-                  />
-                )
-              )}
+              {/* Indicator Dots */}
+              <div className="flex gap-3">
+                {Array.from({ length: Math.ceil(products.length / itemsPerSlide) }).map(
+                  (_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentIndex(index * itemsPerSlide)}
+                      className={`h-1.5 rounded-none transition-all duration-500 ${
+                        index === Math.floor(currentIndex / itemsPerSlide)
+                          ? 'bg-primary w-12'
+                          : 'bg-gray-200 hover:bg-gray-300 w-6'
+                      }`}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  )
+                )}
+              </div>
+
+              <button
+                onClick={handleNext}
+                disabled={!canScrollNext}
+                className="p-4 rounded-none border border-gray-200 text-secondary hover:bg-secondary hover:text-white transition-all disabled:opacity-20 disabled:cursor-not-allowed group cursor-pointer"
+                aria-label="Next products"
+              >
+                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
             </div>
-
-            <button
-              onClick={handleNext}
-              disabled={!canScrollNext}
-              className="p-3 rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              aria-label="Next products"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
+          </FadeIn>
         </div>
       </div>
     </section>

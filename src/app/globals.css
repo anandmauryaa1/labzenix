@@ -169,3 +169,15 @@
   @apply border-t border-gray-300 my-8;
 }
 
+
+@keyframes scan {
+  0% { top: 0; opacity: 0; }
+  5% { opacity: 0.5; }
+  50% { top: 100%; opacity: 0.5; }
+  95% { opacity: 0.5; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.animate-scan {
+  animation: scan 4s linear infinite;
+}
