@@ -28,12 +28,17 @@ interface Category {
 
 function ProductsContent() {
   const searchParams = useSearchParams();
-  const categoryParam = searchParams.get('category'); 
+  const categoryParam = searchParams.get('category');
+  const searchParam   = searchParams.get('search') ?? '';  // from navbar
 
   const [products, setProducts]     = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading]       = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  // localSearch drives the in-page search box; URL param takes precedence
+  const [localSearch, setLocalSearch] = useState('');
+
+  // Effective search term: URL param wins (navbar search), else in-page input
+  const searchTerm = searchParam || localSearch;
 
   const itemVariant = {
     hidden: { opacity: 0, y: 20 },
@@ -53,7 +58,7 @@ function ProductsContent() {
 
   useEffect(() => {
     fetchProducts();
-  }, [categoryParam]);
+  }, [categoryParam]);   // searchParam changes don't need a re-fetch (filtering is client-side)
 
   async function fetchProducts() {
     setLoading(true);
@@ -83,13 +88,17 @@ function ProductsContent() {
     }
   }
 
-  const filteredProducts = products.filter(p =>
-    p.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.modelNumber?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredProducts = searchTerm
+    ? products.filter(p =>
+        p.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.modelNumber?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : products;
 
-  if (!categoryParam) {
+
+  // If searching across all products (no category filter) — show grid directly
+  if (!categoryParam && !searchTerm) {
     return (
       <div className="bg-white overflow-hidden">
         {/* Hero */}
@@ -169,7 +178,7 @@ function ProductsContent() {
     );
   }
 
-  // ── Category products view (filter selected) ─────────────
+  // ── Category / Search results view ───────────────────────
   return (
     <div className="bg-white overflow-hidden">
       <section className="py-24 px-4 bg-gradient-to-b from-gray-50 to-white">
@@ -183,15 +192,27 @@ function ProductsContent() {
                 </button>
               </Link>
               <div>
-                <h1 className="text-5xl md:text-7xl font-black text-secondary uppercase tracking-tighter leading-none mb-2">
-                  {selectedCategory?.name ?? categoryParam}
-                </h1>
-                {selectedCategory?.description && (
-                  <p className="text-gray-500 font-medium text-lg lg:text-xl max-w-2xl">{selectedCategory.description}</p>
+                {searchTerm && !categoryParam ? (
+                  <>
+                    <p className="text-primary font-black tracking-[0.3em] uppercase text-[10px] mb-2">Search Results</p>
+                    <h1 className="text-5xl md:text-7xl font-black text-secondary uppercase tracking-tighter leading-none mb-2">
+                      &ldquo;{searchTerm}&rdquo;
+                    </h1>
+                  </>
+                ) : (
+                  <>
+                    <h1 className="text-5xl md:text-7xl font-black text-secondary uppercase tracking-tighter leading-none mb-2">
+                      {selectedCategory?.name ?? categoryParam}
+                    </h1>
+                    {selectedCategory?.description && (
+                      <p className="text-gray-500 font-medium text-lg lg:text-xl max-w-2xl">{selectedCategory.description}</p>
+                    )}
+                  </>
                 )}
               </div>
             </div>
           </FadeIn>
+
 
           {/* Search */}
           <FadeIn direction="up" delay={0.1}>
@@ -200,9 +221,10 @@ function ProductsContent() {
                 <Search className="w-5 h-5 text-gray-400 mx-5 group-focus-within:text-primary transition-colors" />
                 <input
                   type="text"
-                  placeholder="Search instruments in this category..."
-                  value={searchTerm}
-                  onChange={e => setSearchTerm(e.target.value)}
+                  placeholder={searchParam ? `Filtering within "${searchParam}"...` : 'Search instruments...'}
+                  value={searchParam ? '' : localSearch}
+                  onChange={e => setLocalSearch(e.target.value)}
+                  readOnly={!!searchParam}
                   className="flex-grow px-3 py-5 outline-none text-gray-700 font-bold uppercase tracking-widest text-xs"
                 />
               </div>
@@ -222,7 +244,7 @@ function ProductsContent() {
               </p>
               {searchTerm && (
                 <button
-                  onClick={() => setSearchTerm('')}
+                  onClick={() => { setLocalSearch(''); if (searchParam) window.location.href = '/products'; }}
                   className="mt-6 text-primary font-black uppercase tracking-[0.2em] text-xs underline hover:no-underline cursor-pointer"
                 >
                   Clear search

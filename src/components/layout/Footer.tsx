@@ -6,9 +6,11 @@ import { Phone, Mail, MapPin } from 'lucide-react';
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   const [settings, setSettings] = useState<any>(null);
+  const [categories, setCategories] = useState<{ _id: string; name: string }[]>([]);
 
   useEffect(() => {
     fetch('/api/settings').then(res => res.json()).then(data => setSettings(data)).catch(console.error);
+    fetch('/api/categories').then(res => res.json()).then(data => setCategories(Array.isArray(data) ? data : [])).catch(console.error);
   }, []);
 
   return (
@@ -48,26 +50,31 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Product Categories */}
+          {/* Product Categories — dynamic from DB */}
           <div>
             <h3 className="text-sm font-black text-secondary mb-8 uppercase tracking-[0.2em] relative pb-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-8 after:h-1 after:bg-primary">
               Industries
             </h3>
             <ul className="space-y-4">
-              {[
-                'Paper & Packaging',
-                'PET & Preform',
-                'Plastic & Poly',
-                'Paint & Coating',
-                'Material Testing'
-              ].map((item) => (
-                <li key={item}>
-                  <Link href="/products" className="text-gray-600 hover:text-primary transition-all flex items-center group font-normal text-sm uppercase tracking-wider">
-                    <span className="w-0 group-hover:w-3 h-0.5 bg-primary mr-0 group-hover:mr-2 transition-all"></span>
-                    {item}
-                  </Link>
-                </li>
-              ))}
+              {categories.length === 0
+                ? /* skeleton while loading */
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <li key={i}>
+                      <span className="block h-3 w-32 bg-gray-100 animate-pulse rounded-sm" />
+                    </li>
+                  ))
+                : categories.map((cat) => (
+                    <li key={cat._id}>
+                      <Link
+                        href={`/products?category=${encodeURIComponent(cat.name)}`}
+                        className="text-gray-600 hover:text-primary transition-all flex items-center group font-normal text-sm uppercase tracking-wider"
+                      >
+                        <span className="w-0 group-hover:w-3 h-0.5 bg-primary mr-0 group-hover:mr-2 transition-all" />
+                        {cat.name}
+                      </Link>
+                    </li>
+                  ))
+              }
             </ul>
           </div>
 

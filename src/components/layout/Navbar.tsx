@@ -1,8 +1,9 @@
 'use client';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, Mail, Search, Menu, X, ChevronDown } from 'lucide-react';
+import { Phone, Mail, Search, Menu, X, ChevronDown, ArrowRight } from 'lucide-react';
 import Button from '../ui/Button';
 
 const navLinks = [
@@ -10,12 +11,12 @@ const navLinks = [
   { 
     name: 'Products', 
     href: '/products',
-    submenu: [
-      { name: 'Paper & Packaging', href: '/products?category=paper-packaging' },
-      { name: 'PET & Preform', href: '/products?category=pet-preform' },
-      { name: 'Plastic & Poly', href: '/products?category=plastic-poly' },
-      { name: 'Paint & Coating', href: '/products?category=paint-coating' },
-    ]
+    // submenu: [
+    //   { name: 'Paper & Packaging', href: '/products?category=paper-packaging' },
+    //   { name: 'PET & Preform', href: '/products?category=pet-preform' },
+    //   { name: 'Plastic & Poly', href: '/products?category=plastic-poly' },
+    //   { name: 'Paint & Coating', href: '/products?category=paint-coating' },
+    // ]
   },
   { name: 'About Us', href: '/about' },
   { name: 'Blog', href: '/blogs' },
@@ -23,10 +24,16 @@ const navLinks = [
 ];
 
 export default function Navbar() {
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
   const [settings, setSettings] = useState<any>(null);
+
+  // Search state
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetch('/api/settings').then(res => res.json()).then(data => setSettings(data)).catch(console.error);
@@ -37,6 +44,32 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Focus input when search opens
+  useEffect(() => {
+    if (searchOpen) {
+      setTimeout(() => searchInputRef.current?.focus(), 100);
+    } else {
+      setSearchQuery('');
+    }
+  }, [searchOpen]);
+
+  // Close search on Escape
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSearchOpen(false);
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, []);
+
+  const handleSearch = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    const q = searchQuery.trim();
+    if (!q) return;
+    setSearchOpen(false);
+    router.push(`/products?search=${encodeURIComponent(q)}`);
+  };
 
   return (
     <header className="fixed top-0 w-full z-50 transition-all duration-300">
@@ -116,10 +149,63 @@ export default function Navbar() {
             </nav>
 
             {/* Actions */}
-            <div className="flex items-center space-x-4">
-              <button className="hidden lg:flex p-2 text-gray-600 hover:text-primary transition-colors">
-                <Search className="w-5 h-5" />
-              </button>
+            <div className="flex items-center space-x-3">
+              {/* ── Expandable Search ────────────────────────── */}
+              <div className="hidden lg:flex items-center">
+                <AnimatePresence mode="wait">
+                  {searchOpen ? (
+                    <motion.form
+                      key="search-form"
+                      onSubmit={handleSearch}
+                      initial={{ width: 0, opacity: 0 }}
+                      animate={{ width: 260, opacity: 1 }}
+                      exit={{ width: 0, opacity: 0 }}
+                      transition={{ duration: 0.25, ease: 'easeOut' }}
+                      className="flex items-center overflow-hidden border-b-2 border-primary bg-transparent"
+                    >
+                      <Search className="w-4 h-4 text-primary mx-2 flex-shrink-0" />
+                      <input
+                        ref={searchInputRef}
+                        type="text"
+                        value={searchQuery}
+                        onChange={e => setSearchQuery(e.target.value)}
+                        placeholder="Search products..."
+                        className="flex-1 py-2 pr-2 text-sm font-medium text-secondary outline-none bg-transparent placeholder-gray-400 min-w-0"
+                      />
+                      {searchQuery && (
+                        <button
+                          type="submit"
+                          className="flex-shrink-0 p-1 mr-1 text-primary hover:text-secondary transition-colors"
+                          title="Search"
+                        >
+                          <ArrowRight className="w-4 h-4" />
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setSearchOpen(false)}
+                        className="flex-shrink-0 p-1 text-gray-400 hover:text-secondary transition-colors"
+                        title="Close"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </motion.form>
+                  ) : (
+                    <motion.button
+                      key="search-icon"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      onClick={() => setSearchOpen(true)}
+                      className="p-2 text-gray-600 hover:text-primary transition-colors rounded-sm hover:bg-gray-100"
+                      title="Search products"
+                    >
+                      <Search className="w-5 h-5" />
+                    </motion.button>
+                  )}
+                </AnimatePresence>
+              </div>
+
               <Link href="/contact" className="hidden md:block">
                 <Button variant="primary" size="sm" className="font-normal">Contact Now</Button>
               </Link>
@@ -146,6 +232,26 @@ export default function Navbar() {
             className="xl:hidden bg-white border-b border-gray-100 overflow-hidden"
           >
             <div className="px-4 pt-2 pb-6 space-y-1">
+              {/* Mobile Search Bar */}
+              <form
+                onSubmit={handleSearch}
+                className="flex items-center border border-gray-200 bg-gray-50 mb-3 px-4 py-3 gap-2"
+              >
+                <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  placeholder="Search products..."
+                  className="flex-1 text-sm font-medium text-secondary outline-none bg-transparent placeholder-gray-400"
+                />
+                {searchQuery && (
+                  <button type="submit" className="flex-shrink-0 p-1 text-primary">
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                )}
+              </form>
+
               {navLinks.map((link) => (
                 <div key={link.name}>
                   <div className="flex justify-between items-center border-b border-gray-50">
@@ -203,4 +309,3 @@ export default function Navbar() {
     </header>
   );
 }
-
