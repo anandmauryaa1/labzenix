@@ -25,7 +25,9 @@ const SettingsSchema = new mongoose.Schema({
   },
   integrations: {
     inquiryCapture: { type: Boolean, default: true },
-    nightlyBackup: { type: Boolean, default: false }
+    nightlyBackup: { type: Boolean, default: false },
+    googleAnalyticsId: { type: String, default: '' },
+    googleAnalyticsUrl: { type: String, default: 'https://analytics.google.com/' }
   },
   updatedAt: { type: Date, default: Date.now }
 });

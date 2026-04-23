@@ -12,7 +12,8 @@ import {
   Database,
   Lock,
   Share2,
-  Circle
+  Circle,
+  BarChart3
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -47,7 +48,9 @@ export default function AdminSettings() {
     },
     integrations: {
       inquiryCapture: true,
-      nightlyBackup: false
+      nightlyBackup: false,
+      googleAnalyticsId: '',
+      googleAnalyticsUrl: ''
     }
   });
 
@@ -396,6 +399,36 @@ export default function AdminSettings() {
                         </div>
                         <div className={`w-12 h-6 rounded-full relative transition-colors ${config.integrations.nightlyBackup ? 'bg-primary' : 'bg-gray-200'}`}>
                           <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${config.integrations.nightlyBackup ? 'right-1' : 'left-1'}`} />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-8 border-t border-gray-100">
+                      <h3 className="text-xs font-black uppercase tracking-widest text-secondary flex items-center mb-6">
+                        <BarChart3 className="w-4 h-4 mr-2 text-primary" />
+                        Google Analytics Configuration
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                           <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Measurement ID (G-XXXXXXX)</label>
+                           <input 
+                             type="text" 
+                             value={config.integrations.googleAnalyticsId}
+                             onChange={(e) => setConfig({...config, integrations: {...config.integrations, googleAnalyticsId: e.target.value}})}
+                             placeholder="G-XXXXXXXXXX"
+                             className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary outline-none transition-all font-bold text-secondary" 
+                           />
+                        </div>
+                        <div className="space-y-2">
+                           <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Dashboard Embedded URL</label>
+                           <input 
+                             type="text" 
+                             value={config.integrations.googleAnalyticsUrl}
+                             onChange={(e) => setConfig({...config, integrations: {...config.integrations, googleAnalyticsUrl: e.target.value}})}
+                             placeholder="https://analytics.google.com/..."
+                             className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary outline-none transition-all font-bold text-secondary" 
+                           />
+                           <p className="text-[10px] text-gray-400 mt-1 italic">Enter your GA4 report URL to display it in the Analytics dashboard section.</p>
                         </div>
                       </div>
                     </div>

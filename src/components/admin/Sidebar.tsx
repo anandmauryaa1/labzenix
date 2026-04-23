@@ -17,7 +17,8 @@ import {
   Layers,
   Globe,
   Menu,
-  X
+  X,
+  BarChart3
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -141,6 +142,13 @@ export default function Sidebar() {
       icon: Settings,
       roles: ['admin'],
       permission: 'settings'
+    },
+    { 
+      title: 'G-Analytics', 
+      href: '/admin/analytics', 
+      icon: BarChart3,
+      roles: ['admin', 'marketing', 'seo'],
+      permission: 'analytics'
     },
   ];
 

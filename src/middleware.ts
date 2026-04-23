@@ -57,6 +57,10 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/admin/unauthorized', request.url));
       }
 
+      if (path.startsWith('/admin/analytics') && !permissions.includes('analytics')) {
+        return NextResponse.redirect(new URL('/admin/unauthorized', request.url));
+      }
+
       return NextResponse.next();
     } catch (err) {
       console.error('Middleware JWT Error:', err);
