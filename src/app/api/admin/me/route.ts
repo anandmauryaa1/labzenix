@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import User from '@/models/User';
-import { getAuthUser } from '@/lib/auth';
+import { getAuthUser, AuthenticatedUser } from '@/lib/auth';
 import { handleProductionError } from '@/lib/errorHandler';
 
 export async function GET(req: NextRequest) {
   try {
-    const authUser = await getAuthUser(req);
+    const authUser = await getAuthUser(req) as AuthenticatedUser | null;
     if (!authUser) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 
     await dbConnect();

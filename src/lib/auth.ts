@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import dbConnect from './dbConnect';
 import { logger } from './logger';
 
-export interface AuthUser {
+export interface AuthenticatedUser {
   id: string;
   role: 'admin' | 'seo' | 'marketing';
   username: string;
@@ -21,7 +21,7 @@ interface JWTPayload {
   permissions: string[];
 }
 
-export async function getAuthUser(req: NextRequest): Promise<AuthUser | null> {
+export async function getAuthUser(req: NextRequest): Promise<AuthenticatedUser | null> {
   const token = req.cookies.get('admin_token')?.value;
   if (!token) return null;
 
