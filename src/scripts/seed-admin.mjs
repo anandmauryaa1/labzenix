@@ -15,9 +15,13 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin';
 
 // User Schema (simplified for script)
 const UserSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, enum: ['admin', 'seo', 'marketing'], default: 'admin' },
+  permissions: { type: [String], default: ['blogs'] },
+  active: { type: Boolean, default: true }
 }, { timestamps: true });
 
 const User = mongoose.models.User || mongoose.model('User', UserSchema);
@@ -33,21 +37,32 @@ async function seed() {
     await mongoose.connect(MONGODB_URI);
     console.log('Connected.');
 
-    const existingAdmin = await User.findOne({ username: ADMIN_USERNAME });
+    const existingAdmin = await User.findOne({ 
+      $or: [
+        { username: ADMIN_USERNAME },
+        { email: 'admin@labzenix.com' }
+      ]
+    });
     
     if (existingAdmin) {
-      console.log(`Admin user "${ADMIN_USERNAME}" already exists. Updating password...`);
-      const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 10);
+      console.log(`Admin user "${existingAdmin.username}" already exists. Updating password and details...`);
+      const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 12);
       existingAdmin.password = hashedPassword;
+      existingAdmin.role = 'admin';
+      existingAdmin.permissions = ['blogs', 'products', 'categories', 'inquiries', 'settings', 'seo'];
       await existingAdmin.save();
-      console.log('Password updated successfully.');
+      console.log('Admin user updated successfully.');
     } else {
       console.log(`Creating new admin user: ${ADMIN_USERNAME}`);
-      const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 10);
+      const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 12);
       const newAdmin = new User({
+        name: 'LabZenix Admin',
+        email: 'admin@labzenix.com',
         username: ADMIN_USERNAME,
         password: hashedPassword,
-        role: 'admin'
+        role: 'admin',
+        permissions: ['blogs', 'products', 'categories', 'inquiries', 'settings', 'seo'],
+        active: true
       });
       await newAdmin.save();
       console.log('Admin user created successfully.');

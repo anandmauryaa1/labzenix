@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import User from '@/models/User';
 import crypto from 'crypto';
+import { logger } from '@/lib/logger';
+import { handleProductionError } from '@/lib/errorHandler';
 
 // Email validation regex
 const isValidEmail = (email: string) => {
@@ -39,7 +41,7 @@ export async function POST(req: NextRequest) {
       .digest('hex');
     
     // Set expiry (1 hour)
-    const resetPasswordExpires = Date.now() + 3600000;
+    const resetPasswordExpires = new Date(Date.now() + 3600000);
 
     user.resetPasswordToken = resetPasswordToken;
     user.resetPasswordExpires = resetPasswordExpires;
@@ -47,20 +49,18 @@ export async function POST(req: NextRequest) {
 
     const resetUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/admin/reset-password/${resetToken}`;
 
-    // Log reset link to console for testing
-    console.log('-------------------------------------------');
-    console.log('🔑 PASSWORD RESET REQUEST');
-    console.log('📧 Email:', user.email);
-    console.log('👤 Name:', user.name);
-    console.log('🔗 Reset URL:', resetUrl);
-    console.log('⏰ Expires in: 1 hour');
-    console.log('-------------------------------------------');
+    // Log reset link to logger
+    logger.info('Password reset link generated', {
+      email: user.email,
+      name: user.name,
+      resetUrl,
+      expires: '1 hour'
+    });
 
     return NextResponse.json({ 
       message: 'If an account exists with that email, a reset link will be sent.'
     });
   } catch (error: any) {
-    console.error('Forgot password error:', error);
-    return NextResponse.json({ error: 'Server error. Please try again.' }, { status: 500 });
+    return handleProductionError(error);
   }
 }

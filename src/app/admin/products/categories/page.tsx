@@ -307,7 +307,7 @@ export default function CategoryManagement() {
                   onClick={() => {
                     setIsAdding(false);
                     setEditingId(null);
-                    setForm({ name: '', description: '' });
+                    setForm({ name: '', description: '', catalogUrl: '', catalogPublicId: '' });
                   }}
                   className="text-gray-400 hover:text-secondary transition-colors"
                 >

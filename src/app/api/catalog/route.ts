@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import Product from '@/models/Product';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   try {
@@ -34,7 +35,7 @@ export async function GET(req: NextRequest) {
       }
     });
   } catch (error: any) {
-    console.error('Catalog generation error:', error);
+    logger.error('Catalog generation error', { error: error.message });
     return NextResponse.json({ error: 'Failed to generate catalog' }, { status: 500 });
   }
 }

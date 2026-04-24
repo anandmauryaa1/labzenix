@@ -16,6 +16,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import toast from 'react-hot-toast';
 
 export default function AdminDashboard() {
@@ -181,7 +182,12 @@ export default function AdminDashboard() {
                 <div key={blog._id} className="p-6 hover:bg-gray-50 transition-all group">
                   <div className="aspect-video bg-gray-100 mb-4 overflow-hidden relative">
                     {blog.image ? (
-                      <img src={blog.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 shadow-inner" alt="" />
+                      <Image 
+                        src={blog.image} 
+                        alt={blog.title} 
+                        fill 
+                        className="object-cover group-hover:scale-110 transition-transform duration-700 shadow-inner" 
+                      />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-300 italic text-[8px] uppercase tracking-widest">Missing Asset</div>
                     )}
@@ -221,7 +227,12 @@ export default function AdminDashboard() {
                 <div key={product._id} className="p-4 flex items-center space-x-3 hover:bg-gray-50 transition-all relative group">
                   <div className="w-12 h-12 bg-gray-50 border border-gray-100 overflow-hidden shrink-0">
                     {product.images?.[0] ? (
-                      <img src={product.images[0]} className="w-full h-full object-cover" alt="" />
+                      <Image 
+                        src={product.images[0]} 
+                        alt={product.title} 
+                        fill 
+                        className="object-cover" 
+                      />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-200">
                         <Package className="w-5 h-5" />

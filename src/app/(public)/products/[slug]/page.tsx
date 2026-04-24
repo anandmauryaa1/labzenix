@@ -1,11 +1,11 @@
 import { notFound } from 'next/navigation';
 import { revalidateTag } from 'next/cache';
 import dbConnect from '@/lib/dbConnect';
-import Product from '@/models/Product';
-import Review from '@/models/Review';
-import Faq from '@/models/Faq';
-import Category from '@/models/Category';
-import Settings from '@/models/Settings';
+import Product, { IProduct } from '@/models/Product';
+import Review, { IReview } from '@/models/Review';
+import Faq, { IFaq } from '@/models/Faq';
+import Category, { ICategory } from '@/models/Category';
+import Settings, { ISettings } from '@/models/Settings';
 import ImageCarousel from '@/components/products/ImageCarousel';
 import ProductTabs from '@/components/products/ProductTabs';
 import { Metadata } from 'next';
@@ -23,15 +23,19 @@ export const revalidate = 0;
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   await dbConnect();
-  const product = await Product.findOne({ slug }).lean() as any;
+  const product = await Product.findOne({ slug }).lean() as IProduct | null;
   if (!product) return { title: 'Not Found' };
+  
+  const title = product.metaTitle || product.title;
+  const description = product.metaDescription || product.description?.substring(0, 160);
+
   return { 
-    title: `${product.metaTitle} | LabZenix`, 
-    description: product.metaDescription || product.description?.substring(0, 160),
+    title: `${title} | LabZenix`, 
+    description: description,
     keywords: [product.category, product.title, product.modelNumber],
     openGraph: {
-      title: product.metaTitle,
-      description: product.metaDescription,
+      title: `${title} | LabZenix`,
+      description: description,
       images: [product.images?.[0] || '/og-image.jpg'],
     }
   };
@@ -40,18 +44,18 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   await dbConnect();
-  const product = await Product.findOne({ slug }).lean() as any;
+  const product = await Product.findOne({ slug }).lean() as IProduct | null;
   if (!product) notFound();
 
   // Fetch category for catalog
-  const category = await Category.findOne({ name: product.category }).lean() as any;
+  const category = await Category.findOne({ name: product.category }).lean() as ICategory | null;
   
   // Fetch social media settings
-  const settings = await Settings.findOne({ configKey: 'global' }).lean() as any;
+  const settings = await Settings.findOne({ configKey: 'global' }).lean() as ISettings | null;
 
   // Explicitly fetch reviews and FAQs from new collections
-  const rawReviews = await Review.find({ product: product._id }).lean() as any[];
-  const rawFaqs    = await Faq.find({ product: product._id }).lean() as any[];
+  const rawReviews = await Review.find({ product: product._id }).lean() as IReview[];
+  const rawFaqs    = await Faq.find({ product: product._id }).lean() as IFaq[];
 
   /* ─── JSON-LD Structured Data ─────────────────────────── */
   const reviews: { author: string; rating: number; comment: string; date?: string; images?: string[] }[] = JSON.parse(JSON.stringify(rawReviews ?? []));
@@ -243,7 +247,8 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                       hover: 'hover:bg-[#1DA1F2]' 
                     }
                   ].map((social) => {
-                    const url = settings.social[social.key];
+                    if (!settings) return null;
+                    const url = (settings.social as any)[social.key];
                     if (!url) return null;
                     const Icon = social.icon;
                     return (

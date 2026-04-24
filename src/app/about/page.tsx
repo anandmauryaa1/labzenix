@@ -4,6 +4,7 @@ import { getPageMetadata } from '@/lib/seo';
 import FadeIn from '@/components/ui/FadeIn';
 import AnimatedCounter from '@/components/ui/AnimatedCounter';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export async function generateMetadata() {
   return await getPageMetadata('about');
@@ -70,10 +71,12 @@ export default function AboutPage() {
           <FadeIn direction="left">
             <div className="relative">
               <div className="aspect-square bg-gray-100 border border-gray-100 relative overflow-hidden group shadow-2xl">
-                <img 
+                <Image 
                   src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=1000" 
-                  alt="Laboratory" 
-                  className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000 scale-110 group-hover:scale-100"
+                  alt="Laboratory Research" 
+                  fill
+                  className="object-cover grayscale hover:grayscale-0 transition-all duration-1000 scale-110 group-hover:scale-100"
+                  priority
                 />
                 <div className="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-all duration-500" />
               </div>
@@ -87,10 +90,11 @@ export default function AboutPage() {
       <section className="relative py-40 overflow-hidden bg-secondary group">
         {/* Dynamic Background */}
         <div className="absolute inset-0 z-0">
-          <img 
+          <Image 
             src="https://images.pexels.com/photos/3825586/pexels-photo-3825586.jpeg" 
-            className="w-full h-full object-cover opacity-30 grayscale group-hover:scale-110 transition-transform duration-[3000ms]"
+            className="object-cover opacity-30 grayscale group-hover:scale-110 transition-transform duration-[3000ms]"
             alt="Laboratory background"
+            fill
           />
           <div className="absolute inset-0 bg-gradient-to-b from-secondary via-secondary/80 to-secondary z-10" />
           <div className="absolute inset-x-0 h-[2px] bg-primary/20 top-0 animate-scan z-20" />

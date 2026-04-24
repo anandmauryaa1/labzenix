@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../ui/Button';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const slides = [
@@ -52,10 +53,12 @@ export default function Hero() {
           className="absolute inset-0"
         >
           <div className="absolute inset-0 bg-black/40 z-10" />
-          <img 
+          <Image 
             src={slides[current].image} 
             alt={slides[current].title}
-            className="w-full h-full object-cover scale-110 animate-slow-zoom"
+            fill
+            className="object-cover scale-110 animate-slow-zoom"
+            priority
           />
         </motion.div>
       </AnimatePresence>

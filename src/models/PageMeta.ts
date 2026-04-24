@@ -1,6 +1,15 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
 
-const PageMetaSchema = new mongoose.Schema({
+export interface IPageMeta extends Document {
+  pageKey: 'home' | 'about' | 'services' | 'products' | 'blogs' | 'contact';
+  metaTitle: string;
+  metaDescription: string;
+  h1: string;
+  keywords: string[];
+  updatedAt: Date;
+}
+
+const PageMetaSchema = new Schema<IPageMeta>({
   pageKey: { 
     type: String, 
     required: true, 
@@ -21,9 +30,8 @@ const PageMetaSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
-PageMetaSchema.pre('save', function(this: any, next: any) {
+PageMetaSchema.pre('save', function() {
   this.updatedAt = new Date();
-  next();
 });
 
-export default mongoose.models.PageMeta || mongoose.model('PageMeta', PageMetaSchema);
+export default mongoose.models.PageMeta || mongoose.model<IPageMeta>('PageMeta', PageMetaSchema);

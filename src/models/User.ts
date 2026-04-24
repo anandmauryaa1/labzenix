@@ -1,12 +1,27 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
+export interface IUser extends mongoose.Document {
+  name: string;
+  email: string;
+  username: string;
+  password: string;
+  role: 'admin' | 'seo' | 'marketing';
+  permissions: string[];
+  active: boolean;
+  lastLogin: Date | null;
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
+  createdAt: Date;
+  comparePassword(password: string): Promise<boolean>;
+}
+
 // Force re-registration for HMR support
 if (mongoose.models && mongoose.models.User) {
   delete mongoose.models.User;
 }
 
-const UserSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema<IUser>({
   name: { 
     type: String, 
     required: true,
@@ -67,4 +82,4 @@ UserSchema.methods.comparePassword = async function(candidatePassword: string) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-export default mongoose.model('User', UserSchema);
+export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema);

@@ -5,11 +5,14 @@ import Product from '@/models/Product';
 import Review from '@/models/Review';
 import Faq from '@/models/Faq';
 import { handleProductionError } from '@/lib/errorHandler';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  let productId: string | undefined;
   try {
     await dbConnect();
     const { id } = await params;
+    productId = id;
     const product = await Product.findById(id).lean() as any;
     if (!product) return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     
@@ -20,15 +23,17 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     // Serialize MongoDB ObjectIds in subdocuments to plain JSON
     return NextResponse.json(JSON.parse(JSON.stringify(product)));
   } catch (error) {
-    console.error('[API] GET product error:', error);
+    logger.error('[API] GET product error', { error, id: productId });
     return NextResponse.json({ error: 'Failed to fetch product' }, { status: 500 });
   }
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  let productId: string | undefined;
   try {
     await dbConnect();
     const { id } = await params;
+    productId = id;
     const body = await req.json();
 
     // Strip fields that should not be overwritten, and extract reviews/faqs
@@ -41,7 +46,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     ).lean() as any;
 
     if (!product) {
-      console.warn('[API] Update failed: Product not found for ID:', id);
+      logger.warn('[API] Update failed: Product not found', { id });
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
 
@@ -66,7 +71,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     product.reviews = await Review.find({ product: id }).lean();
     product.faqs = await Faq.find({ product: id }).lean();
 
-    console.log('[API] Saved successfully | reviews in DB:', product.reviews.length, '| faqs in DB:', product.faqs.length);
+    logger.info('[API] Saved successfully', { 
+      productId: id, 
+      reviewsInDb: product.reviews.length, 
+      faqsInDb: product.faqs.length 
+    });
     
     // Revalidate cached pages
     revalidatePath('/admin/products');
@@ -77,25 +86,27 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     
     return NextResponse.json(JSON.parse(JSON.stringify(product)));
   } catch (error) {
-    console.error('[API] Update FATAL error:', error);
+    logger.error('[API] Update FATAL error', { error, id: productId });
     return handleProductionError(error);
   }
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  let productId: string | undefined;
   try {
     await dbConnect();
     const { id } = await params;
+    productId = id;
     
-    console.log('[API] Deleting product ID:', id);
+    logger.info('[API] Deleting product', { id });
     const product = await Product.findByIdAndDelete(id);
     
     if (!product) {
-       console.warn('[API] Delete failed: Product not found for ID:', id);
+       logger.warn('[API] Delete failed: Product not found', { id });
        return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
     
-    console.log('[API] Delete successful for ID:', id);
+    logger.info('[API] Delete successful', { id });
     
     // Revalidate cached pages
     revalidatePath('/admin/products');
@@ -106,8 +117,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('[API] Delete error');
-    console.error(error);
+    logger.error('[API] Delete error', { error, id: productId });
     return handleProductionError(error);
   }
 }

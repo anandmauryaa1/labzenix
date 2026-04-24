@@ -5,6 +5,7 @@ import Blog from '@/models/Blog';
 import User from '@/models/User';
 import jwt from 'jsonwebtoken';
 import { handleProductionError } from '@/lib/errorHandler';
+import { logger } from '@/lib/logger';
 
 export async function GET(
   req: NextRequest,
@@ -56,20 +57,20 @@ export async function DELETE(
   try {
     const token = req.cookies.get('admin_token')?.value;
     if (!token) {
-      console.warn('Delete Attempt Failed: No admin_token provided for ID:', params.id);
+      logger.warn('Delete Attempt Failed: No admin_token provided', { id: params.id });
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     await dbConnect();
-    console.log('Deleting blog post:', params.id);
+    logger.info('Deleting blog post', { id: params.id });
     const blog = await Blog.findByIdAndDelete(params.id);
     
     if (!blog) {
-      console.warn('Delete Attempt Failed: Blog not found in database:', params.id);
+      logger.warn('Delete Attempt Failed: Blog not found in database', { id: params.id });
       return NextResponse.json({ error: 'Blog post not found' }, { status: 404 });
     }
 
-    console.log('Blog post deleted successfully:', params.id);
+    logger.info('Blog post deleted successfully', { id: params.id });
     
     // Revalidate cached pages
     revalidatePath('/admin/blogs');
@@ -79,7 +80,7 @@ export async function DELETE(
     
     return NextResponse.json({ message: 'Blog post deleted successfully' });
   } catch (error: any) {
-    console.error('Delete Protocol Failure:', error);
+    logger.error('Delete Protocol Failure', { error: error.message, id: params.id });
     return handleProductionError(error);
   }
 }

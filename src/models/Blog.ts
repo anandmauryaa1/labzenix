@@ -1,33 +1,36 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
 
-const BlogSchema = new mongoose.Schema({
+export interface IBlog extends Document {
+  title: string;
+  slug: string;
+  content: string;
+  image: string;
+  category: string;
+  status: 'published' | 'draft';
+  tags: string[];
+  metaTitle: string;
+  metaDescription: string;
+  author: mongoose.Types.ObjectId;
+  createdAt: Date;
+  views: number;
+}
+
+const BlogSchema = new Schema<IBlog>({
   title: { type: String, required: [true, 'Blog title is mandatory'] },
   slug: { type: String, required: true, unique: true },
-  content: { type: String, required: [true, 'Internal content is mandatory'] },
-  image: { type: String, required: [true, 'Featured display image is mandatory'] },
-  category: { type: String, required: [true, 'Content classification is mandatory'] },
-  status: { 
-    type: String, 
-    enum: ['published', 'draft'], 
-    default: 'published' 
-  },
-  tags: {
-    type: [String],
-    validate: {
-      validator: (v: string[]) => v.length > 0,
-      message: 'At least one indexing tag is required'
-    },
-    required: true
-  },
-  metaTitle: { type: String, required: [true, 'SEO Header Title is mandatory'] },
-  metaDescription: { type: String, required: [true, 'SEO Meta Description is mandatory'] },
-  author: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'User', 
-    required: true 
-  },
-  createdAt: { type: Date, default: Date.now },
-  views: { type: Number, default: 0 },
+  content: { type: String, required: true },
+  image: { type: String, required: true },
+  category: { type: String, required: true },
+  status: { type: String, enum: ['published', 'draft'], default: 'published' },
+  tags: [{ type: String }],
+  metaTitle: { type: String, required: true },
+  metaDescription: { type: String, required: true },
+  author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  views: { type: Number, default: 0 }
+}, {
+  timestamps: true
 });
 
-export default mongoose.models.Blog || mongoose.model('Blog', BlogSchema);
+BlogSchema.index({ slug: 1 }, { unique: true });
+
+export default mongoose.models.Blog || mongoose.model<IBlog>('Blog', BlogSchema);

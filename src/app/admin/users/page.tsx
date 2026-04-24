@@ -43,7 +43,7 @@ export default function UsersPage() {
     email: '',
     username: '',
     password: '',
-    role: 'marketing' as const,
+    role: 'marketing' as 'admin' | 'seo' | 'marketing',
     permissions: [] as string[]
   });
 

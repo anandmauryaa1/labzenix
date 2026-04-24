@@ -1,8 +1,10 @@
 import dbConnect from '@/lib/dbConnect';
 import Blog from '@/models/Blog';
+import { logger } from '@/lib/logger';
 import { notFound } from 'next/navigation';
 import { Calendar, User, ArrowRight, Share2, Globe, MessageSquare, Link as LinkIcon, Mail } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import Button from '@/components/ui/Button';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -14,14 +16,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       { slug: `/${slug}` }
     ]
   });
-  if (!blog) return {};
+  if (!blog) return { title: 'Not Found' };
+
+  const title = blog.metaTitle || blog.title;
+  const description = blog.metaDescription || blog.content?.substring(0, 160).replace(/<[^>]*>/g, '');
 
   return {
-    title: `${blog.metaTitle} | LabZenix Knowledge Center`,
-    description: blog.metaDescription,
+    title: `${title} | LabZenix Knowledge Center`,
+    description: description,
     openGraph: {
-      title: blog.metaTitle,
-      description: blog.metaDescription,
+      title: `${title} | LabZenix Knowledge Center`,
+      description: description,
       images: [blog.image],
     },
   };
@@ -31,7 +36,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
   const { slug } = await params;
   await dbConnect();
 
-  console.log('Fetching blog with slug:', slug);
+  logger.info('Fetching blog details', { slug });
   // Try matching slug exactly as passed or with a leading slash if stored that way
   const blog = await Blog.findOneAndUpdate(
     { 
@@ -80,10 +85,12 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
     <div className="bg-white min-h-screen">
       {/* Blog Hero/Header */}
       <section className="relative h-[50vh] min-h-[400px] overflow-hidden bg-secondary">
-        <img 
+        <Image 
           src={blog.image} 
-          className="absolute inset-0 w-full h-full object-cover opacity-40"
+          fill
+          className="object-cover opacity-40"
           alt={blog.title} 
+          priority
         />
         <div className="absolute inset-0 bg-gradient-to-t from-secondary via-secondary/60 to-secondary/40" />
         
@@ -167,8 +174,8 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
                   {recentBlogs.map((post: any) => (
                     <Link key={post._id} href={`/blogs/${post.slug}`} className="group block">
                       <div className="flex gap-6 items-start">
-                        <div className="w-20 h-20 shrink-0 bg-gray-100 overflow-hidden">
-                          <img src={post.image} className="w-full h-full object-cover grayscale transition-transform duration-500 group-hover:scale-110 group-hover:grayscale-0" alt="" />
+                        <div className="w-20 h-20 shrink-0 bg-gray-100 overflow-hidden relative">
+                          <Image src={post.image} fill className="object-cover grayscale transition-transform duration-500 group-hover:scale-110 group-hover:grayscale-0" alt="" />
                         </div>
                         <div>
                           <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-2">{post.category}</p>
@@ -192,7 +199,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
                     <Link key={post._id} href={`/blogs/${post.slug}`} className="group block">
                       <div className="flex gap-6 items-start">
                         <div className="w-20 h-20 shrink-0 bg-gray-100 overflow-hidden relative">
-                          <img src={post.image} className="w-full h-full object-cover grayscale transition-transform duration-500 group-hover:scale-110 group-hover:grayscale-0" alt="" />
+                          <Image src={post.image} fill className="object-cover grayscale transition-transform duration-500 group-hover:scale-110 group-hover:grayscale-0" alt="" />
                           <div className="absolute top-0 right-0 bg-secondary text-white text-[8px] font-black px-1 py-0.5">
                             {post.views || 0}
                           </div>
@@ -248,7 +255,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
                     {relatedBlogs.map((post: any) => (
                         <Link key={post._id} href={`/blogs/${post.slug}`} className="group bg-white border border-gray-100 overflow-hidden flex flex-col">
                             <div className="aspect-video relative overflow-hidden">
-                                <img src={post.image} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" alt="" />
+                                <Image src={post.image} fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" alt="" />
                             </div>
                             <div className="p-8 flex flex-col flex-grow">
                                 <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-4 inline-block">{post.category}</span>

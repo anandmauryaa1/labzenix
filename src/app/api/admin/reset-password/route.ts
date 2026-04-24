@@ -2,39 +2,30 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import User from '@/models/User';
 import crypto from 'crypto';
+import { logger } from '@/lib/logger';
+import { handleProductionError } from '@/lib/errorHandler';
+import { z } from 'zod';
 
-// Password validation function
-const validatePassword = (password: string) => {
-  if (!password || password.length < 8) {
-    return 'Password must be at least 8 characters long';
-  }
-  if (!/[A-Z]/.test(password)) {
-    return 'Password must contain at least one uppercase letter';
-  }
-  if (!/[a-z]/.test(password)) {
-    return 'Password must contain at least one lowercase letter';
-  }
-  if (!/[0-9]/.test(password)) {
-    return 'Password must contain at least one number';
-  }
-  return null;
-};
+const resetPasswordSchema = z.object({
+  token: z.string().min(1, 'Token is required'),
+  password: z.string()
+    .min(8, 'Password must be at least 8 characters long')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number'),
+});
 
 export async function POST(req: NextRequest) {
   try {
     await dbConnect();
-    const { token, password } = await req.json();
+    const rawBody = await req.json();
 
-    // Validate inputs
-    if (!token || !password) {
-      return NextResponse.json({ error: 'Token and password are required' }, { status: 400 });
+    const result = resetPasswordSchema.safeParse(rawBody);
+    if (!result.success) {
+      return NextResponse.json({ error: 'Validation failed', details: result.error.format() }, { status: 400 });
     }
 
-    // Validate password strength
-    const passwordError = validatePassword(password);
-    if (passwordError) {
-      return NextResponse.json({ error: passwordError }, { status: 400 });
-    }
+    const { token, password } = result.data;
 
     const hashedToken = crypto
       .createHash('sha256')
@@ -58,13 +49,12 @@ export async function POST(req: NextRequest) {
     user.resetPasswordExpires = undefined;
     await user.save();
 
-    console.log('✅ Password reset successful for user:', user.email);
+    logger.info('Password reset successful', { email: user.email, username: user.username });
 
     return NextResponse.json({ 
       message: 'Password has been reset successfully. You can now login with your new password.' 
     });
   } catch (error: any) {
-    console.error('Reset password error:', error);
-    return NextResponse.json({ error: 'Server error. Please try again.' }, { status: 500 });
+    return handleProductionError(error);
   }
 }

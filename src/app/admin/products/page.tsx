@@ -16,6 +16,7 @@ import {
   Eye,
   ChevronLeft
 } from 'lucide-react';
+import Image from 'next/image';
 import toast from 'react-hot-toast';
 
 export default function ProductListing() {
@@ -233,7 +234,12 @@ export default function ProductListing() {
                     <div className="flex items-center space-x-3">
                       <div className="w-12 h-12 bg-gray-100 border border-gray-200 overflow-hidden flex items-center justify-center">
                         {product.images && product.images[0] ? (
-                          <img src={product.images[0]} className="w-full h-full object-cover" alt="" />
+                          <Image 
+                            src={product.images[0]} 
+                            alt={product.title} 
+                            fill 
+                            className="object-cover" 
+                          />
                         ) : (
                           <Package className="w-5 h-5 text-gray-300" />
                         )}

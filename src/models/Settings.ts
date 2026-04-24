@@ -1,6 +1,38 @@
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 
-const SettingsSchema = new mongoose.Schema({
+export interface ISettings extends Document {
+  configKey: string;
+  communication: {
+    supportEmail: string;
+    supportPhone: string;
+    salesEmail: string;
+    salesPhone: string;
+    marketingEmail: string;
+    marketingPhone: string;
+    seoEmail: string;
+    seoPhone: string;
+    address: string;
+  };
+  social: {
+    facebook: string;
+    twitter: string;
+    linkedin: string;
+    instagram: string;
+  };
+  seo: {
+    titleSuffix: string;
+    globalDescription: string;
+  };
+  integrations: {
+    inquiryCapture: boolean;
+    nightlyBackup: boolean;
+    googleAnalyticsId: string;
+    googleAnalyticsUrl: string;
+  };
+  updatedAt: Date;
+}
+
+const SettingsSchema = new mongoose.Schema<ISettings>({
   configKey: { type: String, default: 'global', unique: true }, // Singleton pattern
   communication: {
     supportEmail: { type: String, default: 'support@labzenix.com' },
@@ -32,9 +64,8 @@ const SettingsSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
-SettingsSchema.pre('save', function(this: any, next: any) {
+SettingsSchema.pre('save', function() {
   this.updatedAt = new Date();
-  next();
 });
 
-export default mongoose.models.Settings || mongoose.model('Settings', SettingsSchema);
+export default mongoose.models.Settings || mongoose.model<ISettings>('Settings', SettingsSchema);

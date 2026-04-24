@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server';
+import { logger } from './logger';
 
 export function handleProductionError(error: any) {
-  console.error('Error:', error);
+  logger.error('API Error caught by production handler', { 
+    name: error.name,
+    message: error.message,
+    code: error.code
+  });
 
   // Mongoose Validation Error
   if (error.name === 'ValidationError') {

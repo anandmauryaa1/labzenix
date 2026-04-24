@@ -167,7 +167,8 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
     const method = isNew ? 'POST' : 'PUT';
     const url = isNew ? '/api/products' : `/api/products/${params.id}`;
 
-    console.log('[SAVE] reviews:', snapshot.reviews.length, '| faqs:', snapshot.faqs.length);
+    // Removed debug log for production readiness
+    // console.log('[SAVE] reviews:', snapshot.reviews.length, '| faqs:', snapshot.faqs.length);
 
     try {
       const res = await fetch(url, {

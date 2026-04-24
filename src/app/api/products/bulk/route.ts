@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import Product from '@/models/Product';
+import { logger } from '@/lib/logger';
 
 export async function DELETE(req: NextRequest) {
   try {
@@ -13,13 +14,15 @@ export async function DELETE(req: NextRequest) {
 
     const result = await Product.deleteMany({ _id: { $in: ids } });
     
+    logger.info('Bulk products deleted', { count: result.deletedCount, ids });
+
     return NextResponse.json({ 
       success: true, 
       message: `${result.deletedCount} products deleted successfully`,
       count: result.deletedCount 
     });
-  } catch (error) {
-    console.error('Bulk delete error:', error);
+  } catch (error: any) {
+    logger.error('Bulk delete error', { error: error.message });
     return NextResponse.json({ error: 'Failed to process bulk deletion' }, { status: 500 });
   }
 }

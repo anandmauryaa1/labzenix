@@ -39,7 +39,7 @@ export default function FadeIn({
       transition: {
         duration,
         delay,
-        ease: [0.21, 0.47, 0.32, 0.98],
+        ease: [0.21, 0.47, 0.32, 0.98] as any,
         staggerChildren: stagger ? 0.1 : 0,
       },
     },

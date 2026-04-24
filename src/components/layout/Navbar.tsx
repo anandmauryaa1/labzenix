@@ -1,22 +1,23 @@
 'use client';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Phone, Mail, Search, Menu, X, ChevronDown, ArrowRight } from 'lucide-react';
 import Button from '../ui/Button';
 
-const navLinks = [
+interface NavLink {
+  name: string;
+  href: string;
+  submenu?: { name: string; href: string; }[];
+}
+
+const navLinks: NavLink[] = [
   { name: 'Home', href: '/' },
   { 
     name: 'Products', 
     href: '/products',
-    // submenu: [
-    //   { name: 'Paper & Packaging', href: '/products?category=paper-packaging' },
-    //   { name: 'PET & Preform', href: '/products?category=pet-preform' },
-    //   { name: 'Plastic & Poly', href: '/products?category=plastic-poly' },
-    //   { name: 'Paint & Coating', href: '/products?category=paint-coating' },
-    // ]
   },
   { name: 'About Us', href: '/about' },
   { name: 'Blog', href: '/blogs' },
@@ -101,12 +102,19 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
             {/* Logo */}
-            <Link href="/" className="flex items-center space-x-2 flex-shrink-0">
-              <img src="/logo.webp" alt="LabZenix" className="h-10 md:h-12 w-auto" />
+            <Link href="/" className="flex items-center space-x-2 flex-shrink-0" aria-label="LabZenix - Home">
+              <Image 
+                src="/logo.webp" 
+                alt="LabZenix Logo" 
+                width={160}
+                height={48}
+                className="h-10 md:h-12 w-auto"
+                priority
+              />
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden xl:flex items-center space-x-8">
+            <nav className="hidden xl:flex items-center space-x-8" aria-label="Main Navigation">
               {navLinks.map((link) => (
                 <div 
                   key={link.name} 
@@ -117,9 +125,11 @@ export default function Navbar() {
                   <Link 
                     href={link.href}
                     className="text-sm font-normal text-secondary hover:text-primary transition-colors flex items-center"
+                    aria-haspopup={link.submenu ? 'true' : 'false'}
+                    aria-expanded={activeSubmenu === link.name}
                   >
                     {link.name}
-                    {link.submenu && <ChevronDown className="w-4 h-4 ml-1 group-hover:rotate-180 transition-transform" />}
+                    {link.submenu && <ChevronDown className="w-4 h-4 ml-1 group-hover:rotate-180 transition-transform" aria-hidden="true" />}
                   </Link>
 
                   {link.submenu && (
@@ -185,7 +195,7 @@ export default function Navbar() {
                         type="button"
                         onClick={() => setSearchOpen(false)}
                         className="flex-shrink-0 p-1 text-gray-400 hover:text-secondary transition-colors"
-                        title="Close"
+                        aria-label="Close search"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -198,7 +208,7 @@ export default function Navbar() {
                       exit={{ opacity: 0 }}
                       onClick={() => setSearchOpen(true)}
                       className="p-2 text-gray-600 hover:text-primary transition-colors rounded-sm hover:bg-gray-100"
-                      title="Search products"
+                      aria-label="Open search"
                     >
                       <Search className="w-5 h-5" />
                     </motion.button>
@@ -214,6 +224,8 @@ export default function Navbar() {
               <button 
                 className="xl:hidden p-2 text-secondary"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={mobileMenuOpen}
               >
                 {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>

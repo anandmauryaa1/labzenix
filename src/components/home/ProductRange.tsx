@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import Button from '../ui/Button';
@@ -100,10 +101,11 @@ export default function ProductRange() {
               >
                 <div className="relative aspect-video group overflow-hidden border-2 border-gray-100 shadow-2xl">
                   <div className="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-colors duration-500 z-10" />
-                  <img 
+                  <Image 
                     src={cat.image} 
                     alt={cat.title}
-                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                    fill
+                    className="object-cover transition-transform duration-1000 group-hover:scale-110"
                   />
                   <div className="absolute bottom-0 left-0 right-0 p-8 bg-linear-to-t from-black/90 via-black/40 to-transparent z-20">
                     <p className="text-white font-black text-xl md:text-2xl mb-4 tracking-tight">{cat.title} Series</p>

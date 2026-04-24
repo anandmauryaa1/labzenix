@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { Phone, Mail, MapPin } from 'lucide-react';
 
@@ -19,8 +20,14 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Company Info */}
           <div className="space-y-6">
-            <Link href="/" className="flex items-center space-x-2">
-              <img src="/logo.webp" alt="LabZenix" className="h-10 md:h-12 w-auto" />
+            <Link href="/" className="flex items-center space-x-2" aria-label="LabZenix - Home">
+              <Image 
+                src="/logo.webp" 
+                alt="LabZenix Logo" 
+                width={150}
+                height={48}
+                className="h-10 md:h-12 w-auto" 
+              />
             </Link>
             <p className="text-gray-700 leading-relaxed font-normal text-sm md:text-base">
               LabZenix is a leading manufacturer of high-precision laboratory testing instruments, committed to quality and precision across global industries.
@@ -155,7 +162,7 @@ export default function Footer() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className={`flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 text-gray-400 transition-all duration-300 hover:text-white ${social.hover}`}
-                      title={social.key.charAt(0).toUpperCase() + social.key.slice(1)}
+                      aria-label={`Follow us on ${social.key.charAt(0).toUpperCase() + social.key.slice(1)}`}
                     >
                       <Icon className="w-4 h-4" />
                     </a>

@@ -4,6 +4,7 @@ import Product from '@/models/Product';
 import Blog from '@/models/Blog';
 import Inquiry from '@/models/Inquiry';
 import Category from '@/models/Category';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   try {
@@ -40,7 +41,7 @@ export async function GET(req: NextRequest) {
       recentProducts
     });
   } catch (error: any) {
-    console.error('Dashboard API Error:', error);
+    logger.error('Dashboard API Error', { error });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

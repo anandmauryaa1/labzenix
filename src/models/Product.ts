@@ -1,6 +1,25 @@
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 
-const ProductSchema = new mongoose.Schema({
+export interface IProduct extends Document {
+  _id: mongoose.Types.ObjectId;
+  title: string;
+  modelNumber: string;
+  slug: string;
+  description: string;
+  category: string;
+  usage: 'Laboratory' | 'Production' | 'R&D';
+  images: string[];
+  features: string[];
+  specificationText: string;
+  specs: Record<string, any>;
+  youtubeUrl: string;
+  metaTitle: string;
+  metaDescription: string;
+  author: mongoose.Types.ObjectId;
+  createdAt: Date;
+}
+
+const ProductSchema = new mongoose.Schema<IProduct>({
   title:       { type: String, required: [true, 'Product title is required'],   trim: true },
   modelNumber: { type: String, required: [true, 'Model number is required'],    trim: true },
   slug:        { type: String, required: true, unique: true, lowercase: true, trim: true },
@@ -10,6 +29,7 @@ const ProductSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Usage type is required'],
     enum: ['Laboratory', 'Production', 'R&D'],
+    index: true
   },
   images:            { type: [String], default: [] },
   features:          { type: [String], default: [] },
@@ -33,9 +53,13 @@ const ProductSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
+    index: true
   },
-  createdAt: { type: Date, default: Date.now },
+  createdAt: { type: Date, default: Date.now, index: true },
 });
 
+ProductSchema.index({ category: 1, usage: 1 });
+ProductSchema.index({ slug: 1 }, { unique: true });
 
-export default mongoose.models.Product || mongoose.model('Product', ProductSchema);
+
+export default mongoose.models.Product || mongoose.model<IProduct>('Product', ProductSchema);

@@ -2,17 +2,38 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import Inquiry from '@/models/Inquiry';
 import jwt from 'jsonwebtoken';
+import { logger } from '@/lib/logger';
+import { z } from 'zod';
+import { handleProductionError } from '@/lib/errorHandler';
+
+const inquirySchema = z.object({
+  name: z.string().min(1, 'Name is required').trim(),
+  email: z.string().email('Invalid email address').trim().toLowerCase(),
+  phone: z.string().optional(),
+  subject: z.string().optional(),
+  message: z.string().min(1, 'Message is required').trim(),
+  productId: z.string().optional(),
+  source: z.enum(['contact form', 'product page', 'download catalog']).default('contact form'),
+});
 
 // POST: Public lead capture
 export async function POST(req: NextRequest) {
   await dbConnect();
   try {
     const body = await req.json();
-    console.log('📬 NEW INQUIRY PAYLOAD:', body);
-    const inquiry = await Inquiry.create(body);
+    
+    const result = inquirySchema.safeParse(body);
+    if (!result.success) {
+      return NextResponse.json({ error: 'Invalid inquiry data', details: result.error.format() }, { status: 400 });
+    }
+
+    const validatedData = result.data;
+    logger.info('NEW INQUIRY RECEIVED', { email: validatedData.email, source: validatedData.source });
+    
+    const inquiry = await Inquiry.create(validatedData);
     return NextResponse.json(inquiry, { status: 201 });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return handleProductionError(err);
   }
 }
 
@@ -27,14 +48,16 @@ export async function GET(req: NextRequest) {
     
     // Admins bypass granular checks, others must have 'inquiries' vector
     if (decoded.role !== 'admin' && !permissions.includes('inquiries')) {
+      logger.warn('Forbidden access to inquiries', { userId: decoded.id, role: decoded.role });
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     await dbConnect();
     const inquiries = await Inquiry.find({}).populate('productId').sort({ createdAt: -1 });
+    logger.info('Inquiries retrieved', { count: inquiries.length });
     return NextResponse.json(inquiries);
-  } catch (error) {
-    return NextResponse.json({ error: 'Session Invalid' }, { status: 401 });
+  } catch (error: any) {
+    return handleProductionError(error);
   }
 }
 
@@ -48,14 +71,22 @@ export async function DELETE(req: NextRequest) {
     const permissions = decoded.permissions || [];
     
     if (decoded.role !== 'admin' && !permissions.includes('inquiries')) {
+      logger.warn('Forbidden deletion attempt', { userId: decoded.id, role: decoded.role });
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     await dbConnect();
     const { id } = await req.json();
-    await Inquiry.findByIdAndDelete(id);
+    const inquiry = await Inquiry.findByIdAndDelete(id);
+    
+    if (!inquiry) {
+      logger.warn('Inquiry delete failed: Not found', { id });
+      return NextResponse.json({ error: 'Inquiry not found' }, { status: 404 });
+    }
+
+    logger.info('Inquiry deleted successfully', { id });
     return NextResponse.json({ message: 'Deleted' });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return handleProductionError(err);
   }
 }

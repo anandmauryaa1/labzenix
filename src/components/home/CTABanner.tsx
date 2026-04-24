@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import Image from 'next/image';
 import Button from '../ui/Button';
 
 export default function CTABanner() {
@@ -8,10 +9,11 @@ export default function CTABanner() {
       <div className="max-w-7xl mx-auto bg-black border border-white/10 p-16 text-center relative overflow-hidden group">
         {/* Background Image with Parallax-like effect */}
         <div className="absolute inset-0 z-0">
-          <img 
+          <Image 
             src="https://images.pexels.com/photos/3825527/pexels-photo-3825527.jpeg" 
-            alt="Laboratory" 
-            className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700"
+            alt="Laboratory background" 
+            fill
+            className="object-cover opacity-80 group-hover:scale-105 transition-transform duration-700"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-black/80 z-10" />
         </div>

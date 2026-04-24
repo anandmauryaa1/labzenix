@@ -2,6 +2,7 @@ import dbConnect from '@/lib/dbConnect';
 import Blog from '@/models/Blog';
 import { Calendar, User, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { getPageMetadata } from '@/lib/seo';
 import FadeIn from '@/components/ui/FadeIn';
 
@@ -64,10 +65,11 @@ export default async function BlogPage({
                   <FadeIn key={blog._id} direction="up" delay={0.1}>
                     <article className="bg-white border border-gray-100 flex flex-col group overflow-hidden hover:shadow-2xl transition-all duration-500 h-full">
                       <Link href={`/blogs/${blog.slug}`} className="block overflow-hidden relative aspect-[16/10]">
-                        <img 
+                        <Image 
                           src={blog.image || 'https://images.unsplash.com/photo-1579154341098-e4e158cc7f55?auto=format&fit=crop&q=80&w=800'} 
                           alt={blog.title} 
-                          className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 grayscale group-hover:grayscale-0"
+                          fill
+                          className="object-cover transition-transform duration-1000 group-hover:scale-110 grayscale group-hover:grayscale-0"
                         />
                         <div className="absolute top-0 right-0 bg-primary text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 z-20">
                           {blog.category}

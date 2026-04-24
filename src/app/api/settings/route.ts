@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import Settings from '@/models/Settings';
+import { handleProductionError } from '@/lib/errorHandler';
 
 export async function GET() {
   try {
@@ -8,7 +9,16 @@ export async function GET() {
     let settings = await Settings.findOne({ configKey: 'global' }).lean();
     
     if (!settings) {
-      settings = await Settings.create({ configKey: 'global' });
+      // Return defaults if none in DB yet
+      return NextResponse.json({
+        communication: {
+          supportEmail: 'info@labzenix.com',
+          supportPhone: '+91-9565453120',
+          address: ' Mohali, Punjab, India'
+        },
+        social: {},
+        seo: {}
+      });
     }
 
     // Only return safe public configurations (no sensitive keys)
@@ -18,6 +28,6 @@ export async function GET() {
       seo: settings.seo
     });
   } catch (error: any) {
-    return NextResponse.json({ error: 'Failed to fetch' }, { status: 500 });
+    return handleProductionError(error);
   }
 }

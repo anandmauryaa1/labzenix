@@ -1,101 +1,108 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import User from '@/models/User';
-import jwt from 'jsonwebtoken';
+import { handleProductionError } from '@/lib/errorHandler';
+import { getAuthUser } from '@/lib/auth';
+import { z } from 'zod';
+import { logger } from '@/lib/logger';
+
+const userSchema = z.object({
+  name: z.string().min(1, 'Name is required').trim(),
+  email: z.string().email('Invalid email address').trim().toLowerCase(),
+  username: z.string().min(3, 'Username must be at least 3 characters').trim(),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  role: z.enum(['admin', 'seo', 'marketing']).default('marketing'),
+  permissions: z.array(z.string()).default(['blogs']),
+});
+
+const userStatusSchema = z.object({
+  userId: z.string().min(1, 'User ID is required'),
+  active: z.boolean(),
+});
 
 export async function GET(req: NextRequest) {
   try {
-    await dbConnect();
-    
-    // Authorization check
-    const token = req.cookies.get('admin_token')?.value;
-    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
-    if (decoded.role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    const user = await getAuthUser(req);
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (user.role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-    const users = await User.find({}, '-password').sort({ createdAt: -1 });
+    await dbConnect();
+    const users = await User.find({}, '-password').sort({ createdAt: -1 }).lean();
     return NextResponse.json(users);
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return handleProductionError(error);
   }
 }
 
 export async function POST(req: NextRequest) {
   try {
+    const adminUser = await getAuthUser(req);
+    if (!adminUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (adminUser.role !== 'admin') return NextResponse.json({ error: 'Only admins can create users' }, { status: 403 });
+
     await dbConnect();
-
-    // Authorization check
-    const token = req.cookies.get('admin_token')?.value;
-    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const rawBody = await req.json();
     
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
-    if (decoded.role !== 'admin') return NextResponse.json({ error: 'Only admins can create users' }, { status: 403 });
-
-    const body = await req.json();
-    const { name, email, username, password, role, permissions } = body;
-
-    if (!name || !email || !username || !password || !role || !permissions) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    const result = userSchema.safeParse(rawBody);
+    if (!result.success) {
+      return NextResponse.json({ error: 'Validation failed', details: result.error.format() }, { status: 400 });
     }
+
+    const body = result.data;
 
     // Check for existing user
     const existing = await User.findOne({ 
-      $or: [{ username }, { email }] 
+      $or: [{ username: body.username }, { email: body.email }] 
     });
     
     if (existing) {
       return NextResponse.json({ error: 'Username or Email already exists' }, { status: 400 });
     }
 
-    const newUser = await User.create({
-      name,
-      email,
-      username,
-      password, // Pre-save hook will hash this
-      role,
-      permissions
-    });
+    const newUser = await User.create(body);
 
     const userResponse = newUser.toObject();
     delete userResponse.password;
 
+    logger.info('New user created', { username: body.username, role: body.role, createdBy: adminUser.username });
     return NextResponse.json(userResponse, { status: 201 });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return handleProductionError(error);
   }
 }
 
 export async function PATCH(req: NextRequest) {
   try {
+    const adminUser = await getAuthUser(req);
+    if (!adminUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (adminUser.role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
     await dbConnect();
-
-    // Authorization check
-    const token = req.cookies.get('admin_token')?.value;
-    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const rawBody = await req.json();
     
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
-    if (decoded.role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-
-    const body = await req.json();
-    const { userId, active } = body;
-
-    if (!userId || typeof active !== 'boolean') {
-      return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+    const result = userStatusSchema.safeParse(rawBody);
+    if (!result.success) {
+      return NextResponse.json({ error: 'Validation failed', details: result.error.format() }, { status: 400 });
     }
 
-    const user = await User.findByIdAndUpdate(
+    const { userId, active } = result.data;
+
+    const targetUser = await User.findByIdAndUpdate(
       userId,
       { 
         active,
         lastLogin: active ? new Date() : null
       },
       { new: true }
-    ).select('-password');
+    ).select('-password').lean();
 
-    return NextResponse.json(user);
+    if (!targetUser) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    logger.info('User status updated', { targetUserId: userId, active, updatedBy: adminUser.username });
+    return NextResponse.json(targetUser);
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return handleProductionError(error);
   }
 }
-

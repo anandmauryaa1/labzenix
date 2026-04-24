@@ -17,38 +17,38 @@ export async function invalidateAdminCaches() {
   revalidatePath('/');
   
   // Cache tags
-  revalidateTag('products', "default");
-  revalidateTag('blogs', "default");
-  revalidateTag('categories', "default");
-  revalidateTag('seo', "default");
+  revalidateTag('products', 'default');
+  revalidateTag('blogs', 'default');
+  revalidateTag('categories', 'default');
+  revalidateTag('seo', 'default');
 }
 
 export async function invalidateProductCaches(slug?: string) {
   revalidatePath('/admin/products');
   revalidatePath('/products');
   if (slug) revalidatePath(`/products/${slug}`);
-  revalidateTag('products', "default");
-  revalidateTag('categories', "default");
+  revalidateTag('products', 'default');
+  revalidateTag('categories', 'default');
 }
 
 export async function invalidateBlogCaches(slug?: string) {
   revalidatePath('/admin/blogs');
   revalidatePath('/blogs');
   if (slug) revalidatePath(`/blogs/${slug}`);
-  revalidateTag('blogs', "default");
+  revalidateTag('blogs', 'default');
 }
 
 export async function invalidateCategoryCaches() {
   revalidatePath('/admin/products/categories');
   revalidatePath('/products');
-  revalidateTag('categories', "default");
+  revalidateTag('categories', 'default');
 }
 
 export async function invalidateSEOCaches(pageKey?: string) {
   revalidatePath('/admin/seo');
   if (pageKey) {
     revalidatePath(`/${pageKey}`);
-    revalidateTag(pageKey, "default");
+    revalidateTag(pageKey, 'default');
   }
-  revalidateTag('seo', "default");
+  revalidateTag('seo', 'default');
 }

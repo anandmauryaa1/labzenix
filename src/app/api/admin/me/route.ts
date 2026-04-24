@@ -1,34 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
 import dbConnect from '@/lib/dbConnect';
 import User from '@/models/User';
+import { getAuthUser } from '@/lib/auth';
+import { handleProductionError } from '@/lib/errorHandler';
 
 export async function GET(req: NextRequest) {
   try {
-    const token = req.cookies.get('admin_token')?.value;
-    if (!token) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    const authUser = await getAuthUser(req);
+    if (!authUser) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
-    
     await dbConnect();
-    const user = await User.findById(decoded.id, '-password');
+    const user = await User.findById(authUser.id, '-password').lean();
     
     if (!user) {
-      // Fallback for dummy admin if needed
-      if (decoded.id === 'dummy-id') {
+      // Fallback for system admin if no DB record yet
+      if (authUser.username === 'admin') {
         return NextResponse.json({ 
           username: 'admin', 
           role: 'admin', 
-          name: 'Super Admin', 
-          email: 'admin@labzenix.com',
-          permissions: ['blogs', 'products', 'categories', 'seo', 'inquiries', 'users', 'settings']
+          name: authUser.name || 'System Admin', 
+          email: authUser.email || 'admin@labzenix.com',
+          permissions: authUser.permissions || ['blogs', 'products', 'categories', 'seo', 'inquiries', 'users', 'settings']
         });
       }
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return NextResponse.json({ error: 'User session invalid' }, { status: 404 });
     }
 
     return NextResponse.json(user);
   } catch (error) {
-    return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    return handleProductionError(error);
   }
 }

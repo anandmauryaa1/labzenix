@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import Settings from '@/models/Settings';
-import jwt from 'jsonwebtoken';
+import { handleProductionError } from '@/lib/errorHandler';
+import { getAuthUser } from '@/lib/auth';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   try {
-    const token = req.cookies.get('admin_token')?.value;
-    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const user = await getAuthUser(req);
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     await dbConnect();
     let settings = await Settings.findOne({ configKey: 'global' });
@@ -17,18 +19,19 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(settings);
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return handleProductionError(error);
   }
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const token = req.cookies.get('admin_token')?.value;
-    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const user = await getAuthUser(req);
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
-    // Optional: Only allow pure 'admin' role to change settings
-    // if (decoded.role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    // Ensure only admins can change global settings
+    if (user.role !== 'admin' && !user.permissions.includes('settings')) {
+       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
     await dbConnect();
     const body = await req.json();
@@ -51,8 +54,9 @@ export async function POST(req: NextRequest) {
       { new: true, upsert: true, strict: false }
     );
 
+    logger.info('Global settings updated', { user: user.username });
     return NextResponse.json(settings);
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return handleProductionError(error);
   }
 }

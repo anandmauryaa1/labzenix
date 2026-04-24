@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Package, Search, ChevronRight, ArrowLeft, Grid3X3 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import toast from 'react-hot-toast';
 import FadeIn from '@/components/ui/FadeIn';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -119,10 +120,12 @@ function ProductsContent() {
               </FadeIn>
               <FadeIn direction="left" className="hidden md:block w-full max-w-sm">
                 <div className="aspect-[4/5] bg-gray-100 border-2 border-primary/20 p-4 relative shadow-2xl">
-                  <img
+                  <Image
                     src="https://images.unsplash.com/photo-1579313101805-39180766150e?auto=format&fit=crop&q=80&w=800"
-                    alt="Instrument"
-                    className="w-full h-full object-cover grayscale brightness-90 hover:grayscale-0 transition-all duration-700"
+                    alt="Industrial Instrument"
+                    fill
+                    className="object-cover grayscale brightness-90 hover:grayscale-0 transition-all duration-700"
+                    priority
                   />
                   <div className="absolute top-8 -right-12 bg-primary text-white p-6 font-black text-xs uppercase tracking-[0.2em] -rotate-90 origin-bottom-right shadow-xl">
                     LabZenix Certified
@@ -261,10 +264,11 @@ function ProductsContent() {
                         {/* Image */}
                         <div className="w-full h-64 bg-gray-50 overflow-hidden flex items-center justify-center relative">
                           {product.images?.[0] ? (
-                            <img
+                            <Image
                               src={product.images[0]}
                               alt={product.title}
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                              fill
+                              className="object-cover group-hover:scale-110 transition-transform duration-700"
                             />
                           ) : (
                             <Package className="w-16 h-16 text-gray-200" />

@@ -16,6 +16,7 @@ import {
   MessageSquare,
 } from 'lucide-react';
 import InquiryForm from './InquiryForm';
+import Image from 'next/image';
 
 /* ─── Types ─────────────────────────────────────────────── */
 
@@ -240,8 +241,13 @@ export default function ProductTabs({ product }: ProductTabsProps) {
                       {review.images && review.images.length > 0 && (
                         <div className="flex gap-3 mt-4">
                           {review.images.map((img, i) => (
-                            <div key={i} className="w-20 h-20 border border-gray-200 p-0.5 bg-gray-50 overflow-hidden cursor-pointer hover:border-primary transition-colors">
-                               <img src={img} className="w-full h-full object-cover" alt="Customer review photo" />
+                            <div key={i} className="relative w-20 h-20 border border-gray-200 p-0.5 bg-gray-50 overflow-hidden cursor-pointer hover:border-primary transition-colors">
+                               <Image 
+                                 src={img} 
+                                 fill
+                                 className="object-cover" 
+                                 alt={`Customer review photo ${i + 1}`} 
+                               />
                             </div>
                           ))}
                         </div>
