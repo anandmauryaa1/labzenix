@@ -18,7 +18,8 @@ import {
   Globe,
   Menu,
   X,
-  BarChart3
+  BarChart3,
+  UserCircle
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -150,6 +151,13 @@ export default function Sidebar() {
       roles: ['admin', 'marketing', 'seo'],
       permission: 'analytics'
     },
+    { 
+      title: 'My Profile', 
+      href: '/admin/profile', 
+      icon: UserCircle,
+      roles: ['admin', 'seo', 'marketing'],
+      permission: '' 
+    },
   ];
 
   if (loading) return <div className={`${isMobile ? 'hidden' : `w-64`} bg-secondary min-h-screen`} />;
@@ -203,8 +211,8 @@ export default function Sidebar() {
             </div>
             {(!isCollapsed || isMobile) && (
               <div>
-                <h2 className="font-black text-lg leading-none tracking-tighter text-secondary\">LABZENIX</h2>
-                <span className="text-[10px] text-primary font-black uppercase tracking-widest\">Admin Control</span>
+                <h2 className="font-black text-lg leading-none tracking-tighter text-secondary">LABZENIX</h2>
+                <span className="text-[10px] text-primary font-black uppercase tracking-widest">Admin Control</span>
               </div>
             )}
           </div>
@@ -256,20 +264,23 @@ export default function Sidebar() {
         <div className={`absolute bottom-0 left-0 w-full border-t border-gray-100 bg-gray-50/50 transition-all duration-300 ${
           isCollapsed && !isMobile ? 'p-4' : 'p-6'
         }`}>
-          <div className={`flex items-center mb-6 ${isCollapsed && !isMobile ? 'flex-col space-y-3' : 'space-x-3 px-2'}`}>
-            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-xs font-bold text-secondary border border-gray-200 shadow-sm flex-shrink-0">
+          <Link 
+            href="/admin/profile"
+            className={`flex items-center mb-6 hover:bg-white transition-all cursor-pointer group/user ${isCollapsed && !isMobile ? 'flex-col space-y-3' : 'space-x-3 px-2 py-2 border border-transparent hover:border-gray-100 hover:shadow-sm'}`}
+          >
+            <div className="w-8 h-8 rounded-full bg-secondary text-white flex items-center justify-center text-xs font-bold border border-gray-200 shadow-sm flex-shrink-0 group-hover/user:bg-primary transition-colors">
               {role?.[0]?.toUpperCase()}
             </div>
             {(!isCollapsed || isMobile) && (
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-black truncate uppercase text-secondary">{role || 'User'}</p>
+                <p className="text-sm font-black truncate uppercase text-secondary group-hover/user:text-primary transition-colors">{role || 'User'}</p>
                 <div className="flex items-center text-[10px] text-primary space-x-1">
                   <ShieldCheck className="w-3 h-3 flex-shrink-0" />
                   <span className="uppercase tracking-tighter font-bold">Verified Session</span>
                 </div>
               </div>
             )}
-          </div>
+          </Link>
           <button
             onClick={handleLogout}
             className={`w-full flex items-center justify-center space-x-2 px-4 py-3 bg-red-600/5 text-red-600 hover:bg-red-600 hover:text-white transition-all duration-300 text-xs font-black uppercase tracking-widest border border-red-600/10 ${

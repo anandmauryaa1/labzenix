@@ -232,7 +232,7 @@ export default function ProductListing() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-3">
-                      <div className="w-12 h-12 bg-gray-100 border border-gray-200 overflow-hidden flex items-center justify-center">
+                      <div className="w-12 h-12 bg-gray-100 border border-gray-200 overflow-hidden flex items-center justify-center relative">
                         {product.images && product.images[0] ? (
                           <Image 
                             src={product.images[0]} 

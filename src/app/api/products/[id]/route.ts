@@ -98,7 +98,14 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     const { id } = await params;
     productId = id;
     
-    logger.info('[API] Deleting product', { id });
+    logger.info('[API] Deleting product and associated records', { id });
+    
+    // Delete associated data first
+    await Promise.all([
+      Review.deleteMany({ product: id }),
+      Faq.deleteMany({ product: id })
+    ]);
+
     const product = await Product.findByIdAndDelete(id);
     
     if (!product) {

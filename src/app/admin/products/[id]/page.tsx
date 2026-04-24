@@ -61,6 +61,7 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
   const [success, setSuccess] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [fetching, setFetching] = useState(!isNew);
+  const [assetUploading, setAssetUploading] = useState(false);
   const [activeTab, setActiveTab] = useState<'details' | 'specs' | 'performance' | 'media' | 'seo' | 'reviews' | 'faq'>('details');
   const [categories, setCategories] = useState<any[]>([]);
 
@@ -220,6 +221,26 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
     }
   };
 
+  const handleDelete = async () => {
+    if (isNew) return;
+    if (!confirm('Permanently delete this product? This will also remove all associated reviews and FAQs.')) return;
+    
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/products/${params.id}`, { method: 'DELETE' });
+      if (res.ok) {
+        toast.success('Product purged from database');
+        router.push('/admin/products');
+      } else {
+        toast.error('Failed to delete product');
+        setLoading(false);
+      }
+    } catch (err) {
+      toast.error('Network error during deletion');
+      setLoading(false);
+    }
+  };
+
   const addSpec = () => {
     if (!newSpec.key || !newSpec.value) return;
     setForm(prev => ({
@@ -284,17 +305,20 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
   };
 
   const updateSlug = (title: string) => {
-    const slug = title
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/[\s_-]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-    
-    // If slug is empty after sanitization but title is not, use a fallback
-    const finalSlug = slug || title.replace(/\s+/g, '-').toLowerCase();
-    
-    setForm(prev => ({ ...prev, title, slug: finalSlug }));
+    if (isNew) {
+      const slug = title
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/[\s_-]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+      
+      // If slug is empty after sanitization but title is not, use a fallback
+      const finalSlug = slug || title.replace(/\s+/g, '-').toLowerCase();
+      setForm(prev => ({ ...prev, title, slug: finalSlug }));
+    } else {
+      setForm(prev => ({ ...prev, title }));
+    }
   };
 
   if (fetching) {
@@ -357,10 +381,21 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
         </div>
         
         <div className="flex items-center space-x-3">
+          {!isNew && (
+            <button 
+              type="button"
+              onClick={handleDelete}
+              disabled={loading}
+              className="flex items-center space-x-2 px-6 py-4 bg-white text-red-600 text-xs font-black uppercase tracking-widest hover:bg-red-50 transition-all border border-red-100 disabled:opacity-50"
+              title="Purge Product"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
           <button 
             type="button"
             onClick={() => handleSubmit()}
-            disabled={loading}
+            disabled={loading || assetUploading}
             className="flex items-center space-x-2 px-10 py-4 bg-secondary text-white text-xs font-black uppercase tracking-widest hover:bg-primary transition-all shadow-xl active:scale-95 disabled:opacity-50"
           >
             {loading ? (
@@ -615,19 +650,19 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
                       
                       <label 
                         className={`aspect-square border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all group ${
-                          loading ? 'border-gray-200 bg-gray-50 cursor-not-allowed' : 'border-gray-200 hover:border-primary hover:bg-primary/5'
+                          assetUploading ? 'border-gray-200 bg-gray-50 cursor-not-allowed' : 'border-gray-200 hover:border-primary hover:bg-primary/5'
                         }`}
                       >
                         <input 
                           type="file" 
                           className="hidden" 
                           accept="image/*"
-                          disabled={loading}
+                          disabled={assetUploading}
                           onChange={async (e) => {
                             const file = e.target.files?.[0];
                             if (!file) return;
                             
-                            setLoading(true);
+                            setAssetUploading(true);
                             const formData = new FormData();
                             formData.append('file', file);
                             
@@ -646,14 +681,14 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
                             } catch (err) {
                               toast.error('Network sync failure');
                             } finally {
-                              setLoading(false);
+                              setAssetUploading(false);
                             }
                           }}
                         />
                         <div className="text-center p-6">
-                          <Plus className={`w-10 h-10 mx-auto mb-3 transition-transform ${loading ? 'animate-spin text-gray-300' : 'text-gray-200 group-hover:text-primary group-hover:scale-110'}`} />
+                          <Plus className={`w-10 h-10 mx-auto mb-3 transition-transform ${assetUploading ? 'animate-spin text-gray-300' : 'text-gray-200 group-hover:text-primary group-hover:scale-110'}`} />
                           <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-primary">
-                            {loading ? 'Processing...' : 'Sync New Asset'}
+                            {assetUploading ? 'Processing...' : 'Sync New Asset'}
                           </span>
                         </div>
                       </label>
@@ -739,9 +774,11 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
                              type="file" 
                              accept="image/*" 
                              className="hidden" 
+                             disabled={assetUploading}
                              onChange={async (e) => {
                                const file = e.target.files?.[0];
                                if (!file) return;
+                               setAssetUploading(true);
                                const formData = new FormData();
                                formData.append('file', file);
                                try {
@@ -749,15 +786,18 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
                                  if (res.ok) {
                                    const data = await res.json();
                                    setNewReview(prev => ({ ...prev, images: [...prev.images, data.url] }));
+                                   toast.success('Review asset synced');
                                  } else {
                                    toast.error('Upload failed');
                                  }
                                } catch (err) {
                                  toast.error('Network error');
+                               } finally {
+                                 setAssetUploading(false);
                                }
                              }}
                            />
-                           <Plus className="w-4 h-4 text-gray-400" />
+                           <Plus className={`w-6 h-6 transition-transform ${assetUploading ? 'animate-spin text-gray-300' : 'text-gray-300 group-hover:text-primary group-hover:scale-110'}`} />
                          </label>
                        </div>
                     </div>
