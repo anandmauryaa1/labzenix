@@ -6,6 +6,13 @@ import Footer from "@/components/layout/Footer";
 export const metadata: Metadata = {
   title: "LabZenix - Precision Laboratory Testing Instruments",
   description: "Manufacturer of high-quality laboratory testing instruments for Paper, Packaging, PET, Plastic, and Paint industries.",
+  metadataBase: new URL('https://labzenix.com'),
+  icons: {
+    icon: '/icon.png',
+    shortcut: '/icon.png',
+    apple: '/apple-icon.png',
+  },
+  manifest: '/site.webmanifest',
   openGraph: {
     title: "LabZenix - Precision Laboratory Testing Instruments",
     description: "Manufacturer of high-quality laboratory testing instruments for Paper, Packaging, PET, Plastic, and Paint industries.",
@@ -13,9 +20,10 @@ export const metadata: Metadata = {
     siteName: 'LabZenix',
     images: [
       {
-        url: '/og-image.jpg', // Assuming this exists or will be added
+        url: '/og-image.png',
         width: 1200,
         height: 630,
+        alt: 'LabZenix - Precision Laboratory Instruments'
       },
     ],
     locale: 'en_US',
@@ -25,7 +33,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'LabZenix - Precision Laboratory Testing Instruments',
     description: 'Manufacturer of high-quality laboratory testing instruments for Paper, Packaging, PET, Plastic, and Paint industries.',
-    images: ['/og-image.jpg'],
+    images: ['/og-image.png'],
   },
 };
 

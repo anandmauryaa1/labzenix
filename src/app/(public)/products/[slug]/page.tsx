@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     openGraph: {
       title: `${title} | LabZenix`,
       description: description,
-      images: [product.images?.[0] || '/og-image.jpg'],
+      images: [product.images?.[0] || '/og-image.png'],
     }
   };
 }

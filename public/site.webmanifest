@@ -1,0 +1,21 @@
+{
+  "name": "LabZenix",
+  "short_name": "LabZenix",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/apple-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "theme_color": "#0066FF",
+  "background_color": "#ffffff",
+  "display": "standalone"
+}
