@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { logger } from '@/lib/logger';
+import { seedDefaultAdmin } from './adminSeeder';
 
 const MONGODB_URI = process.env.MONGODB_URI!;
 
@@ -51,6 +52,8 @@ async function dbConnect() {
   
   try {
     cached!.conn = await cached!.promise;
+    // Seed default admin on first successful connection
+    await seedDefaultAdmin();
   } catch (e: any) {
     cached!.promise = null;
     throw e;
