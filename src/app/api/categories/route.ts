@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
     // Revalidate cached pages
     revalidatePath('/admin/products/categories');
     revalidatePath('/products');
-    revalidateTag('categories');
+    revalidateTag('categories', 'max');
     
     return NextResponse.json(JSON.parse(JSON.stringify(category)), { status: 201 });
   } catch (error: any) {

@@ -81,8 +81,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     revalidatePath('/admin/products');
     revalidatePath('/products');
     revalidatePath(`/products/${product.slug}`);
-    revalidateTag('products', "default");
-    revalidateTag('categories', "default");
+    revalidateTag('products', 'max');
+    revalidateTag('categories', 'max');
     
     return NextResponse.json(JSON.parse(JSON.stringify(product)));
   } catch (error) {
@@ -112,8 +112,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     revalidatePath('/admin/products');
     revalidatePath('/products');
     revalidatePath(`/products/${product.slug}`);
-    revalidateTag('products', "default");
-    revalidateTag('categories', "default");
+    revalidateTag('products', 'max');
+    revalidateTag('categories', 'max');
     
     return NextResponse.json({ success: true });
   } catch (error) {

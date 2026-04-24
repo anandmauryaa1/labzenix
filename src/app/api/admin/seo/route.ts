@@ -58,8 +58,8 @@ export async function POST(req: NextRequest) {
     // Revalidate cached pages based on pageKey
     revalidatePath('/admin/seo');
     revalidatePath(`/${pageKey === 'home' ? '' : pageKey}`);
-    revalidateTag('seo');
-    revalidateTag(pageKey);
+    revalidateTag('seo', 'max');
+    revalidateTag(pageKey, 'max');
 
     return NextResponse.json(seo);
   } catch (error: any) {

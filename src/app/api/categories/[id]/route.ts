@@ -59,7 +59,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     // Revalidate cached pages
     revalidatePath('/admin/products/categories');
     revalidatePath('/products');
-    revalidateTag('categories');
+    revalidateTag('categories', 'max');
     
     return NextResponse.json(category);
   } catch (error: any) {
@@ -85,7 +85,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     // Revalidate cached pages
     revalidatePath('/admin/products/categories');
     revalidatePath('/products');
-    revalidateTag('categories');
+    revalidateTag('categories', 'max');
     
     return NextResponse.json({ message: 'Category deleted' });
   } catch (error: any) {

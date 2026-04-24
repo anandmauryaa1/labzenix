@@ -20,7 +20,7 @@ const productSchema = z.object({
   images: z.array(z.string()).optional(),
   features: z.array(z.string()).optional(),
   specificationText: z.string().optional(),
-  specs: z.record(z.any()).optional(),
+  specs: z.record(z.string(), z.any()).optional(),
   youtubeUrl: z.string().optional(),
   metaTitle: z.string().min(1, 'Meta title is required').trim(),
   metaDescription: z.string().min(1, 'Meta description is required').trim(),

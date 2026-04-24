@@ -41,7 +41,7 @@ export async function PUT(
     revalidatePath('/admin/blogs');
     revalidatePath('/blogs');
     revalidatePath(`/blogs/${blog.slug}`);
-    revalidateTag('blogs', "default");
+    revalidateTag('blogs', 'max');
 
     return NextResponse.json(blog);
   } catch (error: any) {
@@ -76,7 +76,7 @@ export async function DELETE(
     revalidatePath('/admin/blogs');
     revalidatePath('/blogs');
     revalidatePath(`/blogs/${blog.slug}`);
-    revalidateTag('blogs', "default");
+    revalidateTag('blogs', 'max');
     
     return NextResponse.json({ message: 'Blog post deleted successfully' });
   } catch (error: any) {
