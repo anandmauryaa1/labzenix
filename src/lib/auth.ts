@@ -7,6 +7,8 @@ export interface AuthUser {
   id: string;
   role: 'admin' | 'seo' | 'marketing';
   username: string;
+  name: string;
+  email: string;
   permissions: string[];
 }
 
@@ -14,6 +16,8 @@ interface JWTPayload {
   id: string;
   role: 'admin' | 'seo' | 'marketing';
   username: string;
+  name: string;
+  email: string;
   permissions: string[];
 }
 
@@ -37,6 +41,8 @@ export async function getAuthUser(req: NextRequest): Promise<AuthUser | null> {
       id: decoded.id,
       role: decoded.role,
       username: decoded.username,
+      name: decoded.name || '',
+      email: decoded.email || '',
       permissions: decoded.permissions || []
     };
   } catch (err) {
