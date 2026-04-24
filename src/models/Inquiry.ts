@@ -7,6 +7,11 @@ const InquirySchema = new mongoose.Schema({
   subject: { type: String },
   message: { type: String, required: true },
   productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+  source: { 
+    type: String, 
+    enum: ['contact form', 'product page', 'download catalog'],
+    default: 'contact form'
+  },
   createdAt: { type: Date, default: Date.now },
 });
 

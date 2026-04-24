@@ -12,6 +12,7 @@ import { Metadata } from 'next';
 import { Download, ChevronRight, Hash, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import * as motion from 'framer-motion/client';
+import CatalogButton from '@/components/products/CatalogButton';
 
 // Always fetch fresh — reviews and FAQs must appear immediately after admin saves
 export const dynamic = 'force-dynamic';
@@ -270,14 +271,11 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                 Contact Now
               </Link>
               {category && category.catalogUrl && (
-                <a 
-                  href={category.catalogUrl}
-                  download={`catalog-${product.category.toLowerCase().replace(/\s+/g, '-')}.pdf`}
-                  className="flex items-center justify-center px-8 py-4 border-2 border-secondary text-secondary font-black uppercase tracking-widest text-sm hover:bg-secondary hover:text-white transition-all active:scale-95"
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  <span>Download Catalog</span>
-                </a>
+                <CatalogButton 
+                  productName={product.title}
+                  productId={product._id.toString()}
+                  catalogUrl={category.catalogUrl}
+                />
               )}
             </div>
           </div>

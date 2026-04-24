@@ -12,9 +12,13 @@ import {
   Hash,
   Eye,
   X,
-  Share2
+  Share2,
+  Box,
+  ExternalLink,
+  Target
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import Link from 'next/link';
 
 export default function InquiryManagement() {
   const [inquiries, setInquiries] = useState<any[]>([]);
@@ -118,6 +122,32 @@ export default function InquiryManagement() {
                       </span>
                     </div>
                   </div>
+                </div>
+
+                <div className="flex flex-col items-end gap-2">
+                  <div className={`flex items-center space-x-1.5 px-3 py-1 border transition-all ${
+                    lead.source === 'download catalog' 
+                      ? 'bg-amber-50 border-amber-200 text-amber-700' 
+                      : lead.source === 'product page'
+                      ? 'bg-blue-50 border-blue-200 text-blue-700'
+                      : 'bg-green-50 border-green-200 text-green-700'
+                  }`}>
+                    <Target className="w-3 h-3" />
+                    <span className="text-[10px] font-black uppercase tracking-widest">
+                      Source: {lead.source || 'contact form'}
+                    </span>
+                  </div>
+                  {lead.productId && (
+                    <Link 
+                      href={`/products/${lead.productId.slug}`} 
+                      target="_blank"
+                      className="flex items-center space-x-1 text-[9px] font-bold text-gray-400 hover:text-primary transition-colors uppercase tracking-widest"
+                    >
+                      <Box className="w-3 h-3" />
+                      <span>{lead.productId.title?.substring(0, 20)}...</span>
+                      <ExternalLink className="w-2.5 h-2.5" />
+                    </Link>
+                  )}
                 </div>
                 
                 {/* Archive Button (Top Right) */}
@@ -238,6 +268,10 @@ export default function InquiryManagement() {
                  <div className="space-y-1">
                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Phone Number</p>
                    <p className="text-secondary font-bold">{selectedInquiry.phone || 'N/A'}</p>
+                 </div>
+                 <div className="md:col-span-2 space-y-1">
+                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Inquiry Source</p>
+                   <p className="text-secondary font-bold uppercase">{selectedInquiry.source || 'contact form'}</p>
                  </div>
                  <div className="md:col-span-2 space-y-1">
                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Subject</p>
