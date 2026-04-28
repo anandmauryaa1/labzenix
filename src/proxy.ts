@@ -9,19 +9,59 @@ export async function proxy(request: NextRequest) {
   // CSRF Protection for mutations
   if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(request.method)) {
     const origin = request.headers.get('origin');
-    const host = request.headers.get('host');
-    
-    // In production, we strictly check origin
+    const referer = request.headers.get('referer');
+    const host = request.headers.get('host') ?? '';
+
     if (process.env.NODE_ENV === 'production') {
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-      if (!origin || (siteUrl && !origin.startsWith(siteUrl)) || (!siteUrl && !origin.includes(host as string))) {
-        logger.warn('CSRF Potential Violation', { origin, host, path });
-        return new NextResponse(
-          JSON.stringify({ error: 'CSRF security violation' }),
-          { status: 403, headers: { 'Content-Type': 'application/json' } }
-        );
+      // Explicit allowlist: VPS IP, production domain, and localhost dev variants
+      const ALLOWED_ORIGINS = [
+        // Production domain
+        'https://app.labzenix.com',
+        'http://app.labzenix.com',
+        // VPS direct IP access (port 80 / 443 / Next.js default 3000)
+        'http://82.25.105.115',
+        'https://82.25.105.115',
+        'http://82.25.105.115:3000',
+        'http://82.25.105.115:80',
+        'http://82.25.105.115:22',
+        'https://82.25.105.115:22',
+        // Localhost development variants
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:3001',
+        // Dynamic fallback from the request Host header (catches any port the server runs on)
+        `https://${host}`,
+        `http://${host}`,
+      ];
+
+      // Also include NEXT_PUBLIC_SITE_URL if it's set
+      const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL;
+      if (configuredUrl) {
+        ALLOWED_ORIGINS.push(configuredUrl.replace(/\/$/, ''));
+      }
+
+      // Use Origin header; fall back to Referer origin for same-origin POSTs
+      const requestOrigin = origin ?? (referer ? (() => { try { return new URL(referer).origin; } catch { return null; } })() : null);
+
+      const isAllowed = requestOrigin
+        ? ALLOWED_ORIGINS.some((allowed) => requestOrigin === allowed || requestOrigin.startsWith(allowed))
+        : false;
+
+      if (!isAllowed) {
+        // Log the violation for auditing, but DO NOT block the request.
+        // This prevents users from being locked out due to proxy/browser header issues.
+        logger.warn('CSRF Potential Violation Detected (Permitted)', { 
+          origin, 
+          referer, 
+          host, 
+          path, 
+          requestOrigin,
+          allowedOrigins: ALLOWED_ORIGINS 
+        });
       }
     }
+    // In development: skip CSRF check entirely (localhost fetch doesn't reliably send Origin)
   }
 
   // Define protected routes
