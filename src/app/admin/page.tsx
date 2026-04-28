@@ -212,49 +212,81 @@ export default function AdminDashboard() {
         <div className="space-y-6">
           {/* Latest Products */}
           <div className="bg-white border border-gray-100 overflow-hidden shadow-sm">
-            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-              <h3 className="text-sm font-black text-secondary uppercase tracking-widest flex items-center">
-                <Package className="w-4 h-4 mr-2 text-primary" />
+            <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+              <h3 className="text-sm font-black text-secondary uppercase tracking-widest flex items-center gap-2">
+                <span className="p-1.5 bg-primary/10 text-primary">
+                  <Package className="w-3.5 h-3.5" />
+                </span>
                 Recent Instruments
               </h3>
+              <Link href="/admin/products" className="text-[9px] font-black text-primary uppercase tracking-widest hover:underline flex items-center gap-1">
+                All <ChevronRight className="w-3 h-3" />
+              </Link>
             </div>
-            <div className="p-2 divide-y divide-gray-50">
+
+            <div className="divide-y divide-gray-50">
               {recentProducts.length === 0 ? (
-                <div className="p-8 text-center text-gray-300 font-bold uppercase text-[10px] tracking-widest">
-                  No catalog items found
+                <div className="py-12 text-center">
+                  <Package className="w-8 h-8 text-gray-200 mx-auto mb-3" />
+                  <p className="text-gray-300 font-bold uppercase text-[10px] tracking-widest">No catalog items found</p>
                 </div>
-              ) : recentProducts.map((product: any) => (
-                <div key={product._id} className="p-4 flex items-center space-x-3 hover:bg-gray-50 transition-all relative group">
-                  <div className="w-12 h-12 bg-gray-50 border border-gray-100 overflow-hidden shrink-0">
+              ) : recentProducts.map((product: any, idx: number) => (
+                <Link
+                  key={product._id}
+                  href={`/admin/products/${product._id}`}
+                  className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50/80 transition-all group"
+                >
+                  {/* Image thumbnail */}
+                  <div className="relative w-14 h-14 bg-gray-100 border border-gray-100 overflow-hidden shrink-0 group-hover:border-primary/30 transition-colors">
                     {product.images?.[0] ? (
-                      <Image 
-                        src={product.images[0]} 
-                        alt={product.title} 
-                        fill 
-                        className="object-cover" 
+                      <Image
+                        src={product.images[0]}
+                        alt={product.title}
+                        fill
+                        sizes="56px"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-200">
+                      <div className="w-full h-full flex items-center justify-center text-gray-300">
                         <Package className="w-5 h-5" />
                       </div>
                     )}
+                    {/* Index badge */}
+                    <span className="absolute top-0 left-0 w-4 h-4 bg-secondary text-white text-[7px] font-black flex items-center justify-center leading-none">
+                      {idx + 1}
+                    </span>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <h4 className="text-[10px] font-black text-secondary uppercase tracking-tight truncate group-hover:text-primary transition-colors">
+
+                  {/* Info */}
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <h4 className="text-[11px] font-black text-secondary uppercase tracking-tight leading-tight line-clamp-2 group-hover:text-primary transition-colors">
                       {product.title}
                     </h4>
-                    <p className="text-[8px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">
-                      Model: {product.modelNumber || 'N/A'}
-                    </p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {product.category && (
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-primary/10 text-primary text-[8px] font-black uppercase tracking-wider">
+                          <Tag className="w-2 h-2" />
+                          {product.category}
+                        </span>
+                      )}
+                      <span className="text-[8px] text-gray-400 font-bold uppercase tracking-widest">
+                        {product.modelNumber ? `#${product.modelNumber}` : 'No Model'}
+                      </span>
+                    </div>
                   </div>
-                  <Link href={`/admin/products/${product._id}`}>
-                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-secondary transition-colors" />
-                  </Link>
-                </div>
+
+                  {/* Arrow */}
+                  <ArrowRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
+                </Link>
               ))}
             </div>
-            <Link href="/admin/products" className="block p-4 bg-gray-50 text-center text-[9px] font-black uppercase tracking-widest text-gray-400 hover:text-secondary hover:bg-gray-100 transition-colors border-t border-gray-100">
+
+            <Link
+              href="/admin/products"
+              className="flex items-center justify-center gap-2 p-4 bg-secondary text-white text-[9px] font-black uppercase tracking-widest hover:bg-secondary/90 transition-colors group border-t border-gray-100"
+            >
               Full Spectrum Catalog
+              <ExternalLink className="w-3 h-3 group-hover:scale-110 transition-transform" />
             </Link>
           </div>
 
