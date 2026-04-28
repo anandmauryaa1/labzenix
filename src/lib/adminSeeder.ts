@@ -17,13 +17,11 @@ export async function seedDefaultAdmin() {
       const password = process.env.ADMIN_PASSWORD || 'Labzenix@2026';
       const email = 'info@labzenix.com';
       
-      const hashedPassword = await bcrypt.hash(password, 12);
-      
       await User.create({
         name: 'System Administrator',
         email,
         username,
-        password: hashedPassword,
+        password: password,
         role: 'admin',
         permissions: ['blogs', 'products', 'categories', 'seo', 'inquiries', 'users', 'settings'],
         active: true,

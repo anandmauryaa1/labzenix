@@ -11,14 +11,15 @@ export async function GET(req: NextRequest) {
     const username = process.env.ADMIN_USERNAME || 'Labz';
     const password = process.env.ADMIN_PASSWORD || 'Labzenix@2026';
     
-    const hashedPassword = await bcrypt.hash(password, 12);
+    // The User model has a pre-save hook that handles hashing, 
+    // so we MUST pass the plain password to .save() or .create() 
+    // to avoid double-hashing.
     
     // Find existing admin or create new one
     let user = await User.findOne({ role: 'admin' });
     
     if (user) {
-      user.username = username;
-      user.password = hashedPassword;
+      user.password = password;
       await user.save();
       logger.info('Admin credentials reset to defaults', { username });
     } else {
@@ -26,7 +27,7 @@ export async function GET(req: NextRequest) {
         name: 'System Administrator',
         email: 'info@labzenix.com',
         username,
-        password: hashedPassword,
+        password: password,
         role: 'admin',
         permissions: ['blogs', 'products', 'categories', 'seo', 'inquiries', 'users', 'settings'],
         active: true,
