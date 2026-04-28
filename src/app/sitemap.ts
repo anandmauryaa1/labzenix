@@ -10,7 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Fetch all products
   const products = await Product.find({}, 'slug updatedAt').lean();
-  const productEntries = products.map((product: any) => ({
+  const productEntries = (products as { slug: string; updatedAt?: Date }[]).map((product) => ({
     url: `${baseUrl}/products/${product.slug}`,
     lastModified: product.updatedAt || new Date(),
     changeFrequency: 'weekly' as const,
@@ -19,7 +19,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Fetch all blogs
   const blogs = await Blog.find({ status: 'published' }, 'slug updatedAt').lean();
-  const blogEntries = blogs.map((blog: any) => ({
+  const blogEntries = (blogs as { slug: string; updatedAt?: Date }[]).map((blog) => ({
     url: `${baseUrl}/blogs/${blog.slug}`,
     lastModified: blog.updatedAt || new Date(),
     changeFrequency: 'monthly' as const,
