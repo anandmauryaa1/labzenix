@@ -118,9 +118,16 @@ export default function Footer() {
               </li>
               <li className="flex items-center">
                 <Phone className="w-5 h-5 text-primary mr-4 flex-shrink-0" />
-                <a href={`tel:${settings?.communication?.supportPhone || '+919565453120'}`} className="text-gray-700 text-sm md:text-base font-normal hover:text-primary transition-colors">
-                  {settings?.communication?.supportPhone || '+91-9565453120'}
-                </a>
+                <div className="flex flex-col">
+                  <a href={`tel:${settings?.communication?.supportPhone || '+919565453120'}`} className="text-gray-700 text-sm md:text-base font-normal hover:text-primary transition-colors">
+                    <span className="font-semibold text-xs uppercase tracking-wider text-gray-400 mr-2">Support:</span>
+                    {settings?.communication?.supportPhone || '+91-9565453120'}
+                  </a>
+                  <a href={`tel:${settings?.communication?.salesPhone || '+919876500002'}`} className="text-gray-700 text-sm md:text-base font-normal hover:text-primary transition-colors">
+                    <span className="font-semibold text-xs uppercase tracking-wider text-gray-400 mr-2">Sales:</span>
+                    {settings?.communication?.salesPhone || '+91-98765-00002'}
+                  </a>
+                </div>
               </li>
               <li className="flex items-center">
                 <Mail className="w-5 h-5 text-primary mr-4 flex-shrink-0" />

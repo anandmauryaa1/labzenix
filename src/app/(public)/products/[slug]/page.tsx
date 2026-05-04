@@ -13,6 +13,7 @@ import { Download, ChevronRight, Hash, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import * as motion from 'framer-motion/client';
 import CatalogButton from '@/components/products/CatalogButton';
+import PageBanner from '@/components/ui/PageBanner';
 
 // Always fetch fresh — reviews and FAQs must appear immediately after admin saves
 export const dynamic = 'force-dynamic';
@@ -147,15 +148,14 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       )}
 
       {/* Breadcrumb */}
-      <div className="max-w-7xl mx-auto px-4 py-6 border-b border-gray-100">
-        <div className="flex items-center space-x-2 text-sm">
-          <Link href="/" className="text-gray-500 hover:text-secondary transition-colors">Home</Link>
-          <ChevronRight className="w-4 h-4 text-gray-300" />
-          <Link href="/products" className="text-gray-500 hover:text-secondary transition-colors">Products</Link>
-          <ChevronRight className="w-4 h-4 text-gray-300" />
-          <span className="text-secondary font-medium">{product.title}</span>
-        </div>
-      </div>
+      <PageBanner 
+        title={product.title} 
+        breadcrumbs={[
+          { label: 'Home', href: '/' },
+          { label: 'Products', href: '/products' },
+          { label: product.title }
+        ]} 
+      />
 
       {/* Product Detail Section */}
       <div className="max-w-7xl mx-auto px-4 py-16">
@@ -195,13 +195,13 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                   <p className="text-xl font-black text-secondary tracking-tighter">{product.modelNumber}</p>
                 </div>
               )}
-              <div className="space-y-1">
+              {/* <div className="space-y-1">
                   <p className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em] flex items-center gap-2">
                     <ShieldCheck className="w-3 h-3 text-primary" />
                     Status
                   </p>
                   <p className="text-xl font-black text-secondary tracking-tighter uppercase transition-colors hover:text-primary">In Regular Stock</p>
-              </div>
+              </div> */}
             </div>
 
             {/* Social Media Links */}

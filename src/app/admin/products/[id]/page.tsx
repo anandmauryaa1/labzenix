@@ -419,11 +419,11 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
           <div className="bg-white border border-gray-100 overflow-hidden shadow-sm">
             <div className="flex border-b border-gray-100 overflow-x-auto scrollbar-hide">
               {[
-                { id: 'details', label: 'General Specs', icon: Info },
-                { id: 'performance', label: 'Technical Narrative', icon: Zap },
-                { id: 'specs', label: 'Engineering Array', icon: Settings },
-                { id: 'media', label: 'Visual Assets', icon: Package },
-                { id: 'reviews', label: 'Customer Reviews', icon: Star },
+                { id: 'details', label: 'Overview', icon: Info },
+                { id: 'performance', label: 'Features', icon: Zap },
+                { id: 'specs', label: 'Specifications', icon: Settings },
+                { id: 'media', label: 'Video & Media', icon: Package },
+                { id: 'reviews', label: 'Reviews', icon: Star },
                 { id: 'faq', label: 'FAQ', icon: HelpCircle },
                 { id: 'seo', label: 'SEO Analysis', icon: Globe }
               ].map((tab) => (

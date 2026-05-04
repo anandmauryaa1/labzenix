@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+export const dynamic = 'force-dynamic';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import dbConnect from '@/lib/dbConnect';
 import Category from '@/models/Category';
@@ -13,6 +14,9 @@ const categorySchema = z.object({
   slug: z.string().optional(),
   description: z.string().optional(),
   image: z.string().optional(),
+  imagePublicId: z.string().optional(),
+  catalogUrl: z.string().optional(),
+  catalogPublicId: z.string().optional(),
 });
 
 export async function GET() {

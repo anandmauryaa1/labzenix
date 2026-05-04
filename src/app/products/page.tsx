@@ -8,6 +8,7 @@ import Image from 'next/image';
 import toast from 'react-hot-toast';
 import FadeIn from '@/components/ui/FadeIn';
 import { motion, AnimatePresence } from 'framer-motion';
+import PageBanner from '@/components/ui/PageBanner';
 
 interface Product {
   _id: string;
@@ -320,12 +321,21 @@ function ProductsContent() {
 
 export default function ProductsPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
-      </div>
-    }>
-      <ProductsContent />
-    </Suspense>
+    <div className="bg-white min-h-screen">
+      <PageBanner 
+        title="Our Products" 
+        breadcrumbs={[
+          { label: 'Home', href: '/' },
+          { label: 'Categories' }
+        ]} 
+      />
+      <Suspense fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+        </div>
+      }>
+        <ProductsContent />
+      </Suspense>
+    </div>
   );
 }

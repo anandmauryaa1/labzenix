@@ -194,7 +194,7 @@ export default function ProductListing() {
                 </th>
                 <th className="px-6 py-4">Instrument / ID</th>
                 <th className="px-6 py-4">Classification</th>
-                <th className="px-6 py-4">Usage Layer</th>
+                {/* <th className="px-6 py-4">Usage Layer</th> */}
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
@@ -264,7 +264,7 @@ export default function ProductListing() {
                       {product.category || 'Uncategorized'}
                     </div>
                   </td>
-                  <td className="px-6 py-4">
+                  {/* <td className="px-6 py-4">
                     <span className={`inline-flex items-center px-2 py-1 text-[10px] font-black uppercase tracking-tighter ${
                       product.usage === 'Laboratory' ? 'bg-blue-50 text-blue-600' : 
                       product.usage === 'Production' ? 'bg-orange-50 text-orange-600' : 'bg-green-50 text-green-600'
@@ -272,7 +272,7 @@ export default function ProductListing() {
                       <Shield className="w-3 h-3 mr-1" />
                       {product.usage || 'N/A'}
                     </span>
-                  </td>
+                  </td> */}
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end space-x-2">
                        <Link href={`/products/${product.slug}`} target="_blank">

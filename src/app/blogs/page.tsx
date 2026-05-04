@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getPageMetadata } from '@/lib/seo';
 import FadeIn from '@/components/ui/FadeIn';
+import PageBanner from '@/components/ui/PageBanner';
 
 export async function generateMetadata() {
   return await getPageMetadata('blogs');
@@ -33,6 +34,13 @@ export default async function BlogPage({
 
   return (
     <div className="bg-white overflow-hidden">
+      <PageBanner 
+        title="Knowledge Center" 
+        breadcrumbs={[
+          { label: 'Home', href: '/' },
+          { label: 'Blogs' }
+        ]} 
+      />
       {/* Blog Hero */}
       <section className="bg-gray-50 py-24 border-b border-gray-100">
         <div className="max-w-7xl auto px-4 sm:px-6 lg:px-8 text-center">

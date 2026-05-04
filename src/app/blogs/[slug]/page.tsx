@@ -153,11 +153,6 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
                     </div>
                   </div>
                   
-                  <div className="px-6 py-5 bg-blue-50 border-l-4 border-primary">
-                    <p className="text-xs font-medium text-secondary italic leading-relaxed">
-                      "Technical integrity is the foundation of scientific advancement."
-                    </p>
-                  </div>
                 </div>
               </div>
             </div>

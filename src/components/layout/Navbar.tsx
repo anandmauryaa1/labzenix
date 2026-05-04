@@ -31,14 +31,28 @@ export default function Navbar() {
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
   const [settings, setSettings] = useState<any>(null);
 
-  // Search state
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [categories, setCategories] = useState<any[]>([]);
 
   useEffect(() => {
     fetch('/api/settings').then(res => res.json()).then(data => setSettings(data)).catch(console.error);
+    fetch('/api/categories').then(res => res.json()).then(data => setCategories(Array.isArray(data) ? data : [])).catch(console.error);
   }, []);
+
+  const dynamicNavLinks = navLinks.map(link => {
+    if (link.name === 'Products') {
+      return {
+        ...link,
+        submenu: categories.map(cat => ({
+          name: cat.name,
+          href: `/products?category=${encodeURIComponent(cat.name)}`
+        }))
+      };
+    }
+    return link;
+  });
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40);
@@ -80,7 +94,13 @@ export default function Navbar() {
           <div className="flex items-center space-x-6">
             <a href={`tel:${settings?.communication?.supportPhone || '+919565453120'}`} className="flex items-center hover:text-gray-200 transition-colors">
               <Phone className="w-3.5 h-3.5 mr-2" />
+              <span className="hidden sm:inline mr-1">Support:</span>
               <span>{settings?.communication?.supportPhone || '+91-9565453120'}</span>
+            </a>
+            <a href={`tel:${settings?.communication?.salesPhone || '+919876500002'}`} className="flex items-center hover:text-gray-200 transition-colors">
+              <Phone className="w-3.5 h-3.5 mr-2" />
+              <span className="hidden sm:inline mr-1">Sales:</span>
+              <span>{settings?.communication?.salesPhone || '+91-98765-00002'}</span>
             </a>
             <a href={`mailto:${settings?.communication?.supportEmail || 'info@labzenix.com'}`} className="hidden lg:flex items-center hover:text-gray-200 transition-colors">
               <Mail className="w-3.5 h-3.5 mr-2" />
@@ -115,7 +135,7 @@ export default function Navbar() {
 
             {/* Desktop Navigation */}
             <nav className="hidden xl:flex items-center space-x-8" aria-label="Main Navigation">
-              {navLinks.map((link) => (
+              {dynamicNavLinks.map((link) => (
                 <div 
                   key={link.name} 
                   className="relative group py-4"
@@ -264,7 +284,7 @@ export default function Navbar() {
                 )}
               </form>
 
-              {navLinks.map((link) => (
+              {dynamicNavLinks.map((link) => (
                 <div key={link.name}>
                   <div className="flex justify-between items-center border-b border-gray-50">
                     <Link
@@ -307,7 +327,13 @@ export default function Navbar() {
               <div className="pt-4 px-3 flex flex-col space-y-4">
                 <a href={`tel:${settings?.communication?.supportPhone || '+919565453120'}`} className="flex items-center text-gray-600">
                   <Phone className="w-4 h-4 mr-3" />
+                  <span className="font-semibold mr-2">Support:</span>
                   <span>{settings?.communication?.supportPhone || '+91-9565453120'}</span>
+                </a>
+                <a href={`tel:${settings?.communication?.salesPhone || '+919876500002'}`} className="flex items-center text-gray-600">
+                  <Phone className="w-4 h-4 mr-3" />
+                  <span className="font-semibold mr-2">Sales:</span>
+                  <span>{settings?.communication?.salesPhone || '+91-98765-00002'}</span>
                 </a>
                 <a href={`mailto:${settings?.communication?.supportEmail || 'info@labzenix.com'}`} className="flex items-center text-gray-600">
                   <Mail className="w-4 h-4 mr-3" />

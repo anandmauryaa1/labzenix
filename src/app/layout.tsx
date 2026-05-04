@@ -38,7 +38,6 @@ export const metadata: Metadata = {
 };
 
 import ConditionalWrapper from "@/components/layout/ConditionalWrapper";
-import { Toaster } from "react-hot-toast";
 
 export default function RootLayout({
   children,
@@ -51,7 +50,6 @@ export default function RootLayout({
         <ConditionalWrapper>
           {children}
         </ConditionalWrapper>
-        <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
       </body>
     </html>
   );

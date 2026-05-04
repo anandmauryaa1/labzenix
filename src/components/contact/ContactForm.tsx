@@ -98,7 +98,31 @@ export default function ContactForm() {
                       <Phone className="w-6 h-6" />
                     </div>
                     <div className="ml-6">
-                      <p className="text-sm font-bold text-secondary uppercase tracking-widest mb-1">Call Us</p>
+                      <p className="text-sm font-bold text-secondary uppercase tracking-widest mb-1">Sales Hotline</p>
+                      <a href={`tel:${settings?.communication?.salesPhone || '+919876500002'}`} className="text-lg text-gray-600 hover:text-primary transition-colors font-semibold">{settings?.communication?.salesPhone || '+91-98765-00002'}</a>
+                    </div>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="w-12 h-12 bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary">
+                      <Mail className="w-6 h-6" />
+                    </div>
+                    <div className="ml-6">
+                      <p className="text-sm font-bold text-secondary uppercase tracking-widest mb-1">Sales Email</p>
+                      <a href={`mailto:${settings?.communication?.salesEmail || 'sales@labzenix.com'}`} className="text-lg text-gray-600 hover:text-primary transition-colors font-semibold">{settings?.communication?.salesEmail || 'sales@labzenix.com'}</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-bold text-secondary mb-8 uppercase tracking-tighter border-b border-primary inline-block pb-2">Customer Support</h3>
+                <div className="space-y-6">
+                  <div className="flex items-start">
+                    <div className="w-12 h-12 bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary">
+                      <Phone className="w-6 h-6" />
+                    </div>
+                    <div className="ml-6">
+                      <p className="text-sm font-bold text-secondary uppercase tracking-widest mb-1">Support Phone</p>
                       <a href={`tel:${settings?.communication?.supportPhone || '+919565453120'}`} className="text-lg text-gray-600 hover:text-primary transition-colors font-semibold">{settings?.communication?.supportPhone || '+91-9565453120'}</a>
                     </div>
                   </div>
@@ -107,7 +131,7 @@ export default function ContactForm() {
                       <Mail className="w-6 h-6" />
                     </div>
                     <div className="ml-6">
-                      <p className="text-sm font-bold text-secondary uppercase tracking-widest mb-1">Email Us</p>
+                      <p className="text-sm font-bold text-secondary uppercase tracking-widest mb-1">Support Email</p>
                       <a href={`mailto:${settings?.communication?.supportEmail || 'info@labzenix.com'}`} className="text-lg text-gray-600 hover:text-primary transition-colors font-semibold">{settings?.communication?.supportEmail || 'info@labzenix.com'}</a>
                     </div>
                   </div>

@@ -15,6 +15,7 @@ interface Product {
   images: string[];
   category: string;
   description: string;
+  views?: number;
 }
 
 export default function ProductCarousel() {
@@ -28,8 +29,9 @@ export default function ProductCarousel() {
       try {
         const response = await fetch('/api/products');
         const data = await response.json();
-        // Get first 6 products
-        setProducts(data.slice(0, 6));
+        // Get top 5 most viewed products
+        const sortedData = data.sort((a: Product, b: Product) => (b.views || 0) - (a.views || 0));
+        setProducts(sortedData.slice(0, 5));
       } catch (error) {
         console.error('Error fetching products:', error);
       } finally {
@@ -84,7 +86,7 @@ export default function ProductCarousel() {
             Featured Products
           </span>
           <h2 className="text-4xl md:text-5xl font-black mb-4 text-center text-secondary uppercase tracking-tighter">
-            Premium Testing Solutions
+            Hot Selling Product
           </h2>
           <p className="text-center text-gray-600 mb-16 max-w-2xl mx-auto font-medium">
             Explore our collection of cutting-edge laboratory and production equipment designed for precision testing.

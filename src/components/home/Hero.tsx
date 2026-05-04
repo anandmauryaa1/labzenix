@@ -42,7 +42,7 @@ export default function Hero() {
   const prevSlide = () => setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
 
   return (
-    <section className="relative h-[75vh] md:h-[85vh] bg-black overflow-hidden pt-[116px] md:pt-[132px]">
+    <section className="relative h-[80vh] md:h-screen min-h-[500px] max-h-[1000px] flex items-center bg-black overflow-hidden py-20">
       <AnimatePresence mode="wait">
         <motion.div
           key={current}
@@ -109,10 +109,10 @@ export default function Hero() {
           ))}
         </div>
         <div className="flex space-x-4">
-          <button onClick={prevSlide} className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center border border-white/20 text-white hover:bg-primary transition-all rounded-full">
+          <button onClick={prevSlide} className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center border border-white/20 text-white hover:bg-primary transition-all rounded-none">
             <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
           </button>
-          <button onClick={nextSlide} className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center border border-white/20 text-white hover:bg-primary transition-all rounded-full">
+          <button onClick={nextSlide} className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center border border-white/20 text-white hover:bg-primary transition-all rounded-none">
             <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
           </button>
         </div>

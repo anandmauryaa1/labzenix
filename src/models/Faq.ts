@@ -5,16 +5,15 @@ export interface IFaq extends Document {
   product: mongoose.Types.ObjectId;
   question: string;
   answer: string;
+  date: Date;
 }
 
 const FaqSchema = new mongoose.Schema<IFaq>({
-  product:  { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+  product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
   question: { type: String, required: true, trim: true },
-  answer:   { type: String, required: true, trim: true },
+  answer: { type: String, required: true, trim: true },
+  date: { type: Date, default: Date.now },
 });
 
-if (mongoose.models.Faq) {
-  delete mongoose.models.Faq;
-}
-
-export default mongoose.model<IFaq>('Faq', FaqSchema);
+// Explicitly handle model compilation to avoid "OverwriteModelError"
+export default mongoose.models.Faq || mongoose.model<IFaq>('Faq', FaqSchema);

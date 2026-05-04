@@ -19,7 +19,9 @@ import {
   Menu,
   X,
   BarChart3,
-  UserCircle
+  UserCircle,
+  HelpCircle,
+  Handshake
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -145,19 +147,27 @@ export default function Sidebar() {
       permission: 'settings'
     },
     { 
+      title: 'FAQs', 
+      href: '/admin/faqs', 
+      icon: HelpCircle,
+      roles: ['admin', 'marketing', 'seo'],
+      permission: 'settings'
+    },
+    { 
+      title: 'Partners', 
+      href: '/admin/partners', 
+      icon: Handshake,
+      roles: ['admin', 'marketing'],
+      permission: 'settings'
+    },
+    { 
       title: 'G-Analytics', 
       href: '/admin/analytics', 
       icon: BarChart3,
       roles: ['admin', 'marketing', 'seo'],
       permission: 'analytics'
     },
-    { 
-      title: 'My Profile', 
-      href: '/admin/profile', 
-      icon: UserCircle,
-      roles: ['admin', 'seo', 'marketing'],
-      permission: '' 
-    },
+
   ];
 
   if (loading) return <div className={`${isMobile ? 'hidden' : `w-64`} bg-secondary min-h-screen`} />;
@@ -203,9 +213,9 @@ export default function Sidebar() {
           </button>
         )}
 
-        <div className={`h-full flex flex-col ${isCollapsed && !isMobile ? 'p-4' : 'p-8'}`}>
+        <div className={`h-full flex flex-col ${isCollapsed && !isMobile ? 'p-0' : 'p-0'}`}>
           {/* Logo section with professional accent */}
-          <div className={`flex items-center mb-10 pb-8 border-b-2 border-primary/10 ${isCollapsed && !isMobile ? 'flex-col space-y-2' : 'space-x-3'}`}>
+          <div className={`flex items-center mb-0 pb-8 border-b-2 border-primary/10 ${isCollapsed && !isMobile ? 'flex-col space-y-2 p-4' : 'space-x-3 p-8'}`}>
             <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center font-black text-lg shadow-lg shadow-primary/20 flex-shrink-0 border-2 border-primary/30">
               L
             </div>
@@ -217,8 +227,8 @@ export default function Sidebar() {
             )}
           </div>
 
-          {/* Navigation */}
-          <nav className="space-y-1">
+          {/* Navigation - Scrollable Area */}
+          <nav className={`flex-grow overflow-y-auto custom-scrollbar ${isCollapsed && !isMobile ? 'px-2' : 'px-8'} space-y-1 py-4`}>
             {menuItems.map((item) => {
               // Admin bypasses all checks
               if (role === 'admin') {
@@ -258,42 +268,65 @@ export default function Sidebar() {
               );
             })}
           </nav>
-        </div>
 
-        {/* Bottom section - User info and logout */}
-        <div className={`absolute bottom-0 left-0 w-full border-t border-gray-100 bg-gray-50/50 transition-all duration-300 ${
-          isCollapsed && !isMobile ? 'p-4' : 'p-6'
-        }`}>
-          <Link 
-            href="/admin/profile"
-            className={`flex items-center mb-6 hover:bg-white transition-all cursor-pointer group/user ${isCollapsed && !isMobile ? 'flex-col space-y-3' : 'space-x-3 px-2 py-2 border border-transparent hover:border-gray-100 hover:shadow-sm'}`}
-          >
-            <div className="w-8 h-8 rounded-full bg-secondary text-white flex items-center justify-center text-xs font-bold border border-gray-200 shadow-sm flex-shrink-0 group-hover/user:bg-primary transition-colors">
-              {role?.[0]?.toUpperCase()}
-            </div>
-            {(!isCollapsed || isMobile) && (
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-black truncate uppercase text-secondary group-hover/user:text-primary transition-colors">{role || 'User'}</p>
-                <div className="flex items-center text-[10px] text-primary space-x-1">
-                  <ShieldCheck className="w-3 h-3 flex-shrink-0" />
-                  <span className="uppercase tracking-tighter font-bold">Verified Session</span>
-                </div>
+          {/* Bottom section - User info and logout */}
+          <div className={`mt-auto border-t border-gray-100 bg-gray-50/50 transition-all duration-300 ${
+            isCollapsed && !isMobile ? 'p-4' : 'p-6'
+          }`}>
+            <Link 
+              href="/admin/profile"
+              className={`flex items-center mb-6 hover:bg-white transition-all cursor-pointer group/user ${isCollapsed && !isMobile ? 'flex-col space-y-3' : 'space-x-3 px-2 py-2 border border-transparent hover:border-gray-100 hover:shadow-sm'}`}
+            >
+              <div className="w-8 h-8 rounded-full bg-secondary text-white flex items-center justify-center text-xs font-bold border border-gray-200 shadow-sm flex-shrink-0 group-hover/user:bg-primary transition-colors">
+                {role?.[0]?.toUpperCase() || 'A'}
               </div>
-            )}
-          </Link>
-          <button
-            onClick={handleLogout}
-            className={`w-full flex items-center justify-center space-x-2 px-4 py-3 bg-red-600/5 text-red-600 hover:bg-red-600 hover:text-white transition-all duration-300 text-xs font-black uppercase tracking-widest border border-red-600/10 ${
-              isCollapsed && !isMobile ? 'px-2 py-2' : ''
-            }`}
-            title={isCollapsed && !isMobile ? 'Sign Out' : ''}
-          >
-            <LogOut className="w-4 h-4 flex-shrink-0" />
-            {(!isCollapsed || isMobile) && <span>Sign Out</span>}
-          </button>
+              {(!isCollapsed || isMobile) && (
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-black truncate uppercase text-secondary group-hover/user:text-primary transition-colors">{role || 'Admin'}</p>
+                  <div className="flex items-center text-[10px] text-primary space-x-1">
+                    <ShieldCheck className="w-3 h-3 flex-shrink-0" />
+                    <span className="uppercase tracking-tighter font-bold">Verified Session</span>
+                  </div>
+                </div>
+              )}
+            </Link>
+            <button
+              onClick={handleLogout}
+              className={`w-full flex items-center justify-center space-x-2 px-4 py-3 bg-red-600/5 text-red-600 hover:bg-red-600 hover:text-white transition-all duration-300 text-xs font-black uppercase tracking-widest border border-red-600/10 ${
+                isCollapsed && !isMobile ? 'px-2 py-2' : ''
+              }`}
+              title={isCollapsed && !isMobile ? 'Sign Out' : ''}
+            >
+              <LogOut className="w-4 h-4 flex-shrink-0" />
+              {(!isCollapsed || isMobile) && <span>Sign Out</span>}
+            </button>
+          </div>
         </div>
       </aside>
 
     </>
   );
+}
+
+// Add these custom scrollbar styles to your global CSS or keep it here for simplicity if allowed
+const scrollbarStyles = `
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #e5e7eb;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #d1d5db;
+  }
+`;
+
+if (typeof document !== 'undefined') {
+  const style = document.createElement('style');
+  style.textContent = scrollbarStyles;
+  document.head.appendChild(style);
 }

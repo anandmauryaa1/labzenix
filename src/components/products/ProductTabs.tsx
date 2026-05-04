@@ -58,6 +58,14 @@ const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
   { id: 'quote',     label: 'Request a quote', icon: Mail },
 ];
 
+/* ─── Helpers ───────────────────────────────────────────── */
+
+const getYouTubeEmbedUrl = (url: string) => {
+  if (!url) return '';
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|watch\?v=|watch\?.+&v=))([^&?]+)/);
+  return match ? `https://www.youtube.com/embed/${match[1]}` : url;
+};
+
 /* ─── Component ─────────────────────────────────────────── */
 
 export default function ProductTabs({ product }: ProductTabsProps) {
@@ -131,12 +139,19 @@ export default function ProductTabs({ product }: ProductTabsProps) {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
-                      {Object.entries(product.specs).map(([key, value]) => (
-                        <tr key={key} className="hover:bg-gray-50 transition-colors">
-                          <td className="px-6 py-4 font-bold text-gray-700">{key}</td>
-                          <td className="px-6 py-4 text-gray-600">{String(value)}</td>
-                        </tr>
-                      ))}
+                      {Array.isArray(product.specs) 
+                        ? product.specs.map((spec: any, idx) => (
+                            <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                              <td className="px-6 py-4 font-bold text-gray-700">{spec.key || spec.name}</td>
+                              <td className="px-6 py-4 text-gray-600">{String(spec.value)}</td>
+                            </tr>
+                          ))
+                        : Object.entries(product.specs || {}).map(([key, value]) => (
+                            <tr key={key} className="hover:bg-gray-50 transition-colors">
+                              <td className="px-6 py-4 font-bold text-gray-700">{key}</td>
+                              <td className="px-6 py-4 text-gray-600">{String(value)}</td>
+                            </tr>
+                          ))}
                     </tbody>
                   </table>
                 </div>
@@ -178,9 +193,7 @@ export default function ProductTabs({ product }: ProductTabsProps) {
                   <div className="relative pt-[56.25%]">
                     <iframe
                       className="absolute top-0 left-0 w-full h-full"
-                      src={product.youtubeUrl
-                        .replace('watch?v=', 'embed/')
-                        .replace('youtu.be/', 'youtube.com/embed/')}
+                      src={getYouTubeEmbedUrl(product.youtubeUrl)}
                       title="Product Video"
                       frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

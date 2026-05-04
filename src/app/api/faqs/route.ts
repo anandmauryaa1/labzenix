@@ -1,0 +1,29 @@
+import { NextResponse } from 'next/server';
+import dbConnect from '@/lib/dbConnect';
+import SiteFaq from '@/models/SiteFaq';
+
+export async function GET(request: Request) {
+  try {
+    await dbConnect();
+    const { searchParams } = new URL(request.url);
+    const activeOnly = searchParams.get('active') === 'true';
+
+    const filter = activeOnly ? { isActive: true } : {};
+    const faqs = await SiteFaq.find(filter).sort({ order: 1, createdAt: -1 });
+
+    return NextResponse.json(faqs);
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    await dbConnect();
+    const body = await request.json();
+    const faq = await SiteFaq.create(body);
+    return NextResponse.json(faq, { status: 201 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+}

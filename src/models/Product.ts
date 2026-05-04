@@ -16,6 +16,7 @@ export interface IProduct extends Document {
   metaTitle: string;
   metaDescription: string;
   author: mongoose.Types.ObjectId;
+  views: number;
   createdAt: Date;
 }
 
@@ -36,6 +37,7 @@ const ProductSchema = new mongoose.Schema<IProduct>({
   specificationText: { type: String,   default: '',  trim: true },
   specs:             { type: mongoose.Schema.Types.Mixed, default: {} },
   youtubeUrl:        { type: String,   default: '',  trim: true },
+  views:             { type: Number,   default: 0,   index: true },
 
   metaTitle: {
     type: String,

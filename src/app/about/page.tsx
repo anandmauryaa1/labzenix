@@ -5,6 +5,7 @@ import FadeIn from '@/components/ui/FadeIn';
 import AnimatedCounter from '@/components/ui/AnimatedCounter';
 import Link from 'next/link';
 import Image from 'next/image';
+import PageBanner from '@/components/ui/PageBanner';
 
 export async function generateMetadata() {
   return await getPageMetadata('about');
@@ -20,6 +21,13 @@ export default function AboutPage() {
 
   return (
     <div className="bg-white scroll-smooth">
+      <PageBanner 
+        title="About Us" 
+        breadcrumbs={[
+          { label: 'Home', href: '/' },
+          { label: 'About Us' }
+        ]} 
+      />
       {/* Hero Section */}
       <section className="bg-gray-50 py-24 border-b border-gray-100 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

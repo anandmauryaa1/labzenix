@@ -27,9 +27,10 @@ export default function CategoryManagement() {
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: '', description: '', catalogUrl: '', catalogPublicId: '' });
+  const [form, setForm] = useState({ name: '', description: '', image: '', imagePublicId: '', catalogUrl: '', catalogPublicId: '' });
   const [isAdding, setIsAdding] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isImageUploading, setIsImageUploading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -72,7 +73,7 @@ export default function CategoryManagement() {
         
         setTimeout(() => {
           setSuccess(false);
-          setForm({ name: '', description: '', catalogUrl: '', catalogPublicId: '' });
+          setForm({ name: '', description: '', image: '', imagePublicId: '', catalogUrl: '', catalogPublicId: '' });
           setEditingId(null);
           setIsAdding(false);
           fetchCategories();
@@ -107,6 +108,8 @@ export default function CategoryManagement() {
     setForm({ 
       name: cat.name, 
       description: cat.description || '',
+      image: cat.image || '',
+      imagePublicId: cat.imagePublicId || '',
       catalogUrl: cat.catalogUrl || '',
       catalogPublicId: cat.catalogPublicId || ''
     });
@@ -147,6 +150,47 @@ export default function CategoryManagement() {
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      return toast.error('Only image files are permitted for category display');
+    }
+
+    setIsImageUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setForm(prev => ({ 
+          ...prev, 
+          image: data.url,
+          imagePublicId: data.public_id 
+        }));
+        toast.success('Image uploaded successfully');
+      } else {
+        toast.error('Upload failed. Please try again.');
+      }
+    } catch (err) {
+      toast.error('Network error');
+    } finally {
+      setIsImageUploading(false);
+    }
+  };
+
+  const removeImage = () => {
+    setForm(prev => ({ ...prev, image: '', imagePublicId: '' }));
+    toast.success('Image removed');
   };
 
   const removeCatalog = () => {
@@ -239,8 +283,12 @@ export default function CategoryManagement() {
                     <tr key={cat._id} className="hover:bg-gray-50/50 transition-colors group">
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 bg-primary/10 text-primary flex items-center justify-center font-black text-xs">
-                            {cat.name[0]}
+                          <div className="w-8 h-8 bg-primary/10 text-primary flex items-center justify-center font-black text-xs overflow-hidden">
+                            {cat.image ? (
+                              <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
+                            ) : (
+                              cat.name[0]
+                            )}
                           </div>
                           <div>
                              <p className="font-bold text-secondary uppercase tracking-tight">{cat.name}</p>
@@ -307,7 +355,7 @@ export default function CategoryManagement() {
                   onClick={() => {
                     setIsAdding(false);
                     setEditingId(null);
-                    setForm({ name: '', description: '', catalogUrl: '', catalogPublicId: '' });
+                    setForm({ name: '', description: '', image: '', imagePublicId: '', catalogUrl: '', catalogPublicId: '' });
                   }}
                   className="text-gray-400 hover:text-secondary transition-colors"
                 >
@@ -337,6 +385,48 @@ export default function CategoryManagement() {
                     rows={4}
                     className="w-full p-4 bg-gray-50 border border-gray-100 text-sm font-medium outline-none focus:border-primary transition-all resize-none"
                   />
+                </div>
+
+                <div className="space-y-4 pt-4 border-t border-gray-100">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-2">Category Display Image</label>
+                  
+                  {form.image ? (
+                    <div className="relative group overflow-hidden border border-gray-100">
+                      <img src={form.image} alt="Preview" className="w-full h-40 object-cover" />
+                      <div className="absolute inset-0 bg-secondary/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <button 
+                          type="button"
+                          onClick={removeImage}
+                          className="p-3 bg-red-500 text-white hover:bg-red-600 transition-colors shadow-lg"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <label className={`w-full border-2 border-dashed rounded-sm p-8 flex flex-col items-center justify-center transition-all cursor-pointer ${
+                      isImageUploading ? 'bg-gray-50 border-gray-200' : 'border-gray-200 hover:border-primary hover:bg-primary/5'
+                    }`}>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleImageUpload} 
+                        className="hidden"
+                        disabled={isImageUploading}
+                      />
+                      {isImageUploading ? (
+                        <>
+                          <Loader2 className="w-8 h-8 text-primary animate-spin mb-3" />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Uploading Image...</span>
+                        </>
+                      ) : (
+                        <>
+                          <UploadCloud className="w-8 h-8 text-gray-200 mb-3 group-hover:scale-110 transition-transform" />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-primary">Click to Upload Display Image</span>
+                        </>
+                      )}
+                    </label>
+                  )}
                 </div>
 
                 <div className="space-y-4 pt-4 border-t border-gray-100">

@@ -3,6 +3,7 @@ import Sidebar from '@/components/admin/Sidebar';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useUIStore } from '@/store/useUIStore';
+import { Toaster } from 'react-hot-toast';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -42,6 +43,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       >
         {children}
       </main>
+      <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
     </div>
   );
 }
