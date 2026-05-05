@@ -14,6 +14,7 @@ import Link from 'next/link';
 import * as motion from 'framer-motion/client';
 import CatalogButton from '@/components/products/CatalogButton';
 import PageBanner from '@/components/ui/PageBanner';
+import ProductRange from '@/components/home/ProductRange';
 
 // Always fetch fresh — reviews and FAQs must appear immediately after admin saves
 export const dynamic = 'force-dynamic';
@@ -316,6 +317,11 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           <p className="text-gray-500">Browse more products in the {product.category} category.</p>
         </div>
       )}
+
+      {/* Product Range Showcase */}
+      <div className="border-t border-gray-100">
+        <ProductRange />
+      </div>
     </div>
   );
 }

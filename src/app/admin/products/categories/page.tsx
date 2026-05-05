@@ -56,6 +56,7 @@ export default function CategoryManagement() {
     e.preventDefault();
     if (!form.name.trim()) return toast.error('Category name is required');
     if (!form.description.trim()) return toast.error('Category description is required');
+    if (form.description.length > 120) return toast.error('Description must be under 120 characters');
     setServerError(null);
     try {
       const url = editingId ? `/api/categories/${editingId}` : '/api/categories';
@@ -237,8 +238,8 @@ export default function CategoryManagement() {
             </button>
           </Link>
           <div>
-            <h1 className="text-3xl font-black text-secondary tracking-tighter uppercase mb-2">Categories</h1>
-            <p className="text-gray-500 font-medium text-sm">Organize and manage product categories.</p>
+            <h1 className="text-3xl font-black text-secondary tracking-tighter uppercase mb-2">Product Categories</h1>
+            <p className="text-gray-500 font-medium text-sm">Organize and manage the categories for header and footer navigation.</p>
           </div>
         </div>
         {!isAdding && (
@@ -247,7 +248,7 @@ export default function CategoryManagement() {
             className="flex items-center space-x-2 px-6 py-4 bg-secondary text-white text-xs font-black uppercase tracking-widest hover:bg-primary transition-all shadow-lg active:scale-95"
           >
             <Plus className="w-4 h-4" />
-            <span>Add New Domain</span>
+            <span>Add Category</span>
           </button>
         )}
       </div>
@@ -260,9 +261,9 @@ export default function CategoryManagement() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-white text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-100">
-                    <th className="px-6 py-4">Domain Name</th>
+                    <th className="px-6 py-4">Range Name</th>
                     <th className="px-6 py-4">Descriptor</th>
-                    <th className="px-6 py-4">Catalog Status</th>
+                    <th className="px-6 py-4">Range Catalog</th>
                     <th className="px-6 py-4 text-right">Actions</th>
                   </tr>
                 </thead>
@@ -349,7 +350,7 @@ export default function CategoryManagement() {
               <div className="flex items-center justify-between border-b border-gray-100 pb-4">
                 <h3 className="text-xs font-black uppercase tracking-widest text-secondary flex items-center">
                   <Layers className="w-4 h-4 mr-2 text-primary" />
-                  {editingId ? 'Refine Domain' : 'Define New Domain'}
+                  {editingId ? 'Refine Product Category' : 'Define New Product Category'}
                 </h3>
                 <button 
                   onClick={() => {
@@ -365,7 +366,7 @@ export default function CategoryManagement() {
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Domain Name</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Range Name</label>
                   <input 
                     type="text" 
                     value={form.name}
@@ -377,56 +378,20 @@ export default function CategoryManagement() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Classification Description</label>
+                  <div className="flex justify-between items-center">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Classification Description</label>
+                    <span className={`text-[9px] font-black uppercase tracking-widest ${form.description.length > 120 ? 'text-red-500' : 'text-gray-300'}`}>
+                      {form.description.length} / 120
+                    </span>
+                  </div>
                   <textarea 
+                    maxLength={120}
                     value={form.description}
                     onChange={(e) => setForm({...form, description: e.target.value})}
                     placeholder="Define the scope of this industrial classification..."
                     rows={4}
                     className="w-full p-4 bg-gray-50 border border-gray-100 text-sm font-medium outline-none focus:border-primary transition-all resize-none"
                   />
-                </div>
-
-                <div className="space-y-4 pt-4 border-t border-gray-100">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-2">Category Display Image</label>
-                  
-                  {form.image ? (
-                    <div className="relative group overflow-hidden border border-gray-100">
-                      <img src={form.image} alt="Preview" className="w-full h-40 object-cover" />
-                      <div className="absolute inset-0 bg-secondary/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <button 
-                          type="button"
-                          onClick={removeImage}
-                          className="p-3 bg-red-500 text-white hover:bg-red-600 transition-colors shadow-lg"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <label className={`w-full border-2 border-dashed rounded-sm p-8 flex flex-col items-center justify-center transition-all cursor-pointer ${
-                      isImageUploading ? 'bg-gray-50 border-gray-200' : 'border-gray-200 hover:border-primary hover:bg-primary/5'
-                    }`}>
-                      <input 
-                        type="file" 
-                        accept="image/*" 
-                        onChange={handleImageUpload} 
-                        className="hidden"
-                        disabled={isImageUploading}
-                      />
-                      {isImageUploading ? (
-                        <>
-                          <Loader2 className="w-8 h-8 text-primary animate-spin mb-3" />
-                          <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Uploading Image...</span>
-                        </>
-                      ) : (
-                        <>
-                          <UploadCloud className="w-8 h-8 text-gray-200 mb-3 group-hover:scale-110 transition-transform" />
-                          <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-primary">Click to Upload Display Image</span>
-                        </>
-                      )}
-                    </label>
-                  )}
                 </div>
 
                 <div className="space-y-4 pt-4 border-t border-gray-100">
@@ -478,7 +443,7 @@ export default function CategoryManagement() {
                   className="w-full flex items-center justify-center space-x-2 px-6 py-4 bg-secondary text-white text-xs font-black uppercase tracking-widest hover:bg-primary transition-all shadow-md active:scale-95 disabled:opacity-50"
                 >
                   <Save className="w-4 h-4" />
-                  <span>{editingId ? 'Apply Refinements' : 'Deploy Domain'}</span>
+                  <span>{editingId ? 'Apply Refinements' : 'Deploy Product Range'}</span>
                 </button>
               </form>
             </div>

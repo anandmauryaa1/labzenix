@@ -82,7 +82,7 @@ export default function ProductCarousel() {
     <section className="py-24 px-4 bg-gradient-to-b from-gray-50 to-white border-b border-gray-100 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <FadeIn direction="up">
-          <span className="block text-primary font-bold tracking-[0.3em] uppercase text-xs text-center mb-4">
+          <span className="block text-primary font-medium tracking-[0.3em] uppercase text-sm text-center mb-4">
             Featured Products
           </span>
           <h2 className="text-4xl md:text-5xl font-black mb-4 text-center text-secondary uppercase tracking-tighter">

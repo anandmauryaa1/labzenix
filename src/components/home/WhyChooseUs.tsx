@@ -38,7 +38,7 @@ export default function WhyChooseUs() {
       <div className="absolute inset-0 bg-primary/5 pattern-grid opacity-10" />
       <div className="max-w-7xl mx-auto relative z-10">
         <FadeIn direction="up">
-          <span className="block text-primary font-bold tracking-[0.3em] uppercase text-xs text-center mb-4">Core Values</span>
+          <span className="block text-primary font-medium tracking-[0.3em] uppercase text-sm text-center mb-4">Core Values</span>
           <h2 className="text-4xl md:text-5xl font-black mb-16 text-center text-secondary uppercase tracking-tighter">Why LabZenix?</h2>
         </FadeIn>
         

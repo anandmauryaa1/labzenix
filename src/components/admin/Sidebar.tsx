@@ -21,7 +21,8 @@ import {
   BarChart3,
   UserCircle,
   HelpCircle,
-  Handshake
+  Handshake,
+  Grid3X3
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -105,11 +106,25 @@ export default function Sidebar() {
       permission: 'products'
     },
     { 
-      title: 'Categories', 
+      title: 'Product Categories', 
       href: '/admin/products/categories', 
       icon: Layers,
       roles: ['admin', 'marketing'],
       permission: 'categories'
+    },
+    { 
+      title: 'Product Range', 
+      href: '/admin/product-ranges', 
+      icon: Grid3X3,
+      roles: ['admin', 'marketing'],
+      permission: 'products'
+    },
+    { 
+      title: 'Applications', 
+      href: '/admin/applications', 
+      icon: LayoutDashboard, // Will use LayoutDashboard for now or import another
+      roles: ['admin', 'marketing'],
+      permission: 'products'
     },
     { 
       title: 'Blogs', 
@@ -157,6 +172,13 @@ export default function Sidebar() {
       title: 'Partners', 
       href: '/admin/partners', 
       icon: Handshake,
+      roles: ['admin', 'marketing'],
+      permission: 'settings'
+    },
+    { 
+      title: 'Hero Slides', 
+      href: '/admin/hero-slides', 
+      icon: Layers,
       roles: ['admin', 'marketing'],
       permission: 'settings'
     },

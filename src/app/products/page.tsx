@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import FadeIn from '@/components/ui/FadeIn';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageBanner from '@/components/ui/PageBanner';
+import ProductRange from '@/components/home/ProductRange';
 
 interface Product {
   _id: string;
@@ -326,7 +327,7 @@ export default function ProductsPage() {
         title="Our Products" 
         breadcrumbs={[
           { label: 'Home', href: '/' },
-          { label: 'Categories' }
+          { label: 'Our Products' }
         ]} 
       />
       <Suspense fallback={
@@ -336,6 +337,11 @@ export default function ProductsPage() {
       }>
         <ProductsContent />
       </Suspense>
+      
+      {/* Product Range Section */}
+      <div className="border-t border-gray-100">
+        <ProductRange />
+      </div>
     </div>
   );
 }

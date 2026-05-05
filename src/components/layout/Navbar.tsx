@@ -16,9 +16,10 @@ interface NavLink {
 const navLinks: NavLink[] = [
   { name: 'Home', href: '/' },
   { 
-    name: 'Products', 
+    name: 'Our Products', 
     href: '/products',
   },
+  { name: 'Applications', href: '/applications' },
   { name: 'About Us', href: '/about' },
   { name: 'Blog', href: '/blogs' },
   { name: 'Contact', href: '/contact' },
@@ -42,7 +43,7 @@ export default function Navbar() {
   }, []);
 
   const dynamicNavLinks = navLinks.map(link => {
-    if (link.name === 'Products') {
+    if (link.name === 'Our Products') {
       return {
         ...link,
         submenu: categories.map(cat => ({

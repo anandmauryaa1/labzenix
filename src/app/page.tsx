@@ -1,6 +1,6 @@
 import { getPageMetadata } from '@/lib/seo';
 import Hero from '@/components/home/Hero';
-import OurProductRange from '@/components/home/OurProductRange';
+import DynamicProductRange from '@/components/home/DynamicProductRange';
 import AboutSummary from '@/components/home/AboutSummary';
 import ProductCarousel from '@/components/home/ProductCarousel';
 // import ProductCategories from '@/components/home/ProductCategories'; // Removed as requested
@@ -19,12 +19,12 @@ export default function Home() {
   return (
     <main className="overflow-hidden">
       <Hero />
-      <OurProductRange />
+      <DynamicProductRange />
       <ProductCarousel />
       <AboutSummary />
       <WhyChooseUs />
-      <ProductRange />
       <Partners />
+      <ProductRange />
       <Testimonials />
       <FAQSection />
       <CTABanner />
