@@ -39,7 +39,12 @@ async function dbConnect() {
     logger.info('Attempting MongoDB connection...');
     const opts = {
       bufferCommands: false,
+      connectTimeoutMS: 10000, // 10 seconds timeout for initial connection
+      socketTimeoutMS: 45000,  // 45 seconds timeout for socket inactivity
+      serverSelectionTimeoutMS: 10000, // 10 seconds to select a server
+      heartbeatFrequencyMS: 10000,
     };
+    
     cached!.promise = mongoose.connect(MONGODB_URI, opts).then(m => {
       logger.info('MongoDB connection established successfully');
       return m;
@@ -51,11 +56,19 @@ async function dbConnect() {
   }
   
   try {
+    // Wait for the promise with a safety timeout wrapper if needed, 
+    // but mongoose's own connectTimeoutMS should handle it.
     cached!.conn = await cached!.promise;
-    // Seed default admin on first successful connection
-    await seedDefaultAdmin();
+    
+    // Seed default admin - we don't await this to avoid blocking the first request
+    // if the seeding process is slow, but we call it to ensure it happens.
+    seedDefaultAdmin().catch(err => {
+      logger.error('Background seeding failed', { error: err.message });
+    });
+    
   } catch (e: any) {
     cached!.promise = null;
+    logger.error('Database connection process failed', { error: e.message });
     throw e;
   }
   return cached!.conn;
