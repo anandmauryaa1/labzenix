@@ -335,7 +335,7 @@ export default function UsersPage() {
                       value={form.name}
                       onChange={e => setForm({...form, name: e.target.value})}
                       className="w-full p-4 pl-12 bg-gray-50 border border-gray-100 outline-none text-xs font-bold text-secondary focus:border-primary transition-all disabled:opacity-50"
-                      placeholder="e.g. Anand Maurya"
+                      placeholder="full name"
                       required
                     />
                   </div>

@@ -1,10 +1,19 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Star, Quote } from 'lucide-react';
 import FadeIn from '../ui/FadeIn';
 import { motion } from 'framer-motion';
 
-const testimonials = [
+interface TestimonialData {
+  _id?: string;
+  name: string;
+  role: string;
+  text: string;
+  rating: number;
+}
+
+const fallbackTestimonials: TestimonialData[] = [
   { 
     name: 'Dr. Rajesh Sharma', 
     role: 'Quality Assurance Manager', 
@@ -26,10 +35,53 @@ const testimonials = [
 ];
 
 export default function Testimonials() {
+  const [testimonials, setTestimonials] = useState<TestimonialData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchTestimonials() {
+      try {
+        const res = await fetch('/api/testimonials');
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setTestimonials(data);
+          } else {
+            setTestimonials(fallbackTestimonials);
+          }
+        } else {
+          setTestimonials(fallbackTestimonials);
+        }
+      } catch (err) {
+        console.error('Failed to fetch testimonials:', err);
+        setTestimonials(fallbackTestimonials);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchTestimonials();
+  }, []);
+
   const itemVariant = {
     hidden: { opacity: 0, scale: 0.95 },
     visible: { opacity: 1, scale: 1 }
   };
+
+  if (loading) return (
+    <section className="py-24 bg-white">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="animate-pulse flex flex-col items-center">
+          <div className="h-4 w-32 bg-gray-200 mb-4"></div>
+          <div className="h-10 w-64 bg-gray-200 mb-16"></div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="h-64 bg-gray-100 border border-gray-100"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 
   return (
     <section className="py-24 px-4 bg-white relative overflow-hidden">
@@ -53,7 +105,10 @@ export default function Testimonials() {
                 
                 <div className="flex mb-6">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 text-primary fill-primary mr-1 group-hover:text-white group-hover:fill-white transition-colors" />
+                    <Star 
+                      key={i} 
+                      className={`w-4 h-4 ${i < testimonial.rating ? 'text-primary fill-primary mr-1 group-hover:text-white group-hover:fill-white' : 'text-gray-200 fill-gray-200'} transition-colors`} 
+                    />
                   ))}
                 </div>
 

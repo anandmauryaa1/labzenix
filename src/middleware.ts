@@ -58,6 +58,8 @@ export async function middleware(request: NextRequest) {
         '/api/product-ranges': 'products',
         '/admin/analytics': 'analytics',
         '/api/admin/analytics': 'analytics',
+        '/admin/testimonials': 'settings',
+        '/api/admin/testimonials': 'settings',
       };
 
       for (const [prefix, requiredPermission] of Object.entries(permissionMap)) {

@@ -22,7 +22,8 @@ import {
   UserCircle,
   HelpCircle,
   Handshake,
-  Grid3X3
+  Grid3X3,
+  Quote
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -139,28 +140,7 @@ export default function Sidebar() {
       icon: MessageSquare,
       roles: ['admin', 'marketing'],
       permission: 'inquiries'
-    },
-    { 
-      title: 'Page SEO', 
-      href: '/admin/seo', 
-      icon: Globe,
-      roles: ['admin', 'seo'],
-      permission: 'seo'
-    },
-    { 
-      title: 'Identity Assets', 
-      href: '/admin/users', 
-      icon: ShieldCheck,
-      roles: ['admin'],
-      permission: 'users'
-    },
-    { 
-      title: 'Settings', 
-      href: '/admin/settings', 
-      icon: Settings,
-      roles: ['admin'],
-      permission: 'settings'
-    },
+    },   
     { 
       title: 'FAQs', 
       href: '/admin/faqs', 
@@ -183,11 +163,39 @@ export default function Sidebar() {
       permission: 'settings'
     },
     { 
+      title: 'Landing Reviews', 
+      href: '/admin/testimonials', 
+      icon: Quote,
+      roles: ['admin', 'marketing'],
+      permission: 'settings'
+    },
+    { 
+      title: 'Page SEO', 
+      href: '/admin/seo', 
+      icon: Globe,
+      roles: ['admin', 'seo'],
+      permission: 'seo'
+    },
+    { 
       title: 'G-Analytics', 
       href: '/admin/analytics', 
       icon: BarChart3,
       roles: ['admin', 'marketing', 'seo'],
       permission: 'analytics'
+    },
+    { 
+      title: 'Identity Assets', 
+      href: '/admin/users', 
+      icon: ShieldCheck,
+      roles: ['admin'],
+      permission: 'users'
+    },
+    { 
+      title: 'Settings', 
+      href: '/admin/settings', 
+      icon: Settings,
+      roles: ['admin'],
+      permission: 'settings'
     },
 
   ];

@@ -95,12 +95,12 @@ export default function Navbar() {
           <div className="flex items-center space-x-6">
             <a href={`tel:${settings?.communication?.supportPhone || '+919565453120'}`} className="flex items-center hover:text-gray-200 transition-colors">
               <Phone className="w-3.5 h-3.5 mr-2" />
-              <span className="hidden sm:inline mr-1">Support:</span>
+              
               <span>{settings?.communication?.supportPhone || '+91-9565453120'}</span>
             </a>
             <a href={`tel:${settings?.communication?.salesPhone || '+919876500002'}`} className="flex items-center hover:text-gray-200 transition-colors">
               <Phone className="w-3.5 h-3.5 mr-2" />
-              <span className="hidden sm:inline mr-1">Sales:</span>
+              
               <span>{settings?.communication?.salesPhone || '+91-98765-00002'}</span>
             </a>
             <a href={`mailto:${settings?.communication?.supportEmail || 'info@labzenix.com'}`} className="hidden lg:flex items-center hover:text-gray-200 transition-colors">

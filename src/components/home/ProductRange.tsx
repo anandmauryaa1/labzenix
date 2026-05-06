@@ -21,8 +21,24 @@ const staticRanges = [
     title: 'PET & Preform Testing',
     slug: 'pet-preform-testing',
     description: 'Our PET & Preform testing solutions provide critical analysis for the beverage and packaging industry. From bottle bursting strength to preform transparency and wall thickness, our instruments ensure your PET products meet international safety and quality standards.',
-    image: 'https://images.unsplash.com/photo-1614859324967-bdf471b4024e?auto=format&fit=crop&q=80&w=1200',
+    image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=1200',
     coreComponents: ['Bottle Burst Tester', 'Preform Thickness Gauge', 'Polariscope']
+  },
+  {
+    _id: '3',
+    title: 'Rubber & Tyre Testing',
+    slug: 'rubber-tyre-testing',
+    description: 'LabZenix provides advanced Rubber & Tyre testing equipment designed to meet rigorous industry standards. Our instruments ensure precision, durability, and consistent performance for applications in automotive and industrial rubber products.',
+    image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=1200',
+    coreComponents: ['Rheometer', 'Mooney Viscometer', 'Tensile Tester']
+  },
+  {
+    _id: '4',
+    title: 'Plastic & Polymer Testing',
+    slug: 'plastic-polymer-testing',
+    description: 'Discover our comprehensive range of Plastic & Polymer testing instruments. LabZenix delivers reliable, high-precision solutions for evaluating material properties, ensuring your products meet global quality and safety benchmarks.',
+    image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=1200',
+    coreComponents: ['Melt Flow Index Tester', 'Izod Impact Tester', 'Hardness Tester']
   }
 ];
 
