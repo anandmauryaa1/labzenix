@@ -14,6 +14,7 @@ const updateSchema = z.object({
   imagePublicId: z.string().optional(),
   order: z.number().optional(),
   active: z.boolean().optional(),
+  category: z.string().optional().nullable(),
 });
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

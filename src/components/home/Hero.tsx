@@ -9,8 +9,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface HeroSlide {
   _id?: string;
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
   image: string;
   link: string;
   order: number;

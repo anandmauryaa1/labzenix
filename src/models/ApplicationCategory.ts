@@ -1,6 +1,6 @@
 import mongoose, { Document } from 'mongoose';
 
-export interface IApplication extends Document {
+export interface IApplicationCategory extends Document {
   _id: mongoose.Types.ObjectId;
   name: string;
   slug: string;
@@ -9,25 +9,23 @@ export interface IApplication extends Document {
   imagePublicId: string;
   order: number;
   active: boolean;
-  category?: mongoose.Types.ObjectId;
   createdAt: Date;
 }
 
-const ApplicationSchema = new mongoose.Schema<IApplication>({
-  name: { type: String, required: [true, 'Application name is required'], unique: true },
+const ApplicationCategorySchema = new mongoose.Schema<IApplicationCategory>({
+  name: { type: String, required: [true, 'Category name is required'], unique: true },
   slug: { type: String, required: true, unique: true },
   description: { type: String, default: '' },
-  image: { type: String, required: [true, 'Image is required'] },
+  image: { type: String, default: '' },
   imagePublicId: { type: String, default: '' },
   order: { type: Number, default: 0 },
   active: { type: Boolean, default: true },
-  category: { type: mongoose.Schema.Types.ObjectId, ref: 'ApplicationCategory' },
   createdAt: { type: Date, default: Date.now },
 });
 
 // Handle model compilation error in development with hot-reloading
 if (process.env.NODE_ENV === 'development') {
-  delete mongoose.models.Application;
+  delete mongoose.models.ApplicationCategory;
 }
 
-export default mongoose.models.Application || mongoose.model<IApplication>('Application', ApplicationSchema);
+export default mongoose.models.ApplicationCategory || mongoose.model<IApplicationCategory>('ApplicationCategory', ApplicationCategorySchema);

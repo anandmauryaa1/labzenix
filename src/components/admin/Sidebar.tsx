@@ -35,6 +35,8 @@ export default function Sidebar() {
   const [isMobile, setIsMobile] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
+  const [openSubMenus, setOpenSubMenus] = useState<Record<string, boolean>>({});
+  
   // Use the store for sidebar collapse state
   const { isAdminSidebarCollapsed: isCollapsed, toggleAdminSidebar, setAdminSidebarCollapsed } = useUIStore();
 
@@ -80,6 +82,18 @@ export default function Sidebar() {
     return () => window.removeEventListener('resize', handleResize);
   }, [router, pathname, setAdminSidebarCollapsed]);
 
+  // Open sub-menu if an item inside is active
+  useEffect(() => {
+    menuItems.forEach(item => {
+      if (item.subItems) {
+        const isChildActive = item.subItems.some(subItem => pathname === subItem.href);
+        if (isChildActive) {
+          setOpenSubMenus(prev => ({ ...prev, [item.title]: true }));
+        }
+      }
+    });
+  }, [pathname]);
+
   const closeSidebarOnMobile = () => {
     if (isMobile) {
       setIsSidebarOpen(false);
@@ -89,6 +103,10 @@ export default function Sidebar() {
   const handleLogout = async () => {
     await fetch('/api/admin/logout', { method: 'POST' });
     router.push('/admin/login');
+  };
+
+  const toggleSubMenu = (title: string) => {
+    setOpenSubMenus(prev => ({ ...prev, [title]: !prev[title] }));
   };
 
   const menuItems = [
@@ -122,10 +140,14 @@ export default function Sidebar() {
     },
     { 
       title: 'Applications', 
-      href: '/admin/applications', 
-      icon: LayoutDashboard, // Will use LayoutDashboard for now or import another
+      href: '#', 
+      icon: Grid3X3,
       roles: ['admin', 'marketing'],
-      permission: 'products'
+      permission: 'products',
+      subItems: [
+        { title: 'All Applications', href: '/admin/applications' },
+        { title: 'Application Category', href: '/admin/applications/categories' },
+      ]
     },
     { 
       title: 'Blogs', 
@@ -197,7 +219,6 @@ export default function Sidebar() {
       roles: ['admin'],
       permission: 'settings'
     },
-
   ];
 
   if (loading) return <div className={`${isMobile ? 'hidden' : `w-64`} bg-secondary min-h-screen`} />;
@@ -268,33 +289,88 @@ export default function Sidebar() {
                 if (item.permission && !permissions.includes(item.permission)) return null;
               }
 
-              const isActive = pathname === item.href;
+              const hasSubItems = item.subItems && item.subItems.length > 0;
+              const isSubMenuOpen = openSubMenus[item.title];
+              const isActive = hasSubItems 
+                ? item.subItems?.some(sub => pathname === sub.href)
+                : pathname === item.href;
+
               return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={closeSidebarOnMobile}
-                  className={`flex items-center justify-between group px-4 py-3 transition-all duration-200 border-l-4 relative overflow-hidden ${
-                    isActive
-                      ? 'border-primary bg-primary/8 text-primary font-bold'
-                      : 'border-transparent text-gray-400 hover:text-secondary hover:bg-gray-50 hover:border-gray-300'
-                  } ${isCollapsed && !isMobile ? 'px-2' : ''}`}
-                  title={isCollapsed && !isMobile ? item.title : ''}
-                >
-                  <div className="flex items-center space-x-3">
-                    <item.icon
-                      className={`w-5 h-5 flex-shrink-0 ${
-                        isActive ? 'text-primary' : 'text-gray-300 group-hover:text-secondary'
-                      }`}
-                    />
-                    {(!isCollapsed || isMobile) && (
-                      <span className="text-sm uppercase tracking-wider">{item.title}</span>
-                    )}
-                  </div>
-                  {isActive && (!isCollapsed || isMobile) && (
-                    <ChevronRight className="w-4 h-4 flex-shrink-0" />
+                <div key={item.title} className="flex flex-col">
+                  {hasSubItems ? (
+                    <button
+                      onClick={() => toggleSubMenu(item.title)}
+                      className={`flex items-center justify-between group px-4 py-3 transition-all duration-200 border-l-4 relative overflow-hidden w-full text-left ${
+                        isActive
+                          ? 'border-primary bg-primary/8 text-primary font-bold'
+                          : 'border-transparent text-gray-400 hover:text-secondary hover:bg-gray-50 hover:border-gray-300'
+                      } ${isCollapsed && !isMobile ? 'px-2' : ''}`}
+                      title={isCollapsed && !isMobile ? item.title : ''}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <item.icon
+                          className={`w-5 h-5 flex-shrink-0 ${
+                            isActive ? 'text-primary' : 'text-gray-300 group-hover:text-secondary'
+                          }`}
+                        />
+                        {(!isCollapsed || isMobile) && (
+                          <span className="text-sm uppercase tracking-wider">{item.title}</span>
+                        )}
+                      </div>
+                      {(!isCollapsed || isMobile) && (
+                        <ChevronRight className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${isSubMenuOpen ? 'rotate-90' : ''}`} />
+                      )}
+                    </button>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      onClick={closeSidebarOnMobile}
+                      className={`flex items-center justify-between group px-4 py-3 transition-all duration-200 border-l-4 relative overflow-hidden ${
+                        isActive
+                          ? 'border-primary bg-primary/8 text-primary font-bold'
+                          : 'border-transparent text-gray-400 hover:text-secondary hover:bg-gray-50 hover:border-gray-300'
+                      } ${isCollapsed && !isMobile ? 'px-2' : ''}`}
+                      title={isCollapsed && !isMobile ? item.title : ''}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <item.icon
+                          className={`w-5 h-5 flex-shrink-0 ${
+                            isActive ? 'text-primary' : 'text-gray-300 group-hover:text-secondary'
+                          }`}
+                        />
+                        {(!isCollapsed || isMobile) && (
+                          <span className="text-sm uppercase tracking-wider">{item.title}</span>
+                        )}
+                      </div>
+                      {isActive && (!isCollapsed || isMobile) && (
+                        <ChevronRight className="w-4 h-4 flex-shrink-0" />
+                      )}
+                    </Link>
                   )}
-                </Link>
+
+                  {/* Sub Menu Rendering */}
+                  {hasSubItems && isSubMenuOpen && (!isCollapsed || isMobile) && (
+                    <div className="flex flex-col ml-8 mt-1 space-y-1 border-l border-gray-100">
+                      {item.subItems?.map((sub) => {
+                        const isSubActive = pathname === sub.href;
+                        return (
+                          <Link
+                            key={sub.href}
+                            href={sub.href}
+                            onClick={closeSidebarOnMobile}
+                            className={`px-4 py-2 text-xs font-black uppercase tracking-widest transition-all ${
+                              isSubActive
+                                ? 'text-primary'
+                                : 'text-gray-400 hover:text-secondary hover:translate-x-1'
+                            }`}
+                          >
+                            {sub.title}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               );
             })}
           </nav>
@@ -333,7 +409,6 @@ export default function Sidebar() {
           </div>
         </div>
       </aside>
-
     </>
   );
 }

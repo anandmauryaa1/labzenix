@@ -26,10 +26,17 @@ interface Application {
   image: string;
   order: number;
   active: boolean;
+  category?: string | any;
+}
+
+interface Category {
+  _id: string;
+  name: string;
 }
 
 export default function ApplicationManagement() {
   const [applications, setApplications] = useState<Application[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -42,11 +49,13 @@ export default function ApplicationManagement() {
     description: '',
     image: '',
     order: 0,
-    active: true
+    active: true,
+    category: ''
   });
 
   useEffect(() => {
     fetchApplications();
+    fetchCategories();
   }, []);
 
   async function fetchApplications() {
@@ -64,6 +73,18 @@ export default function ApplicationManagement() {
     }
   }
 
+  async function fetchCategories() {
+    try {
+      const res = await fetch('/api/application-categories');
+      if (res.ok) {
+        const data = await res.json();
+        setCategories(data);
+      }
+    } catch (err) {
+      console.error('Failed to load categories');
+    }
+  }
+
   const handleOpenModal = (app: Application | null = null) => {
     if (app) {
       setEditingApp(app);
@@ -72,7 +93,8 @@ export default function ApplicationManagement() {
         description: app.description || '',
         image: app.image,
         order: app.order || 0,
-        active: app.active
+        active: app.active,
+        category: typeof app.category === 'object' ? app.category._id : app.category || ''
       });
     } else {
       setEditingApp(null);
@@ -81,7 +103,8 @@ export default function ApplicationManagement() {
         description: '',
         image: '',
         order: applications.length,
-        active: true
+        active: true,
+        category: ''
       });
     }
     setIsModalOpen(true);
@@ -313,16 +336,31 @@ export default function ApplicationManagement() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Application Name</label>
-                <input 
-                  type="text" 
-                  className="w-full border border-gray-200 px-4 py-3 outline-none focus:border-primary text-sm font-medium transition-all"
-                  value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  placeholder="e.g. Adhesive Testing Instruments"
-                  required
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Application Name</label>
+                  <input 
+                    type="text" 
+                    className="w-full border border-gray-200 px-4 py-3 outline-none focus:border-primary text-sm font-medium transition-all"
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    placeholder="e.g. Adhesive Testing"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Application Category</label>
+                  <select 
+                    className="w-full border border-gray-200 px-4 py-3 outline-none focus:border-primary text-sm font-medium transition-all"
+                    value={formData.category}
+                    onChange={(e) => setFormData({...formData, category: e.target.value})}
+                  >
+                    <option value="">Select Category</option>
+                    {categories.map(cat => (
+                      <option key={cat._id} value={cat._id}>{cat.name}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div className="space-y-2">

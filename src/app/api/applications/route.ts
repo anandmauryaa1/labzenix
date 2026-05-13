@@ -14,24 +14,46 @@ const applicationSchema = z.object({
   imagePublicId: z.string().optional(),
   order: z.number().default(0),
   active: z.boolean().default(true),
+  category: z.string().optional().nullable(),
 });
+
+import ApplicationCategory from '@/models/ApplicationCategory';
 
 export async function GET(req: NextRequest) {
   try {
     await dbConnect();
     const { searchParams } = new URL(req.url);
     const isAdminView = searchParams.get('admin') === 'true';
+    const categoryName = searchParams.get('category');
 
-    let query = { active: true };
+    let query: any = { active: true };
     
     if (isAdminView) {
       const user = await getAuthUser(req);
       if (user) {
-        query = {} as any;
+        query = {};
+      }
+    }
+
+    if (categoryName) {
+      // Find category by name first
+      const cat = await ApplicationCategory.findOne({ name: categoryName });
+      if (cat) {
+        query.category = cat._id;
+      } else {
+        // If not found by name, try searching for categories that match the name (case-insensitive)
+        const catInsensitive = await ApplicationCategory.findOne({ name: { $regex: new RegExp(`^${categoryName}$`, 'i') } });
+        if (catInsensitive) {
+          query.category = catInsensitive._id;
+        } else {
+          // If still not found, return empty array
+          return NextResponse.json([]);
+        }
       }
     }
 
     const applications = await Application.find(query)
+      .populate('category', 'name slug')
       .sort({ order: 1, createdAt: -1 })
       .lean()
       .select('-__v');

@@ -36,10 +36,12 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [categories, setCategories] = useState<any[]>([]);
+  const [appCategories, setAppCategories] = useState<any[]>([]);
 
   useEffect(() => {
     fetch('/api/settings').then(res => res.json()).then(data => setSettings(data)).catch(console.error);
     fetch('/api/categories').then(res => res.json()).then(data => setCategories(Array.isArray(data) ? data : [])).catch(console.error);
+    fetch('/api/application-categories').then(res => res.json()).then(data => setAppCategories(Array.isArray(data) ? data : [])).catch(console.error);
   }, []);
 
   const dynamicNavLinks = navLinks.map(link => {
@@ -49,6 +51,15 @@ export default function Navbar() {
         submenu: categories.map(cat => ({
           name: cat.name,
           href: `/products?category=${encodeURIComponent(cat.name)}`
+        }))
+      };
+    }
+    if (link.name === 'Applications') {
+      return {
+        ...link,
+        submenu: appCategories.map(cat => ({
+          name: cat.name,
+          href: `/applications?category=${encodeURIComponent(cat.name)}`
         }))
       };
     }

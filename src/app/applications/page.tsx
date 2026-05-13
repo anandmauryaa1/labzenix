@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import PageBanner from '@/components/ui/PageBanner';
 import FadeIn from '@/components/ui/FadeIn';
 import Link from 'next/link';
@@ -18,16 +19,23 @@ interface Application {
 export default function ApplicationsPage() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
+  const searchParams = useSearchParams();
+  const categoryFilter = searchParams.get('category');
 
   useEffect(() => {
-    fetch('/api/applications')
+    setLoading(true);
+    const url = categoryFilter 
+      ? `/api/applications?category=${encodeURIComponent(categoryFilter)}` 
+      : '/api/applications';
+      
+    fetch(url)
       .then(res => res.ok ? res.json() : [])
       .then(data => {
         setApplications(Array.isArray(data) ? data : []);
       })
       .catch(err => console.error('Fetch error:', err))
       .finally(() => setLoading(false));
-  }, []);
+  }, [categoryFilter]);
 
   return (
     <div className="bg-white min-h-screen">
@@ -50,6 +58,17 @@ export default function ApplicationsPage() {
               "Our Testing Instruments are in Strict Compliance to International Application that Makes Them Applicable in the International Markets As Well."
             </p>
           </FadeIn>
+
+          {categoryFilter && (
+            <FadeIn direction="up" className="mb-12 flex items-center justify-between border-b border-gray-100 pb-6">
+              <h3 className="text-xl font-bold text-secondary uppercase tracking-tighter">
+                Category: <span className="text-primary">{categoryFilter}</span>
+              </h3>
+              <Link href="/applications" className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-primary transition-colors">
+                Clear Filter
+              </Link>
+            </FadeIn>
+          )}
 
           {loading ? (
             <div className="text-center py-20">

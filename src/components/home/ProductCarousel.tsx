@@ -28,10 +28,20 @@ export default function ProductCarousel() {
     const fetchProducts = async () => {
       try {
         const response = await fetch('/api/products');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch products: ${response.status}`);
+        }
         const data = await response.json();
-        // Get top 5 most viewed products
-        const sortedData = data.sort((a: Product, b: Product) => (b.views || 0) - (a.views || 0));
-        setProducts(sortedData.slice(0, 5));
+        
+        // Ensure data is an array before sorting
+        if (Array.isArray(data)) {
+          // Get top 5 most viewed products
+          const sortedData = [...data].sort((a: Product, b: Product) => (b.views || 0) - (a.views || 0));
+          setProducts(sortedData.slice(0, 5));
+        } else {
+          console.error('API did not return an array of products:', data);
+          setProducts([]);
+        }
       } catch (error) {
         console.error('Error fetching products:', error);
       } finally {
