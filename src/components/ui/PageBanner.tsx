@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 
 interface BreadcrumbItem {
   label: string;
@@ -9,16 +10,41 @@ interface BreadcrumbItem {
 interface PageBannerProps {
   title: string;
   breadcrumbs: BreadcrumbItem[];
+  description?: string;
+  showBackButton?: boolean;
+  backUrl?: string;
 }
 
-export default function PageBanner({ title, breadcrumbs }: PageBannerProps) {
+export default function PageBanner({ 
+  title, 
+  breadcrumbs, 
+  description, 
+  showBackButton, 
+  backUrl = '/products' 
+}: PageBannerProps) {
   return (
-    <section className="bg-primary py-12 md:py-16">
-      <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        {/* Title */}
-        <h1 className="text-3xl md:text-4xl font-black text-white uppercase tracking-tighter">
-          {title}
-        </h1>
+    <section className="bg-primary py-5 md:py-10">
+      <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row md:items-center justify-between gap-8">
+        {/* Title & Description */}
+        <div className="flex-1 flex items-start gap-6">
+          {showBackButton && (
+            <Link href={backUrl}>
+              <button className="mt-2 p-3 bg-white/10 hover:bg-white/20 text-white transition-all rounded-none border border-white/20">
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+            </Link>
+          )}
+          <div>
+            <h1 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter leading-tight">
+              {title}
+            </h1>
+            {description && (
+              <p className="mt-2 text-white/90 font-medium text-sm md:text-base max-w-2xl leading-relaxed">
+                {description}
+              </p>
+            )}
+          </div>
+        </div>
 
         {/* Breadcrumb */}
         <nav className="text-white/80 font-medium text-sm">

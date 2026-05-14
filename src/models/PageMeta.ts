@@ -14,7 +14,7 @@ const PageMetaSchema = new Schema<IPageMeta>({
     type: String, 
     required: true, 
     unique: true,
-    enum: ['home', 'about', 'services', 'products', 'blogs', 'contact']
+    enum: ['home', 'about', 'services', 'products', 'blogs', 'contact', 'applications']
   },
   metaTitle: { type: String, required: [true, 'Browser title is mandatory'] },
   metaDescription: { type: String, required: [true, 'Search meta description is mandatory'] },

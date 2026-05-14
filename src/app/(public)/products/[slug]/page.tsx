@@ -2,6 +2,7 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import dbConnect from '@/lib/dbConnect';
 import Product, { IProduct } from '@/models/Product';
+import Application, { IApplication } from '@/models/Application';
 import Review, { IReview } from '@/models/Review';
 import Faq, { IFaq } from '@/models/Faq';
 import Category, { ICategory } from '@/models/Category';
@@ -58,6 +59,9 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   // Explicitly fetch reviews and FAQs from new collections
   const rawReviews = await Review.find({ product: product._id }).lean() as IReview[];
   const rawFaqs    = await Faq.find({ product: product._id }).lean() as IFaq[];
+
+  // Fetch linked applications
+  const linkedApplications = await Application.find({ _id: { $in: product.applications || [] } }).lean() as IApplication[];
 
   /* ─── JSON-LD Structured Data ─────────────────────────── */
   const reviews: { author: string; rating: number; comment: string; date?: string; images?: string[] }[] = JSON.parse(JSON.stringify(rawReviews ?? []));
@@ -156,6 +160,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           { label: 'Products', href: '/products' },
           { label: product.title }
         ]} 
+        showBackButton={true}
       />
 
       {/* Product Detail Section */}
@@ -173,17 +178,30 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
               <span className="inline-block px-4 py-1.5 bg-primary/5 text-primary text-[10px] font-black uppercase tracking-[0.2em] border border-primary/20 rounded-none mb-6 shadow-sm">
                 Category: {product.category}
               </span>
+              {linkedApplications.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {linkedApplications.map((app) => (
+                    <Link 
+                      key={app._id.toString()} 
+                      href={`/applications?category=${app.name}`}
+                      className="text-[9px] font-bold text-gray-500 uppercase tracking-widest px-3 py-1 bg-gray-50 border border-gray-100 hover:border-primary hover:text-primary transition-all"
+                    >
+                      {app.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* Title */}
-            <div>
+            {/* Title (Commented out as moved to Banner) */}
+            {/* <div>
               <h1 className="text-4xl font-black text-secondary uppercase tracking-tighter leading-tight mb-2">
                 {product.title}
               </h1>
               {product.modelNumber && (
                 <p className="text-gray-500 font-medium">{product.modelNumber}</p>
               )}
-            </div>
+            </div> */}
 
             {/* Key Information Grid */}
             <div className="grid grid-cols-2 gap-8 py-8 border-y border-gray-100">

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { 
   Plus, 
@@ -14,12 +15,16 @@ import {
   ChevronRight,
   Filter,
   Eye,
-  ChevronLeft
+  ChevronLeft,
+  X
 } from 'lucide-react';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
 
-export default function ProductListing() {
+function ProductListingContent() {
+  const searchParams = useSearchParams();
+  const applicationFilter = searchParams.get('application');
+  
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -31,12 +36,16 @@ export default function ProductListing() {
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [applicationFilter]);
 
   async function fetchProducts() {
     setLoading(true);
     try {
-      const res = await fetch('/api/products');
+      let url = '/api/products';
+      if (applicationFilter) {
+        url += `?application=${encodeURIComponent(applicationFilter)}`;
+      }
+      const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
         setProducts(Array.isArray(data) ? data : []);
@@ -131,13 +140,34 @@ export default function ProductListing() {
           <h1 className="text-3xl font-black text-secondary tracking-tighter uppercase mb-2">Products</h1>
           <p className="text-gray-500 font-medium text-sm">Manage all laboratory testing instruments and technical specifications.</p>
         </div>
-        <Link href="/admin/products/new">
-          <button className="flex items-center space-x-2 px-6 py-4 bg-secondary text-white text-xs font-black uppercase tracking-widest hover:bg-primary transition-all shadow-lg active:scale-95">
-            <Plus className="w-4 h-4" />
-              <span>Add Product</span>
-          </button>
-        </Link>
+        <div className="flex items-center space-x-3">
+          {applicationFilter && (
+            <Link href="/admin/products">
+              <button className="flex items-center space-x-2 px-4 py-4 bg-primary/10 text-primary text-xs font-black uppercase tracking-widest hover:bg-primary/20 transition-all border border-primary/20">
+                <X className="w-3.5 h-3.5" />
+                <span>Clear Application Filter</span>
+              </button>
+            </Link>
+          )}
+          <Link href="/admin/products/new">
+            <button className="flex items-center space-x-2 px-6 py-4 bg-secondary text-white text-xs font-black uppercase tracking-widest hover:bg-primary transition-all shadow-lg active:scale-95">
+              <Plus className="w-4 h-4" />
+                <span>Add Product</span>
+            </button>
+          </Link>
+        </div>
       </div>
+
+      {applicationFilter && (
+        <div className="bg-primary/5 border border-primary/20 p-4 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+             <Filter className="w-4 h-4 text-primary" />
+             <span className="text-[10px] font-black uppercase tracking-widest text-primary">
+               Showing Products for Application: <span className="text-secondary">{applicationFilter}</span>
+             </span>
+          </div>
+        </div>
+      )}
 
       <div className="bg-white border border-gray-100 shadow-sm relative overflow-hidden">
         {/* Bulk Action Bar */}
@@ -194,7 +224,6 @@ export default function ProductListing() {
                 </th>
                 <th className="px-6 py-4">Instrument / ID</th>
                 <th className="px-6 py-4">Classification</th>
-                {/* <th className="px-6 py-4">Usage Layer</th> */}
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
@@ -264,15 +293,6 @@ export default function ProductListing() {
                       {product.category || 'Uncategorized'}
                     </div>
                   </td>
-                  {/* <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2 py-1 text-[10px] font-black uppercase tracking-tighter ${
-                      product.usage === 'Laboratory' ? 'bg-blue-50 text-blue-600' : 
-                      product.usage === 'Production' ? 'bg-orange-50 text-orange-600' : 'bg-green-50 text-green-600'
-                    }`}>
-                      <Shield className="w-3 h-3 mr-1" />
-                      {product.usage || 'N/A'}
-                    </span>
-                  </td> */}
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end space-x-2">
                        <Link href={`/products/${product.slug}`} target="_blank">
@@ -341,5 +361,18 @@ export default function ProductListing() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function ProductListing() {
+  return (
+    <Suspense fallback={
+      <div className="flex flex-col items-center justify-center p-20 space-y-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Loading Catalog...</span>
+      </div>
+    }>
+      <ProductListingContent />
+    </Suspense>
   );
 }

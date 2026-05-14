@@ -16,6 +16,7 @@ export interface IProduct extends Document {
   metaTitle: string;
   metaDescription: string;
   author: mongoose.Types.ObjectId;
+  applications: mongoose.Types.ObjectId[];
   views: number;
   createdAt: Date;
 }
@@ -57,6 +58,11 @@ const ProductSchema = new mongoose.Schema<IProduct>({
     required: true,
     index: true
   },
+  applications: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Application',
+    index: true
+  }],
   createdAt: { type: Date, default: Date.now, index: true },
 });
 

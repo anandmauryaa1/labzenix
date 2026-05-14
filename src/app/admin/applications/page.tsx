@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { 
   Plus, 
   Search, 
@@ -260,6 +261,14 @@ export default function ApplicationManagement() {
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
+                        <Link href={`/admin/products?application=${app.slug}`}>
+                          <button 
+                            className="p-2.5 bg-gray-50 text-gray-400 hover:text-primary hover:bg-primary/5 transition-all"
+                            title="Linked Products"
+                          >
+                            <FileText className="w-4 h-4" />
+                          </button>
+                        </Link>
                         <button 
                           onClick={() => deleteApplication(app._id)}
                           className="p-2.5 bg-red-50 text-red-400 hover:text-red-600 hover:bg-red-100 transition-all"

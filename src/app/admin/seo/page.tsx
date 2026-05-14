@@ -17,8 +17,10 @@ import SEOMetrics from '@/components/admin/SEOMetrics';
 const PAGES = [
   { key: 'home', name: 'Home Landing', path: '/' },
   { key: 'about', name: 'About Us', path: '/about' },
-  { key: 'products', name: 'Global Products', path: '/products' },
-  { key: 'blogs', name: 'Knowledge Center', path: '/blogs' },
+  { key: 'services', name: 'Our Services', path: '/services' },
+  { key: 'products', name: 'Products', path: '/products' },
+  { key: 'applications', name: 'Applications', path: '/applications' },
+  { key: 'blogs', name: 'Blogs', path: '/blogs' },
   { key: 'contact', name: 'Contact Us', path: '/contact' },
 ];
 

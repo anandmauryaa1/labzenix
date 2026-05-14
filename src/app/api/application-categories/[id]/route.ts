@@ -21,11 +21,12 @@ const applicationCategorySchema = z.object({
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect();
-    const category = await ApplicationCategory.findById(params.id).lean();
+    const { id } = await params;
+    const category = await ApplicationCategory.findById(id).lean();
     if (!category) {
       return NextResponse.json({ error: 'Category not found' }, { status: 404 });
     }
@@ -37,9 +38,10 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const user = await getAuthUser(req);
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -60,7 +62,7 @@ export async function PATCH(
     }
     
     const category = await ApplicationCategory.findByIdAndUpdate(
-      params.id,
+      id,
       { $set: body },
       { new: true, runValidators: true }
     );
@@ -69,7 +71,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Category not found' }, { status: 404 });
     }
 
-    logger.info('Application Category updated', { id: params.id, name: category.name, user: user.username });
+    logger.info('Application Category updated', { id, name: category.name, user: user.username });
 
     revalidatePath('/admin/applications/categories');
     revalidatePath('/applications');
@@ -82,9 +84,10 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const user = await getAuthUser(req);
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -92,13 +95,13 @@ export async function DELETE(
     if (!canEdit) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
     await dbConnect();
-    const category = await ApplicationCategory.findByIdAndDelete(params.id);
+    const category = await ApplicationCategory.findByIdAndDelete(id);
     
     if (!category) {
       return NextResponse.json({ error: 'Category not found' }, { status: 404 });
     }
 
-    logger.info('Application Category deleted', { id: params.id, name: category.name, user: user.username });
+    logger.info('Application Category deleted', { id, name: category.name, user: user.username });
 
     revalidatePath('/admin/applications/categories');
     revalidatePath('/applications');

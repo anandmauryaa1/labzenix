@@ -24,12 +24,27 @@ const productSchema = z.object({
   youtubeUrl: z.string().optional(),
   metaTitle: z.string().min(1, 'Meta title is required').trim(),
   metaDescription: z.string().min(1, 'Meta description is required').trim(),
+  applications: z.array(z.string()).optional(),
 });
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     await dbConnect();
-    const products = await Product.find({})
+    const { searchParams } = new URL(req.url);
+    const applicationSlug = searchParams.get('application');
+    
+    let query = {};
+    
+    if (applicationSlug) {
+      // Find the application ID from slug
+      const Application = (await import('@/models/Application')).default;
+      const app = await Application.findOne({ slug: applicationSlug }).lean();
+      if (app) {
+        query = { applications: app._id };
+      }
+    }
+
+    const products = await Product.find(query)
       .populate({ path: 'author', model: User, select: 'name' })
       .sort({ createdAt: -1 })
       .lean()

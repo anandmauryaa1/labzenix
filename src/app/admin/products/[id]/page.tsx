@@ -50,7 +50,8 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
     metaTitle: '',
     metaDescription: '',
     reviews: [] as { author: string; rating: number; comment: string; images?: string[] }[],
-    faqs: [] as { question: string; answer: string }[]
+    faqs: [] as { question: string; answer: string }[],
+    applications: [] as string[]
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [newSpec, setNewSpec] = useState({ key: '', value: '' });
@@ -64,6 +65,7 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
   const [assetUploading, setAssetUploading] = useState(false);
   const [activeTab, setActiveTab] = useState<'details' | 'specs' | 'performance' | 'media' | 'seo' | 'reviews' | 'faq'>('details');
   const [categories, setCategories] = useState<any[]>([]);
+  const [allApplications, setAllApplications] = useState<any[]>([]);
 
   // Always-current ref so handleSubmit never reads stale closure state
   const formRef = useRef(form);
@@ -74,6 +76,11 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
       .then(res => res.json())
       .then(data => setCategories(data))
       .catch(() => toast.error('Failed to load categories'));
+
+    fetch('/api/applications?admin=true')
+      .then(res => res.json())
+      .then(data => setAllApplications(Array.isArray(data) ? data : []))
+      .catch(() => toast.error('Failed to load applications'));
   }, []);
 
   useEffect(() => {
@@ -97,7 +104,8 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
             metaTitle: data.metaTitle || '',
             metaDescription: data.metaDescription || '',
             reviews: data.reviews || [],
-            faqs: data.faqs || []
+            faqs: data.faqs || [],
+            applications: data.applications || []
           });
           setFetching(false);
         })
@@ -196,7 +204,8 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
           metaTitle: saved.metaTitle || '',
           metaDescription: saved.metaDescription || '',
           reviews: saved.reviews || [],
-          faqs: saved.faqs || []
+          faqs: saved.faqs || [],
+          applications: saved.applications || []
         };
         setForm(synced);
         formRef.current = synced;
@@ -1011,6 +1020,38 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
                   </button>
                 ))}
               </div>
+            </div>
+
+            <div className="space-y-4 pt-4 border-t border-gray-100">
+              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Linked Applications</label>
+              <div className="space-y-2 max-h-64 overflow-y-auto pr-2 scrollbar-hide">
+                {allApplications.length === 0 ? (
+                  <p className="text-[10px] text-gray-400 italic">No applications found</p>
+                ) : (
+                  allApplications.map((app) => (
+                    <label key={app._id} className="flex items-center space-x-3 cursor-pointer group p-2 hover:bg-gray-50 transition-colors">
+                      <input 
+                        type="checkbox" 
+                        className="w-4 h-4 accent-primary rounded border-gray-300"
+                        checked={form.applications.includes(app._id)}
+                        onChange={(e) => {
+                          const checked = e.target.checked;
+                          setForm(prev => ({
+                            ...prev,
+                            applications: checked 
+                              ? [...prev.applications, app._id]
+                              : prev.applications.filter(id => id !== app._id)
+                          }));
+                        }}
+                      />
+                      <span className={`text-[11px] font-bold uppercase tracking-tight transition-colors ${form.applications.includes(app._id) ? 'text-secondary' : 'text-gray-400 group-hover:text-secondary'}`}>
+                        {app.name}
+                      </span>
+                    </label>
+                  ))
+                )}
+              </div>
+              <p className="text-[9px] text-gray-400 leading-tight">Link this product to relevant industrial applications.</p>
             </div>
           </div>
         </div>

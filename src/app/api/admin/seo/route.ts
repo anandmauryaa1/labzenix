@@ -12,7 +12,7 @@ const seoSchema = z.object({
   metaTitle: z.string().min(1, 'Title is required').trim(),
   metaDescription: z.string().min(1, 'Description is required').trim(),
   h1: z.string().optional(),
-  keywords: z.string().optional(),
+  keywords: z.union([z.string(), z.array(z.string())]).optional(),
 });
 
 export async function GET(req: NextRequest) {
@@ -46,10 +46,14 @@ export async function POST(req: NextRequest) {
     }
 
     const { pageKey, metaTitle, metaDescription, h1, keywords } = result.data;
+    
+    const keywordsArray = typeof keywords === 'string' 
+      ? keywords.split(',').map(k => k.trim()).filter(Boolean)
+      : keywords;
 
     const seo = await PageMeta.findOneAndUpdate(
       { pageKey },
-      { metaTitle, metaDescription, h1, keywords, updatedAt: new Date() },
+      { metaTitle, metaDescription, h1, keywords: keywordsArray, updatedAt: new Date() },
       { returnDocument: 'after', upsert: true, runValidators: true }
     );
 

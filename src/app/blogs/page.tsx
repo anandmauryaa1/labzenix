@@ -35,7 +35,7 @@ export default async function BlogPage({
   return (
     <div className="bg-white overflow-hidden">
       <PageBanner 
-        title="Knowledge Center" 
+        title="Our Blogs" 
         breadcrumbs={[
           { label: 'Home', href: '/' },
           { label: 'Blogs' }
@@ -46,10 +46,10 @@ export default async function BlogPage({
         <div className="max-w-7xl auto px-4 sm:px-6 lg:px-8 text-center">
           <FadeIn direction="up">
             <span className="text-primary font-black tracking-[0.3em] uppercase text-[10px] mb-4 block">
-              Knowledge Center
+              Our Blogs
             </span>
             <h1 className="text-4xl md:text-7xl font-black text-secondary mb-6 uppercase tracking-tighter leading-none">
-              Knowledge <span className="text-primary">& Insights</span>
+              Our <span className="text-primary">Blogs</span>
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed font-medium">
               Stay updated with the latest industry standards, maintenance tips, and technological breakthroughs in laboratory testing.
