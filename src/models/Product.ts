@@ -67,7 +67,6 @@ const ProductSchema = new mongoose.Schema<IProduct>({
 });
 
 ProductSchema.index({ category: 1, usage: 1 });
-ProductSchema.index({ slug: 1 }, { unique: true });
 
 
 export default mongoose.models.Product || mongoose.model<IProduct>('Product', ProductSchema);

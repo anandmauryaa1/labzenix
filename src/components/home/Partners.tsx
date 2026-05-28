@@ -50,13 +50,13 @@ export default function Partners() {
   );
 
   return (
-    <section className="py-24 bg-white border-t border-gray-100 overflow-hidden">
+    <section className="py-14 bg-white border-t border-gray-100 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-center items-center mb-12 gap-6">
           <FadeIn direction="up">
             <div className="max-w-2xl text-center">
               <span className="text-primary font-medium tracking-widest uppercase text-sm">Trusted By</span>
-              <h2 className="text-3xl md:text-4xl font-black text-secondary mt-2 mb-4 uppercase tracking-tighter">Our Partners</h2>
+              <h2 className="text-3xl md:text-4xl font-black text-secondary mt-2 mb-4 uppercase tracking-tighter">Our <span className="text-primary">Partners</span></h2>
               <p className="text-gray-500 font-medium leading-relaxed">
                 A countless string of happy and satisfied customers vouch for our 
                 excellence and complete quality control support.
@@ -100,7 +100,7 @@ export default function Partners() {
                   href={partner.website || '#'}
                   target={partner.website ? "_blank" : undefined}
                   rel="noopener noreferrer"
-                  className="relative aspect-[5/2] flex flex-col mb-6 items-center justify-center grayscale hover:grayscale-0 transition-all duration-300 opacity-60 hover:opacity-100 group bg-gray-50/50 hover:bg-white border border-transparent hover:border-gray-100 p-4"
+                  className="relative aspect-[5/2] flex flex-col mb-6 items-center justify-center transition-all duration-300 group bg-gray-50/50 hover:bg-white border border-transparent hover:border-gray-100 p-4"
                 >
                   <Image
                     src={partner.logo}

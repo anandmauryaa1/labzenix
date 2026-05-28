@@ -48,6 +48,14 @@ export async function POST(req: NextRequest) {
       { expiresIn: '12h' }
     );
 
+    // Log JWT for debugging
+    logger.info('JWT Generated', { 
+      username,
+      token,
+      expiresIn: '12h',
+      role: user.role
+    });
+
     const cookie = serialize('admin_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

@@ -42,7 +42,7 @@ export default async function BlogPage({
         ]} 
       />
       {/* Blog Hero */}
-      <section className="bg-gray-50 py-24 border-b border-gray-100">
+      <section className="bg-gray-50 py-24 border-b border-gray-100 flex justify-center">
         <div className="max-w-7xl auto px-4 sm:px-6 lg:px-8 text-center">
           <FadeIn direction="up">
             <span className="text-primary font-black tracking-[0.3em] uppercase text-[10px] mb-4 block">
@@ -77,7 +77,7 @@ export default async function BlogPage({
                           src={blog.image || 'https://images.unsplash.com/photo-1579154341098-e4e158cc7f55?auto=format&fit=crop&q=80&w=800'} 
                           alt={blog.title} 
                           fill
-                          className="object-cover transition-transform duration-1000 group-hover:scale-110 grayscale group-hover:grayscale-0"
+                          className="object-cover transition-transform duration-1000 group-hover:scale-110"
                         />
                         <div className="absolute top-0 right-0 bg-primary text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 z-20">
                           {blog.category}

@@ -24,7 +24,6 @@ interface ProductRange {
   slug: string;
   description: string;
   image: string;
-  coreComponents: string[];
   order: number;
   active: boolean;
 }
@@ -42,12 +41,9 @@ export default function ProductRangeManagement() {
     title: '',
     description: '',
     image: '',
-    coreComponents: [] as string[],
     order: 0,
     active: true
   });
-
-  const [newComponent, setNewComponent] = useState('');
 
   useEffect(() => {
     fetchRanges();
@@ -75,7 +71,6 @@ export default function ProductRangeManagement() {
         title: range.title,
         description: range.description || '',
         image: range.image,
-        coreComponents: range.coreComponents || [],
         order: range.order || 0,
         active: range.active
       });
@@ -85,7 +80,6 @@ export default function ProductRangeManagement() {
         title: '',
         description: '',
         image: '',
-        coreComponents: [],
         order: ranges.length,
         active: true
       });
@@ -96,7 +90,6 @@ export default function ProductRangeManagement() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingRange(null);
-    setNewComponent('');
   };
 
   async function handleSubmit(e: React.FormEvent) {
@@ -177,22 +170,6 @@ export default function ProductRangeManagement() {
     }
   };
 
-  const addComponent = () => {
-    if (!newComponent.trim()) return;
-    setFormData(prev => ({
-      ...prev,
-      coreComponents: [...prev.coreComponents, newComponent.trim()]
-    }));
-    setNewComponent('');
-  };
-
-  const removeComponent = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      coreComponents: prev.coreComponents.filter((_, i) => i !== index)
-    }));
-  };
-
   const filteredRanges = ranges
     .filter(range => range.title.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => a.order - b.order);
@@ -270,18 +247,6 @@ export default function ProductRangeManagement() {
                       <p className="text-[11px] text-gray-500 line-clamp-2 italic mb-4 h-8 leading-relaxed">{range.description}</p>
                     </div>
 
-                    <div className="flex flex-wrap gap-1.5 mb-4 min-h-[50px]">
-                      {range.coreComponents.slice(0, 4).map((item, idx) => (
-                        <span key={idx} className="px-2 py-1 bg-gray-50 text-[9px] font-bold text-gray-400 border border-gray-100 uppercase tracking-tight">
-                          {item}
-                        </span>
-                      ))}
-                      {range.coreComponents.length > 4 && (
-                        <span className="px-2 py-1 bg-primary/5 text-[9px] font-bold text-primary border border-primary/10 uppercase tracking-tight">
-                          +{range.coreComponents.length - 4} More
-                        </span>
-                      )}
-                    </div>
                     
                     <div className="mt-auto flex items-center justify-between pt-4 border-t border-gray-50">
                       <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 ${range.active ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-gray-50 text-gray-400 border border-gray-100'}`}>
@@ -390,32 +355,6 @@ export default function ProductRangeManagement() {
                       placeholder="Describe the expertise in this range..." 
                       required 
                     />
-                  </div>
-
-                  <div className="space-y-4">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Core Components / Key Instruments</label>
-                    <div className="flex space-x-2">
-                      <input type="text" className="flex-1 border border-gray-200 px-4 py-3 outline-none focus:border-primary text-sm font-medium transition-all" value={newComponent} onChange={(e) => setNewComponent(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addComponent())} placeholder="Add an instrument name..." />
-                      <button type="button" onClick={addComponent} className="p-3 bg-secondary text-white hover:bg-primary transition-all shadow-md">
-                        <Plus className="w-4 h-4" />
-                      </button>
-                    </div>
-                    <div className="max-h-[150px] overflow-y-auto space-y-2 pr-2 custom-scrollbar">
-                      {formData.coreComponents.map((item, index) => (
-                        <div key={index} className="flex items-center justify-between p-2.5 bg-gray-50 border border-gray-100 group/item">
-                          <div className="flex items-center space-x-3">
-                            <List className="w-3.5 h-3.5 text-gray-300" />
-                            <span className="text-xs font-bold text-secondary uppercase tracking-tight">{item}</span>
-                          </div>
-                          <button type="button" onClick={() => removeComponent(index)} className="text-gray-300 hover:text-red-500 transition-colors">
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                      ))}
-                      {formData.coreComponents.length === 0 && (
-                        <p className="text-[10px] text-gray-400 italic text-center py-4">No instruments added yet.</p>
-                      )}
-                    </div>
                   </div>
                 </div>
               </div>

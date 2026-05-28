@@ -18,7 +18,7 @@ export default function ProductCategories() {
   };
 
   return (
-    <section className="py-24 px-4 bg-white border-y border-gray-100 overflow-hidden">
+    <section className="py-14 px-4 bg-white border-y border-gray-100 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <FadeIn direction="up">
           <span className="block text-primary font-bold tracking-[0.3em] uppercase text-xs text-center mb-4">Our Expertise</span>

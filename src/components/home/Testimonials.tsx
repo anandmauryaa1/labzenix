@@ -68,7 +68,7 @@ export default function Testimonials() {
   };
 
   if (loading) return (
-    <section className="py-24 bg-white">
+    <section className="py-14 bg-white">
       <div className="max-w-7xl mx-auto px-4">
         <div className="animate-pulse flex flex-col items-center">
           <div className="h-4 w-32 bg-gray-200 mb-4"></div>
@@ -84,12 +84,12 @@ export default function Testimonials() {
   );
 
   return (
-    <section className="py-24 px-4 bg-white relative overflow-hidden">
+    <section className="py-14 px-4 bg-white relative overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <FadeIn direction="up">
           <div className="text-center mb-16">
             <span className="text-primary font-bold tracking-widest uppercase text-sm">Customer Stories</span>
-            <h2 className="text-4xl md:text-5xl font-black text-secondary mt-2 uppercase tracking-tighter italic">Trusted Globally</h2>
+            <h2 className="text-4xl md:text-5xl font-black text-secondary mt-2 uppercase tracking-tighter italic"> <span className="text-primary">Trusted </span> Globally</h2>
           </div>
         </FadeIn>
 

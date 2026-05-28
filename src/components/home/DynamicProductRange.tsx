@@ -13,7 +13,6 @@ interface ProductRange {
   slug: string;
   description: string;
   image: string;
-  coreComponents: string[];
 }
 
 export default function DynamicProductRange() {
@@ -33,25 +32,26 @@ export default function DynamicProductRange() {
   if (loading || ranges.length === 0) return null;
 
   return (
-    <section className="py-24 px-4 bg-gray-50 overflow-hidden">
+    <section aria-labelledby="dynamic-ranges-heading" className="py-14 px-4 bg-gray-50 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <FadeIn direction="up">
-          <div className="text-center mb-16">
+          <header className="text-center mb-16">
             <span className="text-primary font-medium tracking-[0.3em] uppercase text-sm mb-4 block">Our Series</span>
-            <h2 className="text-4xl md:text-5xl font-black text-secondary uppercase tracking-tighter leading-none mb-6">
+            <h2 id="dynamic-ranges-heading" className="text-4xl md:text-5xl font-black text-secondary uppercase tracking-tighter leading-none mb-6">
               Our <span className="text-primary">Product</span> Ranges
             </h2>
             <p className="text-gray-500 font-medium max-w-2xl mx-auto">
               Explore our specialized instrument series tailored for diverse industrial testing requirements.
             </p>
-          </div>
+          </header>
         </FadeIn>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" role="list">
           {ranges.map((range, index) => (
             <FadeIn key={range._id} direction="up" delay={index * 0.1}>
-              <Link href={`/products?range=${range.slug}`}>
-                <div className="group bg-white border border-gray-100 hover:border-primary hover:shadow-2xl transition-all duration-500 overflow-hidden h-full flex flex-col cursor-pointer">
+              <article role="listitem" className="h-full">
+                <Link href={`/products?range=${range.slug}`} className="block h-full">
+                  <div className="group bg-white border border-gray-100 hover:border-primary hover:shadow-2xl transition-all duration-500 overflow-hidden h-full flex flex-col cursor-pointer">
                   <div className="relative aspect-video overflow-hidden">
                     <Image 
                       src={range.image} 
@@ -73,8 +73,9 @@ export default function DynamicProductRange() {
                       <ArrowRight className="w-5 h-5 text-primary group-hover:translate-x-2 transition-transform" />
                     </div>
                   </div>
-                </div>
-              </Link>
+                  </div>
+                </Link>
+              </article>
             </FadeIn>
           ))}
         </div>

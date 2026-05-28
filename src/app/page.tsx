@@ -3,7 +3,6 @@ import Hero from '@/components/home/Hero';
 import DynamicProductRange from '@/components/home/DynamicProductRange';
 import AboutSummary from '@/components/home/AboutSummary';
 import ProductCarousel from '@/components/home/ProductCarousel';
-// import ProductCategories from '@/components/home/ProductCategories'; // Removed as requested
 import WhyChooseUs from '@/components/home/WhyChooseUs';
 import ProductRange from '@/components/home/ProductRange';
 import Testimonials from '@/components/home/Testimonials';

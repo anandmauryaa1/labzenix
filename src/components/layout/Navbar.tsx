@@ -102,8 +102,8 @@ export default function Navbar() {
     <header className="fixed top-0 w-full z-50 transition-all duration-300">
       {/* Top Bar */}
       <div className="bg-primary text-white py-2 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto flex justify-between items-center text-sm font-medium">
-          <div className="flex items-center space-x-6">
+        <div className="max-w-7xl mx-auto flex justify-between items-center text-xs font-medium">
+          <div className="flex items-center space-x-4">
             <a href={`tel:${settings?.communication?.supportPhone || '+919565453120'}`} className="flex items-center hover:text-gray-200 transition-colors">
               <Phone className="w-3.5 h-3.5 mr-2" />
               
@@ -129,7 +129,7 @@ export default function Navbar() {
       <div className={`transition-all duration-500 ${
         scrolled 
           ? 'bg-white/80 backdrop-blur-md shadow-lg py-2 border-b border-gray-100' 
-          : 'bg-white/95 py-5'
+          : 'bg-white/95 py-3'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">

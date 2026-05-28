@@ -84,13 +84,15 @@ export default function Sidebar() {
 
   // Open sub-menu if an item inside is active
   useEffect(() => {
-    menuItems.forEach(item => {
-      if (item.subItems) {
-        const isChildActive = item.subItems.some(subItem => pathname === subItem.href);
-        if (isChildActive) {
-          setOpenSubMenus(prev => ({ ...prev, [item.title]: true }));
+    menuGroups.forEach(group => {
+      group.items.forEach(item => {
+        if (item.subItems) {
+          const isChildActive = item.subItems.some(subItem => pathname === subItem.href);
+          if (isChildActive) {
+            setOpenSubMenus(prev => ({ ...prev, [item.title]: true }));
+          }
         }
-      }
+      });
     });
   }, [pathname]);
 
@@ -109,116 +111,169 @@ export default function Sidebar() {
     setOpenSubMenus(prev => ({ ...prev, [title]: !prev[title] }));
   };
 
-  const menuItems = [
-    { 
-      title: 'Dashboard', 
-      href: '/admin', 
-      icon: LayoutDashboard,
-      roles: ['admin', 'seo', 'marketing'],
-      permission: '' // Always visible
-    },
-    { 
-      title: 'Products', 
-      href: '/admin/products', 
-      icon: Package,
-      roles: ['admin', 'marketing'],
-      permission: 'products'
-    },
-    { 
-      title: 'Product Categories', 
-      href: '/admin/products/categories', 
-      icon: Layers,
-      roles: ['admin', 'marketing'],
-      permission: 'categories'
-    },
-    { 
-      title: 'Product Range', 
-      href: '/admin/product-ranges', 
-      icon: Grid3X3,
-      roles: ['admin', 'marketing'],
-      permission: 'products'
-    },
-    { 
-      title: 'Applications', 
-      href: '#', 
-      icon: Grid3X3,
-      roles: ['admin', 'marketing'],
-      permission: 'products',
-      subItems: [
-        { title: 'All Applications', href: '/admin/applications' },
-        { title: 'Application Category', href: '/admin/applications/categories' },
+  const menuGroups = [
+    {
+      group: 'Overview',
+      items: [
+        { 
+          title: 'Dashboard', 
+          href: '/admin', 
+          icon: LayoutDashboard,
+          roles: ['admin', 'seo', 'marketing'],
+          permission: '' // Always visible
+        }
       ]
     },
-    { 
-      title: 'Blogs', 
-      href: '/admin/blogs', 
-      icon: FileText,
-      roles: ['admin', 'seo', 'marketing'],
-      permission: 'blogs'
+    {
+      group: 'Product Catalog',
+      items: [
+        { 
+          title: 'Products', 
+          href: '/admin/products', 
+          icon: Package,
+          roles: ['admin', 'marketing'],
+          permission: 'products'
+        },
+        { 
+          title: 'Product Categories', 
+          href: '/admin/products/categories', 
+          icon: Layers,
+          roles: ['admin', 'marketing'],
+          permission: 'categories'
+        },
+        { 
+          title: 'Product Range', 
+          href: '/admin/product-ranges', 
+          icon: Grid3X3,
+          roles: ['admin', 'marketing'],
+          permission: 'products'
+        },
+        { 
+          title: 'Complete Range', 
+          href: '/admin/complete-product-ranges', 
+          icon: Layers,
+          roles: ['admin', 'marketing'],
+          permission: 'products'
+        },
+        { 
+          title: 'Applications', 
+          href: '#', 
+          icon: Grid3X3,
+          roles: ['admin', 'marketing'],
+          permission: 'products',
+          subItems: [
+            { title: 'All Applications', href: '/admin/applications' },
+            { title: 'Application Category', href: '/admin/applications/categories' },
+          ]
+        }
+      ]
     },
-    { 
-      title: 'Inquiries', 
-      href: '/admin/inquiries', 
-      icon: MessageSquare,
-      roles: ['admin', 'marketing'],
-      permission: 'inquiries'
-    },   
-    { 
-      title: 'FAQs', 
-      href: '/admin/faqs', 
-      icon: HelpCircle,
-      roles: ['admin', 'marketing', 'seo'],
-      permission: 'settings'
+    {
+      group: 'Content & Marketing',
+      items: [
+        { 
+          title: 'Blogs', 
+          href: '/admin/blogs', 
+          icon: FileText,
+          roles: ['admin', 'seo', 'marketing'],
+          permission: 'blogs'
+        },
+        { 
+          title: 'About Content', 
+          href: '/admin/about-content', 
+          icon: Layers,
+          roles: ['admin', 'marketing'],
+          permission: 'settings'
+        },
+        { 
+          title: 'Company Stats', 
+          href: '/admin/company-stats', 
+          icon: BarChart3,
+          roles: ['admin', 'marketing'],
+          permission: 'settings'
+        },
+        { 
+          title: 'Core Values', 
+          href: '/admin/core-values', 
+          icon: ShieldCheck,
+          roles: ['admin', 'marketing'],
+          permission: 'settings'
+        },
+        { 
+          title: 'Hero Slides', 
+          href: '/admin/hero-slides', 
+          icon: Layers,
+          roles: ['admin', 'marketing'],
+          permission: 'settings'
+        },
+        { 
+          title: 'Landing Reviews', 
+          href: '/admin/testimonials', 
+          icon: Quote,
+          roles: ['admin', 'marketing'],
+          permission: 'settings'
+        },
+        { 
+          title: 'Partners', 
+          href: '/admin/partners', 
+          icon: Handshake,
+          roles: ['admin', 'marketing'],
+          permission: 'settings'
+        },
+        { 
+          title: 'FAQs', 
+          href: '/admin/faqs', 
+          icon: HelpCircle,
+          roles: ['admin', 'marketing', 'seo'],
+          permission: 'settings'
+        }
+      ]
     },
-    { 
-      title: 'Partners', 
-      href: '/admin/partners', 
-      icon: Handshake,
-      roles: ['admin', 'marketing'],
-      permission: 'settings'
+    {
+      group: 'CRM & Leads',
+      items: [
+        { 
+          title: 'Inquiries', 
+          href: '/admin/inquiries', 
+          icon: MessageSquare,
+          roles: ['admin', 'marketing'],
+          permission: 'inquiries'
+        }
+      ]
     },
-    { 
-      title: 'Hero Slides', 
-      href: '/admin/hero-slides', 
-      icon: Layers,
-      roles: ['admin', 'marketing'],
-      permission: 'settings'
-    },
-    { 
-      title: 'Landing Reviews', 
-      href: '/admin/testimonials', 
-      icon: Quote,
-      roles: ['admin', 'marketing'],
-      permission: 'settings'
-    },
-    { 
-      title: 'Page SEO', 
-      href: '/admin/seo', 
-      icon: Globe,
-      roles: ['admin', 'seo'],
-      permission: 'seo'
-    },
-    { 
-      title: 'G-Analytics', 
-      href: '/admin/analytics', 
-      icon: BarChart3,
-      roles: ['admin', 'marketing', 'seo'],
-      permission: 'analytics'
-    },
-    { 
-      title: 'Identity Assets', 
-      href: '/admin/users', 
-      icon: ShieldCheck,
-      roles: ['admin'],
-      permission: 'users'
-    },
-    { 
-      title: 'Settings', 
-      href: '/admin/settings', 
-      icon: Settings,
-      roles: ['admin'],
-      permission: 'settings'
-    },
+    {
+      group: 'System & Configuration',
+      items: [
+        { 
+          title: 'Page SEO', 
+          href: '/admin/seo', 
+          icon: Globe,
+          roles: ['admin', 'seo'],
+          permission: 'seo'
+        },
+        { 
+          title: 'G-Analytics', 
+          href: '/admin/analytics', 
+          icon: BarChart3,
+          roles: ['admin', 'marketing', 'seo'],
+          permission: 'analytics'
+        },
+        { 
+          title: 'Identity Assets', 
+          href: '/admin/users', 
+          icon: ShieldCheck,
+          roles: ['admin'],
+          permission: 'users'
+        },
+        { 
+          title: 'Settings', 
+          href: '/admin/settings', 
+          icon: Settings,
+          roles: ['admin'],
+          permission: 'settings'
+        }
+      ]
+    }
   ];
 
   if (loading) return <div className={`${isMobile ? 'hidden' : `w-64`} bg-secondary min-h-screen`} />;
@@ -280,99 +335,110 @@ export default function Sidebar() {
 
           {/* Navigation - Scrollable Area */}
           <nav className={`flex-grow overflow-y-auto custom-scrollbar ${isCollapsed && !isMobile ? 'px-2' : 'px-8'} space-y-1 py-4`}>
-            {menuItems.map((item) => {
-              // Admin bypasses all checks
-              if (role === 'admin') {
-                // Keep the original map (Admin sees everything)
-              } else {
-                // Check permissions for non-admins
-                if (item.permission && !permissions.includes(item.permission)) return null;
-              }
+            {menuGroups.map((group, groupIdx) => (
+              <div key={groupIdx} className="mb-6">
+                {(!isCollapsed || isMobile) && (
+                  <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 ml-4">
+                    {group.group}
+                  </h3>
+                )}
+                <div className="space-y-1">
+                  {group.items.map((item) => {
+                    // Admin bypasses all checks
+                    if (role === 'admin') {
+                      // Keep the original map (Admin sees everything)
+                    } else {
+                      // Check permissions for non-admins
+                      if (item.permission && !permissions.includes(item.permission)) return null;
+                    }
 
-              const hasSubItems = item.subItems && item.subItems.length > 0;
-              const isSubMenuOpen = openSubMenus[item.title];
-              const isActive = hasSubItems 
-                ? item.subItems?.some(sub => pathname === sub.href)
-                : pathname === item.href;
+                    const hasSubItems = item.subItems && item.subItems.length > 0;
+                    const isSubMenuOpen = openSubMenus[item.title];
+                    const isActive = hasSubItems 
+                      ? item.subItems?.some(sub => pathname === sub.href)
+                      : pathname === item.href;
 
-              return (
-                <div key={item.title} className="flex flex-col">
-                  {hasSubItems ? (
-                    <button
-                      onClick={() => toggleSubMenu(item.title)}
-                      className={`flex items-center justify-between group px-4 py-3 transition-all duration-200 border-l-4 relative overflow-hidden w-full text-left ${
-                        isActive
-                          ? 'border-primary bg-primary/8 text-primary font-bold'
-                          : 'border-transparent text-gray-400 hover:text-secondary hover:bg-gray-50 hover:border-gray-300'
-                      } ${isCollapsed && !isMobile ? 'px-2' : ''}`}
-                      title={isCollapsed && !isMobile ? item.title : ''}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <item.icon
-                          className={`w-5 h-5 flex-shrink-0 ${
-                            isActive ? 'text-primary' : 'text-gray-300 group-hover:text-secondary'
-                          }`}
-                        />
-                        {(!isCollapsed || isMobile) && (
-                          <span className="text-sm uppercase tracking-wider">{item.title}</span>
-                        )}
-                      </div>
-                      {(!isCollapsed || isMobile) && (
-                        <ChevronRight className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${isSubMenuOpen ? 'rotate-90' : ''}`} />
-                      )}
-                    </button>
-                  ) : (
-                    <Link
-                      href={item.href}
-                      onClick={closeSidebarOnMobile}
-                      className={`flex items-center justify-between group px-4 py-3 transition-all duration-200 border-l-4 relative overflow-hidden ${
-                        isActive
-                          ? 'border-primary bg-primary/8 text-primary font-bold'
-                          : 'border-transparent text-gray-400 hover:text-secondary hover:bg-gray-50 hover:border-gray-300'
-                      } ${isCollapsed && !isMobile ? 'px-2' : ''}`}
-                      title={isCollapsed && !isMobile ? item.title : ''}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <item.icon
-                          className={`w-5 h-5 flex-shrink-0 ${
-                            isActive ? 'text-primary' : 'text-gray-300 group-hover:text-secondary'
-                          }`}
-                        />
-                        {(!isCollapsed || isMobile) && (
-                          <span className="text-sm uppercase tracking-wider">{item.title}</span>
-                        )}
-                      </div>
-                      {isActive && (!isCollapsed || isMobile) && (
-                        <ChevronRight className="w-4 h-4 flex-shrink-0" />
-                      )}
-                    </Link>
-                  )}
-
-                  {/* Sub Menu Rendering */}
-                  {hasSubItems && isSubMenuOpen && (!isCollapsed || isMobile) && (
-                    <div className="flex flex-col ml-8 mt-1 space-y-1 border-l border-gray-100">
-                      {item.subItems?.map((sub) => {
-                        const isSubActive = pathname === sub.href;
-                        return (
-                          <Link
-                            key={sub.href}
-                            href={sub.href}
-                            onClick={closeSidebarOnMobile}
-                            className={`px-4 py-2 text-xs font-black uppercase tracking-widest transition-all ${
-                              isSubActive
-                                ? 'text-primary'
-                                : 'text-gray-400 hover:text-secondary hover:translate-x-1'
-                            }`}
+                    return (
+                      <div key={item.title} className="flex flex-col">
+                        {hasSubItems ? (
+                          <button
+                            onClick={() => toggleSubMenu(item.title)}
+                            className={`flex items-center justify-between group px-4 py-3 transition-all duration-200 border-l-4 relative overflow-hidden w-full text-left ${
+                              isActive
+                                ? 'border-primary bg-primary/8 text-primary font-bold'
+                                : 'border-transparent text-gray-400 hover:text-secondary hover:bg-gray-50 hover:border-gray-300'
+                            } ${isCollapsed && !isMobile ? 'px-2' : ''}`}
+                            title={isCollapsed && !isMobile ? item.title : ''}
                           >
-                            {sub.title}
+                            <div className="flex items-center space-x-3">
+                              <item.icon
+                                className={`w-5 h-5 flex-shrink-0 ${
+                                  isActive ? 'text-primary' : 'text-gray-300 group-hover:text-secondary'
+                                }`}
+                              />
+                              {(!isCollapsed || isMobile) && (
+                                <span className="text-sm uppercase tracking-wider">{item.title}</span>
+                              )}
+                            </div>
+                            {(!isCollapsed || isMobile) && (
+                              <ChevronRight className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${isSubMenuOpen ? 'rotate-90' : ''}`} />
+                            )}
+                          </button>
+                        ) : (
+                          <Link
+                            href={item.href}
+                            onClick={closeSidebarOnMobile}
+                            className={`flex items-center justify-between group px-4 py-3 transition-all duration-200 border-l-4 relative overflow-hidden ${
+                              isActive
+                                ? 'border-primary bg-primary/8 text-primary font-bold'
+                                : 'border-transparent text-gray-400 hover:text-secondary hover:bg-gray-50 hover:border-gray-300'
+                            } ${isCollapsed && !isMobile ? 'px-2' : ''}`}
+                            title={isCollapsed && !isMobile ? item.title : ''}
+                          >
+                            <div className="flex items-center space-x-3">
+                              <item.icon
+                                className={`w-5 h-5 flex-shrink-0 ${
+                                  isActive ? 'text-primary' : 'text-gray-300 group-hover:text-secondary'
+                                }`}
+                              />
+                              {(!isCollapsed || isMobile) && (
+                                <span className="text-sm uppercase tracking-wider">{item.title}</span>
+                              )}
+                            </div>
+                            {isActive && (!isCollapsed || isMobile) && (
+                              <ChevronRight className="w-4 h-4 flex-shrink-0" />
+                            )}
                           </Link>
-                        );
-                      })}
-                    </div>
-                  )}
+                        )}
+
+                        {/* Sub Menu Rendering */}
+                        {hasSubItems && isSubMenuOpen && (!isCollapsed || isMobile) && (
+                          <div className="flex flex-col ml-8 mt-1 space-y-1 border-l border-gray-100">
+                            {item.subItems?.map((sub) => {
+                              const isSubActive = pathname === sub.href;
+                              return (
+                                <Link
+                                  key={sub.href}
+                                  href={sub.href}
+                                  onClick={closeSidebarOnMobile}
+                                  className={`px-4 py-2 text-xs font-black uppercase tracking-widest transition-all ${
+                                    isSubActive
+                                      ? 'text-primary'
+                                      : 'text-gray-400 hover:text-secondary hover:translate-x-1'
+                                  }`}
+                                >
+                                  {sub.title}
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </nav>
 
           {/* Bottom section - User info and logout */}

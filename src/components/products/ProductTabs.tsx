@@ -113,11 +113,11 @@ export default function ProductTabs({ product }: ProductTabsProps) {
         {activeTab === 'overview' && (
           <Panel id="overview">
             <SectionHeader icon={<Box className="w-5 h-5" />} title="Product Overview & Applications" />
-            <p className="mt-6 text-gray-700 leading-relaxed font-medium text-lg border-l-4 border-primary/20 pl-6 italic">
+            {/* <p className="mt-6 text-gray-700 leading-relaxed font-medium text-lg border-l-4 border-primary/20 pl-6 italic">
               {product.description}
-            </p>
+            </p> */}
             {product.specificationText && (
-              <div className="mt-8">
+              <div className="mt-8 shadow-lg rounded-sm p-6 bg-white">
                 <h3 className="text-lg font-black text-secondary uppercase tracking-tight mb-4">Standards</h3>
                 <p className="text-gray-700 leading-relaxed">{product.specificationText}</p>
               </div>
@@ -128,7 +128,7 @@ export default function ProductTabs({ product }: ProductTabsProps) {
         {activeTab === 'specs' && (
           <Panel id="specs">
             <SectionHeader icon={<SettingsIcon className="w-5 h-5" />} title="Key Specifications" />
-            <div className="mt-8">
+            <div className="mt-8 shadow-lg rounded-sm p-6 bg-white">
               {product.specs && Object.keys(product.specs).length > 0 ? (
                 <div className="overflow-x-auto border border-gray-200">
                   <table className="w-full">
@@ -165,9 +165,9 @@ export default function ProductTabs({ product }: ProductTabsProps) {
         {activeTab === 'features' && (
           <Panel id="features">
             <SectionHeader icon={<Zap className="w-5 h-5" />} title="Features" />
-            <div className="mt-8">
+            <div className="mt-8 shadow-lg rounded-sm p-6 bg-white">
               {product.features && product.features.length > 0 ? (
-                <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <ul className="grid grid-cols-1 gap-4">
                   {product.features.map((feature, i) => (
                     <li key={i} className="flex items-center space-x-4 p-5 bg-gray-50 border border-gray-100 hover:border-primary/30 transition-all duration-300 hover:shadow-md group">
                       <div className="w-10 h-10 bg-white border border-gray-200 flex items-center justify-center flex-shrink-0 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300">
@@ -187,7 +187,7 @@ export default function ProductTabs({ product }: ProductTabsProps) {
         {activeTab === 'video' && (
           <Panel id="video">
             <SectionHeader icon={<PlayCircle className="w-5 h-5" />} title="Product Video" />
-            <div className="mt-8">
+            <div className="mt-8 shadow-lg rounded-sm p-6 bg-white">
               {product.youtubeUrl ? (
                 <div className="relative w-full bg-black rounded-lg overflow-hidden shadow-xl">
                   <div className="relative pt-[56.25%]">
@@ -211,7 +211,7 @@ export default function ProductTabs({ product }: ProductTabsProps) {
         {activeTab === 'reviews' && (
           <Panel id="reviews">
             <SectionHeader icon={<Star className="w-5 h-5" />} title="Customer Reviews" />
-            <div className="mt-8">
+            <div className="mt-8 shadow-lg rounded-sm p-6 bg-white">
               {reviews.length > 0 ? (
                 <div className="space-y-4">
                   {/* Average Rating Summary */}
@@ -278,7 +278,7 @@ export default function ProductTabs({ product }: ProductTabsProps) {
         {activeTab === 'faq' && (
           <Panel id="faq">
             <SectionHeader icon={<HelpCircle className="w-5 h-5" />} title="Frequently Asked Questions" />
-            <div className="mt-8">
+            <div className="mt-8 shadow-lg rounded-sm p-6 bg-white">
               {faqs.length > 0 ? (
                 <div className="space-y-3">
                   {faqs.map((faq, idx) => (
@@ -308,7 +308,7 @@ export default function ProductTabs({ product }: ProductTabsProps) {
               </div>
               <h2 className="text-2xl font-black text-secondary uppercase tracking-tighter">Request a Quote</h2>
             </div>
-            <div className="max-w-2xl">
+            <div className="max-w-2xl shadow-lg p-5">
               <p className="text-gray-500 font-medium mb-8">
                 Fill in your details below and our team will get back to you with a personalised quote.
               </p>

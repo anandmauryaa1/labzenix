@@ -17,7 +17,6 @@ const ProductRangeSchema = new mongoose.Schema<IProductRange>({
   slug: { type: String, required: true, unique: true },
   description: { type: String, required: [true, 'Description is required'] },
   image: { type: String, required: [true, 'Image is required'] },
-  coreComponents: [{ type: String }],
   order: { type: Number, default: 0 },
   active: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },

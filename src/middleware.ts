@@ -2,40 +2,60 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
+/**
+ * Middleware for authentication and permission-based access control.
+ * 
+ * CSRF Protection Note:
+ * JWT tokens stored in httpOnly cookies with sameSite='strict' already provide
+ * inherent CSRF protection. No additional CSRF token mechanism is needed.
+ */
+
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
-  
+  const response = NextResponse.next();
+
   try {
     const normalizedPath = path.endsWith('/') && path.length > 1 ? path.slice(0, -1) : path;
 
-    // Auth & Permission Protection for Admin routes
-    const isPublicAdminApi = normalizedPath === '/api/admin/login' || normalizedPath === '/api/admin/forgot-password' || normalizedPath.startsWith('/api/admin/reset-password');
+    // ====================================================================
+    // AUTHENTICATION & PERMISSION PROTECTION for Admin routes
+    // ====================================================================
+    const isPublicAdminApi = normalizedPath === '/api/admin/login' ||
+      normalizedPath === '/api/admin/forgot-password' ||
+      normalizedPath.startsWith('/api/admin/reset-password');
     const isApiAdmin = normalizedPath.startsWith('/api/admin') && !isPublicAdminApi;
-    const isAdminUI = normalizedPath.startsWith('/admin') && normalizedPath !== '/admin/login' && normalizedPath !== '/admin/forgot-password' && !normalizedPath.startsWith('/admin/reset-password');
+    const isAdminUI = normalizedPath.startsWith('/admin') &&
+      normalizedPath !== '/admin/login' &&
+      normalizedPath !== '/admin/forgot-password' &&
+      !normalizedPath.startsWith('/admin/reset-password');
 
     if (isApiAdmin || isAdminUI) {
       const token = request.cookies.get('admin_token')?.value;
 
       if (!token) {
-        if (isApiAdmin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        if (isApiAdmin) {
+          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
         return NextResponse.redirect(new URL('/admin/login', request.url));
       }
 
       const jwtSecret = process.env.JWT_SECRET;
       if (!jwtSecret) {
         console.error('CRITICAL: JWT_SECRET is not defined');
-        if (isApiAdmin) return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+        if (isApiAdmin) {
+          return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+        }
         return NextResponse.redirect(new URL('/admin/login', request.url));
       }
-      
+
       const secret = new TextEncoder().encode(jwtSecret);
       const { payload } = await jwtVerify(token, secret);
-      
+
       const permissions = (payload.permissions as string[]) || [];
       const userRole = payload.role as string;
 
-      if (normalizedPath === '/admin/unauthorized') return NextResponse.next();
-      if (userRole === 'admin') return NextResponse.next();
+      if (normalizedPath === '/admin/unauthorized') return response;
+      if (userRole === 'admin') return response;
 
       const permissionMap: Record<string, string> = {
         '/admin/products': 'products',
@@ -64,30 +84,37 @@ export async function middleware(request: NextRequest) {
 
       for (const [prefix, requiredPermission] of Object.entries(permissionMap)) {
         if (normalizedPath.startsWith(prefix) && !permissions.includes(requiredPermission)) {
-          if (isApiAdmin) return NextResponse.json({ error: 'Forbidden: Missing permission' }, { status: 403 });
+          if (isApiAdmin) {
+            return NextResponse.json(
+              { error: 'Forbidden: Missing permission' },
+              { status: 403 }
+            );
+          }
           return NextResponse.redirect(new URL('/admin/unauthorized', request.url));
         }
       }
     }
 
-    return NextResponse.next();
+    return response;
   } catch (err: any) {
     const isApi = path.startsWith('/api');
-    
+
     if (err.code === 'ERR_JWT_EXPIRED' || err.code === 'ERR_JWS_INVALID') {
-      if (isApi) return NextResponse.json({ error: 'Session expired' }, { status: 401 });
+      if (isApi) {
+        return NextResponse.json({ error: 'Session expired' }, { status: 401 });
+      }
       return NextResponse.redirect(new URL('/admin/login', request.url));
     }
 
-    console.error('Middleware Error', { message: err.message, path });
-    
-    if (isApi) return NextResponse.json({ error: 'Middleware failure' }, { status: 500 });
-    return NextResponse.next();
+    console.error('Middleware Error', { message: err.message, path, method: request.method });
+
+    if (isApi) {
+      return NextResponse.json({ error: 'Middleware failure' }, { status: 500 });
+    }
+    return response;
   }
 }
 
 export const config = {
   matcher: ['/admin/:path*', '/api/:path*'],
 };
-
-export default middleware;

@@ -198,7 +198,7 @@ export default function PartnerManagement() {
             <div className="col-span-full py-12 text-center text-gray-400 text-xs font-black uppercase tracking-widest">No partners registered</div>
           ) : filteredPartners.map((partner) => (
             <div key={partner._id} className="group relative bg-white border border-gray-100 p-6 flex flex-col items-center justify-center space-y-4 hover:border-primary transition-all duration-300 shadow-sm hover:shadow-md">
-              <div className="relative w-full aspect-[3/2] flex items-center justify-center grayscale group-hover:grayscale-0 transition-all">
+              <div className="relative w-full aspect-[3/2] flex items-center justify-center transition-all">
                 <Image 
                   src={partner.logo} 
                   alt={partner.name}

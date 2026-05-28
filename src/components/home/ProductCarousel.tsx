@@ -89,14 +89,14 @@ export default function ProductCarousel() {
   };
 
   return (
-    <section className="py-24 px-4 bg-gradient-to-b from-gray-50 to-white border-b border-gray-100 overflow-hidden">
+    <section className="py-14 px-4 bg-gradient-to-b from-gray-50 to-white border-b border-gray-100 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <FadeIn direction="up">
           <span className="block text-primary font-medium tracking-[0.3em] uppercase text-sm text-center mb-4">
             Featured Products
           </span>
           <h2 className="text-4xl md:text-5xl font-black mb-4 text-center text-secondary uppercase tracking-tighter">
-            Hot Selling Product
+            Hot <span className="text-primary"> Selling </span> Product
           </h2>
           <p className="text-center text-gray-600 mb-16 max-w-2xl mx-auto font-medium">
             Explore our collection of cutting-edge laboratory and production equipment designed for precision testing.
@@ -134,9 +134,9 @@ export default function ProductCarousel() {
                               No Product Image
                             </div>
                           )}
-                          <div className="absolute top-0 right-0 bg-primary text-white px-4 py-2 text-[10px] font-black uppercase tracking-widest z-20">
+                          {/* <div className="absolute top-0 right-0 bg-primary text-white px-4 py-2 text-[10px] font-black uppercase tracking-widest z-20">
                             {product.category}
-                          </div>
+                          </div> */}
                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500 z-10" />
                         </div>
 

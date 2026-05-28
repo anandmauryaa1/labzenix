@@ -9,6 +9,7 @@ export interface ICategory extends Document {
   imagePublicId: string;
   catalogUrl: string;
   catalogPublicId: string;
+  order: number;
   createdAt: Date;
 }
 
@@ -18,6 +19,7 @@ const CategorySchema = new mongoose.Schema<ICategory>({
   description: { type: String, required: [true, 'Category description is required'] },
   image: { type: String, default: '' },
   imagePublicId: { type: String, default: '' },
+  order: { type: Number, default: 0 },
   catalogUrl: { type: String, default: '' },
   catalogPublicId: { type: String, default: '' },
   createdAt: { type: Date, default: Date.now },

@@ -22,7 +22,7 @@ const categorySchema = z.object({
 export async function GET() {
   try {
     await dbConnect();
-    const categories = await Category.find({}).sort({ name: 1 }).lean();
+    const categories = await Category.find({}).sort({ order: 1, name: 1 }).lean();
     return NextResponse.json(JSON.parse(JSON.stringify(categories)));
   } catch (error) {
     return handleProductionError(error);

@@ -15,6 +15,25 @@ const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'ap
 
 export async function POST(req: NextRequest) {
   try {
+    // Check Cloudinary configuration first
+    if (!process.env.CLOUDINARY_CLOUD_NAME) {
+      logger.error('CRITICAL: CLOUDINARY_CLOUD_NAME not configured');
+      return NextResponse.json({ error: 'Server configuration error: Cloudinary Cloud Name missing' }, { status: 500 });
+    }
+    if (!process.env.CLOUDINARY_API_KEY) {
+      logger.error('CRITICAL: CLOUDINARY_API_KEY not configured');
+      return NextResponse.json({ error: 'Server configuration error: Cloudinary API Key missing' }, { status: 500 });
+    }
+    if (!process.env.CLOUDINARY_API_SECRET || process.env.CLOUDINARY_API_SECRET === 'your_cloudinary_api_secret_here') {
+      logger.error('CRITICAL: CLOUDINARY_API_SECRET not configured or is placeholder', {
+        hasSecret: !!process.env.CLOUDINARY_API_SECRET,
+      });
+      return NextResponse.json(
+        { error: 'Server configuration error: Cloudinary API Secret not configured. Please update .env.local with your actual Cloudinary API Secret.' },
+        { status: 500 }
+      );
+    }
+
     const user = await getAuthUser(req);
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -47,8 +66,16 @@ export async function POST(req: NextRequest) {
           type: 'upload'
         },
         (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
+          if (error) {
+            logger.error('Cloudinary upload error', {
+              message: error.message,
+              status: error.http_code,
+              fileName: file.name
+            });
+            reject(error);
+          } else {
+            resolve(result);
+          }
         }
       );
       uploadStream.end(buffer);
@@ -66,6 +93,10 @@ export async function POST(req: NextRequest) {
       public_id: (result as any).public_id 
     });
   } catch (error: any) {
+    logger.error('Upload endpoint error', {
+      message: error?.message || 'Unknown error',
+      code: error?.code,
+    });
     return handleProductionError(error);
   }
 }

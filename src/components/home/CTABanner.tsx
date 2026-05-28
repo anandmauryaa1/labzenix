@@ -5,7 +5,7 @@ import Button from '../ui/Button';
 
 export default function CTABanner() {
   return (
-    <section className="py-20 px-4">
+    <section className="py-14 px-4">
       <div className="max-w-7xl mx-auto bg-black border border-white/10 p-16 text-center relative overflow-hidden group">
         {/* Background Image with Parallax-like effect */}
         <div className="absolute inset-0 z-0">

@@ -39,12 +39,12 @@ export default function FAQSection() {
   if (loading || faqs.length === 0) return null;
 
   return (
-    <section className="py-24 px-4 bg-gray-50 border-t border-gray-100">
+    <section className="py-14 px-4 bg-gray-50 border-t border-gray-100">
       <div className="max-w-4xl mx-auto">
         <FadeIn direction="up">
           <div className="text-center mb-16">
             <span className="text-primary font-bold tracking-widest uppercase text-sm">Support</span>
-            <h2 className="text-3xl md:text-4xl font-black text-secondary mt-2 uppercase tracking-tighter">Frequently Asked Questions</h2>
+            <h2 className="text-3xl md:text-4xl font-black text-secondary mt-2 uppercase tracking-tighter">Frequently Asked <span className="text-primary"> Questions </span></h2>
           </div>
         </FadeIn>
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Package, Search, ChevronRight, ArrowLeft, Grid3X3 } from 'lucide-react';
+import { Package, ChevronRight, ArrowLeft, Grid3X3 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
@@ -45,9 +45,7 @@ function ProductsContent() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading]       = useState(true);
-  const [localSearch, setLocalSearch] = useState('');
-
-  const searchTerm = searchParam || localSearch;
+  const searchTerm = searchParam;
 
   const itemVariant = {
     hidden: { opacity: 0, y: 20 },
@@ -177,7 +175,7 @@ function ProductsContent() {
                     src="https://images.unsplash.com/photo-1579313101805-39180766150e?auto=format&fit=crop&q=80&w=800"
                     alt="Industrial Instrument"
                     fill
-                    className="object-cover grayscale brightness-90 hover:grayscale-0 transition-all duration-700"
+                    className="object-cover brightness-90 transition-all duration-700"
                     priority
                   />
                   <div className="absolute top-8 -right-12 bg-primary text-white p-6 font-black text-xs uppercase tracking-[0.2em] -rotate-90 origin-bottom-right shadow-xl">
@@ -247,7 +245,7 @@ function ProductsContent() {
       <section className="py-24 px-4 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto">
           {/* Search */}
-          <FadeIn direction="up" delay={0.1}>
+          {/* <FadeIn direction="up" delay={0.1}>
             <div className="mb-16">
               <div className="flex items-center p-1 bg-white border-2 border-gray-200 shadow-sm max-w-xl group focus-within:border-primary transition-colors">
                 <Search className="w-5 h-5 text-gray-400 mx-5 group-focus-within:text-primary transition-colors" />
@@ -261,7 +259,7 @@ function ProductsContent() {
                 />
               </div>
             </div>
-          </FadeIn>
+          </FadeIn>*/}
 
           {/* Products grid */}
           {loading ? (
@@ -276,7 +274,7 @@ function ProductsContent() {
               </p>
               {searchTerm && (
                 <button
-                  onClick={() => { setLocalSearch(''); if (searchParam) window.location.href = '/products'; }}
+                  onClick={() => { if (searchParam) window.location.href = '/products'; }}
                   className="mt-6 text-primary font-black uppercase tracking-[0.2em] text-xs underline hover:no-underline cursor-pointer"
                 >
                   Clear search

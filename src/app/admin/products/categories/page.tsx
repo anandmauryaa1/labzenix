@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { 
   Plus, 
-  Search, 
   Layers, 
   Edit2, 
   Trash2, 
@@ -18,7 +17,11 @@ import {
   ExternalLink,
   CheckCircle2,
   AlertCircle,
-  XCircle
+  XCircle,
+  GripVertical,
+  ArrowUp,
+  ArrowDown,
+  ListOrdered,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
@@ -34,6 +37,15 @@ export default function CategoryManagement() {
   const [success, setSuccess] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
+  // Reorder state
+  const [reorderMode, setReorderMode] = useState(false);
+  const [orderedCategories, setOrderedCategories] = useState<any[]>([]);
+  const [isSavingOrder, setIsSavingOrder] = useState(false);
+
+  // Drag-and-drop refs
+  const dragItem = useRef<number | null>(null);
+  const dragOverItem = useRef<number | null>(null);
+
   useEffect(() => {
     fetchCategories();
   }, []);
@@ -44,6 +56,7 @@ export default function CategoryManagement() {
       if (res.ok) {
         const data = await res.json();
         setCategories(data);
+        setOrderedCategories(data);
       }
     } catch (err) {
       toast.error('Failed to load categories');
@@ -97,7 +110,9 @@ export default function CategoryManagement() {
       const res = await fetch(`/api/categories/${id}`, { method: 'DELETE' });
       if (res.ok) {
         toast.success('Category removed');
-        setCategories(categories.filter(c => c._id !== id));
+        const updated = categories.filter(c => c._id !== id);
+        setCategories(updated);
+        setOrderedCategories(updated);
       }
     } catch (err) {
       toast.error('Delete failed');
@@ -115,8 +130,74 @@ export default function CategoryManagement() {
       catalogPublicId: cat.catalogPublicId || ''
     });
     setIsAdding(true);
+    setReorderMode(false);
   };
 
+  // ── Drag & Drop handlers ────────────────────────────────────────────────────
+  const handleDragStart = (index: number) => {
+    dragItem.current = index;
+  };
+
+  const handleDragEnter = (index: number) => {
+    dragOverItem.current = index;
+    if (dragItem.current === null || dragItem.current === index) return;
+    const newList = [...orderedCategories];
+    const dragged = newList.splice(dragItem.current, 1)[0];
+    newList.splice(index, 0, dragged);
+    dragItem.current = index;
+    setOrderedCategories(newList);
+  };
+
+  const handleDragEnd = () => {
+    dragItem.current = null;
+    dragOverItem.current = null;
+  };
+
+  // ── Arrow buttons ────────────────────────────────────────────────────────────
+  const moveUp = (index: number) => {
+    if (index === 0) return;
+    const newList = [...orderedCategories];
+    [newList[index - 1], newList[index]] = [newList[index], newList[index - 1]];
+    setOrderedCategories(newList);
+  };
+
+  const moveDown = (index: number) => {
+    if (index === orderedCategories.length - 1) return;
+    const newList = [...orderedCategories];
+    [newList[index], newList[index + 1]] = [newList[index + 1], newList[index]];
+    setOrderedCategories(newList);
+  };
+
+  // ── Save reorder ─────────────────────────────────────────────────────────────
+  async function saveOrder() {
+    setIsSavingOrder(true);
+    try {
+      const payload = orderedCategories.map((cat, idx) => ({ id: cat._id, order: idx }));
+      const res = await fetch('/api/categories/reorder', {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (res.ok) {
+        toast.success('Category order saved');
+        setCategories([...orderedCategories]);
+        setReorderMode(false);
+      } else {
+        toast.error('Failed to save order');
+      }
+    } catch {
+      toast.error('Network error');
+    } finally {
+      setIsSavingOrder(false);
+    }
+  }
+
+  const cancelReorder = () => {
+    setOrderedCategories([...categories]);
+    setReorderMode(false);
+  };
+
+  // ── File uploads ─────────────────────────────────────────────────────────────
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -199,6 +280,9 @@ export default function CategoryManagement() {
     toast.success('File removed');
   };
 
+  // which list to show in the table
+  const displayList = reorderMode ? orderedCategories : categories;
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500 relative">
       {/* Success Modal Overlay */}
@@ -242,16 +326,56 @@ export default function CategoryManagement() {
             <p className="text-gray-500 font-medium text-sm">Organize and manage the categories for header and footer navigation.</p>
           </div>
         </div>
-        {!isAdding && (
-          <button 
-            onClick={() => setIsAdding(true)}
-            className="flex items-center space-x-2 px-6 py-4 bg-secondary text-white text-xs font-black uppercase tracking-widest hover:bg-primary transition-all shadow-lg active:scale-95"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Add Category</span>
-          </button>
-        )}
+        <div className="flex items-center gap-3">
+          {!isAdding && !reorderMode && (
+            <>
+              <button
+                onClick={() => { setReorderMode(true); setOrderedCategories([...categories]); setIsAdding(false); }}
+                className="flex items-center space-x-2 px-5 py-4 bg-white border border-gray-200 text-secondary text-xs font-black uppercase tracking-widest hover:border-primary hover:text-primary transition-all shadow-sm active:scale-95"
+              >
+                <ListOrdered className="w-4 h-4" />
+                <span>Reorder</span>
+              </button>
+              <button 
+                onClick={() => setIsAdding(true)}
+                className="flex items-center space-x-2 px-6 py-4 bg-secondary text-white text-xs font-black uppercase tracking-widest hover:bg-primary transition-all shadow-lg active:scale-95"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add Category</span>
+              </button>
+            </>
+          )}
+          {reorderMode && (
+            <>
+              <button
+                onClick={cancelReorder}
+                className="flex items-center space-x-2 px-5 py-4 bg-white border border-gray-200 text-gray-500 text-xs font-black uppercase tracking-widest hover:border-red-300 hover:text-red-500 transition-all shadow-sm active:scale-95"
+              >
+                <X className="w-4 h-4" />
+                <span>Cancel</span>
+              </button>
+              <button
+                onClick={saveOrder}
+                disabled={isSavingOrder}
+                className="flex items-center space-x-2 px-6 py-4 bg-primary text-white text-xs font-black uppercase tracking-widest hover:bg-secondary transition-all shadow-lg active:scale-95 disabled:opacity-50"
+              >
+                {isSavingOrder ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                <span>{isSavingOrder ? 'Saving...' : 'Save Order'}</span>
+              </button>
+            </>
+          )}
+        </div>
       </div>
+
+      {/* Reorder hint banner */}
+      {reorderMode && (
+        <div className="bg-primary/5 border border-primary/20 px-6 py-3 flex items-center space-x-3 animate-in slide-in-from-top-2 duration-300">
+          <GripVertical className="w-4 h-4 text-primary flex-shrink-0" />
+          <p className="text-xs font-bold text-primary uppercase tracking-widest">
+            Drag rows or use ↑ ↓ arrows to reorder — then click <span className="font-black">Save Order</span>.
+          </p>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Category List */}
@@ -261,29 +385,47 @@ export default function CategoryManagement() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-white text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-100">
+                    {reorderMode && <th className="px-4 py-4 w-10"></th>}
                     <th className="px-6 py-4">Range Name</th>
                     <th className="px-6 py-4">Descriptor</th>
                     <th className="px-6 py-4">Range Catalog</th>
-                    <th className="px-6 py-4 text-right">Actions</th>
+                    <th className="px-6 py-4 text-right">{reorderMode ? 'Move' : 'Actions'}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {loading ? (
                     <tr>
-                      <td colSpan={3} className="px-6 py-12 text-center text-gray-400 uppercase text-[10px] font-black tracking-widest">
+                      <td colSpan={reorderMode ? 5 : 4} className="px-6 py-12 text-center text-gray-400 uppercase text-[10px] font-black tracking-widest">
                         Synchronizing...
                       </td>
                     </tr>
-                  ) : categories.length === 0 ? (
+                  ) : displayList.length === 0 ? (
                     <tr>
-                      <td colSpan={3} className="px-6 py-12 text-center text-gray-400 font-medium italic">
+                      <td colSpan={reorderMode ? 5 : 4} className="px-6 py-12 text-center text-gray-400 font-medium italic">
                         No domains registered in the master catalog.
                       </td>
                     </tr>
-                  ) : categories.map((cat) => (
-                    <tr key={cat._id} className="hover:bg-gray-50/50 transition-colors group">
+                  ) : displayList.map((cat, index) => (
+                    <tr
+                      key={cat._id}
+                      draggable={reorderMode}
+                      onDragStart={reorderMode ? () => handleDragStart(index) : undefined}
+                      onDragEnter={reorderMode ? () => handleDragEnter(index) : undefined}
+                      onDragEnd={reorderMode ? handleDragEnd : undefined}
+                      onDragOver={reorderMode ? (e) => e.preventDefault() : undefined}
+                      className={`hover:bg-gray-50/50 transition-colors group ${reorderMode ? 'cursor-grab active:cursor-grabbing' : ''}`}
+                    >
+                      {/* Drag handle column */}
+                      {reorderMode && (
+                        <td className="px-4 py-4">
+                          <GripVertical className="w-4 h-4 text-gray-300 group-hover:text-gray-400 transition-colors" />
+                        </td>
+                      )}
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-3">
+                          {reorderMode && (
+                            <span className="text-[10px] font-black text-gray-300 w-4 text-center select-none">{index + 1}</span>
+                          )}
                           <div className="w-8 h-8 bg-primary/10 text-primary flex items-center justify-center font-black text-xs overflow-hidden">
                             {cat.image ? (
                               <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
@@ -320,20 +462,43 @@ export default function CategoryManagement() {
                         )}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end space-x-2">
-                          <button 
-                            onClick={() => startEdit(cat)}
-                            className="p-2 text-gray-300 hover:text-secondary transition-colors"
-                          >
-                            <Edit2 className="w-4 h-4" />
-                          </button>
-                          <button 
-                            onClick={() => deleteCategory(cat._id)}
-                            className="p-2 text-gray-300 hover:text-red-500 transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
+                        {reorderMode ? (
+                          /* Up / Down arrows */
+                          <div className="flex items-center justify-end space-x-1">
+                            <button
+                              onClick={() => moveUp(index)}
+                              disabled={index === 0}
+                              className="p-2 text-gray-300 hover:text-secondary transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+                              title="Move up"
+                            >
+                              <ArrowUp className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => moveDown(index)}
+                              disabled={index === orderedCategories.length - 1}
+                              className="p-2 text-gray-300 hover:text-secondary transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+                              title="Move down"
+                            >
+                              <ArrowDown className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ) : (
+                          /* Normal edit / delete */
+                          <div className="flex items-center justify-end space-x-2">
+                            <button 
+                              onClick={() => startEdit(cat)}
+                              className="p-2 text-gray-300 hover:text-secondary transition-colors"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                            <button 
+                              onClick={() => deleteCategory(cat._id)}
+                              className="p-2 text-gray-300 hover:text-red-500 transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        )}
                       </td>
                     </tr>
                   ))}

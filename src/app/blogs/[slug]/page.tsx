@@ -170,7 +170,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
                     <Link key={post._id} href={`/blogs/${post.slug}`} className="group block">
                       <div className="flex gap-6 items-start">
                         <div className="w-20 h-20 shrink-0 bg-gray-100 overflow-hidden relative">
-                          <Image src={post.image} fill className="object-cover grayscale transition-transform duration-500 group-hover:scale-110 group-hover:grayscale-0" alt="" />
+                          <Image src={post.image} fill className="object-cover transition-transform duration-500 group-hover:scale-110" alt="" />
                         </div>
                         <div>
                           <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-2">{post.category}</p>
@@ -194,7 +194,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
                     <Link key={post._id} href={`/blogs/${post.slug}`} className="group block">
                       <div className="flex gap-6 items-start">
                         <div className="w-20 h-20 shrink-0 bg-gray-100 overflow-hidden relative">
-                          <Image src={post.image} fill className="object-cover grayscale transition-transform duration-500 group-hover:scale-110 group-hover:grayscale-0" alt="" />
+                          <Image src={post.image} fill className="object-cover transition-transform duration-500 group-hover:scale-110" alt="" />
                           <div className="absolute top-0 right-0 bg-secondary text-white text-[8px] font-black px-1 py-0.5">
                             {post.views || 0}
                           </div>
@@ -250,7 +250,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
                     {relatedBlogs.map((post: any) => (
                         <Link key={post._id} href={`/blogs/${post.slug}`} className="group bg-white border border-gray-100 overflow-hidden flex flex-col">
                             <div className="aspect-video relative overflow-hidden">
-                                <Image src={post.image} fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" alt="" />
+                                <Image src={post.image} fill className="object-cover transition-all duration-700 group-hover:scale-105" alt="" />
                             </div>
                             <div className="p-8 flex flex-col flex-grow">
                                 <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-4 inline-block">{post.category}</span>

@@ -175,15 +175,15 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           <div className="space-y-8">
             {/* Category Badge */}
             <div>
-              <span className="inline-block px-4 py-1.5 bg-primary/5 text-primary text-[10px] font-black uppercase tracking-[0.2em] border border-primary/20 rounded-none mb-6 shadow-sm">
+              {/* <span className="inline-block px-4 py-1.5 bg-primary/5 text-primary text-[10px] font-black uppercase tracking-[0.2em] border border-primary/20 rounded-none mb-6 shadow-sm">
                 Category: {product.category}
-              </span>
+              </span> */}
               {linkedApplications.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-6">
                   {linkedApplications.map((app) => (
                     <Link 
                       key={app._id.toString()} 
-                      href={`/applications?category=${app.name}`}
+                      href={`/applications?category=${app.slug}`}
                       className="text-[9px] font-bold text-gray-500 uppercase tracking-widest px-3 py-1 bg-gray-50 border border-gray-100 hover:border-primary hover:text-primary transition-all"
                     >
                       {app.name}
@@ -194,14 +194,23 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             </div>
 
             {/* Title (Commented out as moved to Banner) */}
-            {/* <div>
+            <div>
               <h1 className="text-4xl font-black text-secondary uppercase tracking-tighter leading-tight mb-2">
                 {product.title}
               </h1>
-              {product.modelNumber && (
+              {/* {product.modelNumber && (
                 <p className="text-gray-500 font-medium">{product.modelNumber}</p>
-              )}
-            </div> */}
+              )} */}
+            </div>
+
+             {/* Product Overview & Applications — description content */}
+            {product.description && (
+              <div>
+                <p className="text-gray-600 leading-relaxed font-medium text-md border-primary/30 pl-4">
+                  {product.description}
+                </p>
+              </div>
+            )}
 
             {/* Key Information Grid */}
             <div className="grid grid-cols-2 gap-8 py-8 border-y border-gray-100">
@@ -209,7 +218,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                 <div className="space-y-1">
                   <p className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em] flex items-center gap-2">
                     <Hash className="w-3 h-3 text-primary" />
-                    Reference ID
+                    Model
                   </p>
                   <p className="text-xl font-black text-secondary tracking-tighter">{product.modelNumber}</p>
                 </div>

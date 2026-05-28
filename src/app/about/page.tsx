@@ -7,17 +7,36 @@ import Link from 'next/link';
 import Image from 'next/image';
 import PageBanner from '@/components/ui/PageBanner';
 
+import dbConnect from '@/lib/dbConnect';
+import CompanyStat from '@/models/CompanyStat';
+
 export async function generateMetadata() {
   return await getPageMetadata('about');
 }
 
-export default function AboutPage() {
-  const stats = [
-    { label: 'Countries Served', value: '45+' },
-    { label: 'Instruments Built', value: '1500+' },
-    { label: 'Happy Clients', value: '800+' },
-    { label: 'Years Experience', value: '12+' },
-  ];
+export default async function AboutPage() {
+  await dbConnect();
+  let stats = [];
+  try {
+    const rawStats = await CompanyStat.find({ active: true }).sort({ order: 1 });
+    // Convert to simple objects so they can be passed to client components if needed, or mapped cleanly
+    stats = rawStats.map(s => ({
+      label: s.label,
+      value: s.value
+    }));
+  } catch (error) {
+    console.error('Failed to fetch stats:', error);
+  }
+
+  // Fallback to defaults if none exist
+  if (stats.length === 0) {
+    stats = [
+      { label: 'Countries Served', value: '45+' },
+      { label: 'Instruments Built', value: '1500+' },
+      { label: 'Happy Clients', value: '800+' },
+      { label: 'Years Experience', value: '12+' },
+    ];
+  }
 
   return (
     <div className="bg-white scroll-smooth">
@@ -83,7 +102,7 @@ export default function AboutPage() {
                   src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=1000" 
                   alt="Laboratory Research" 
                   fill
-                  className="object-cover grayscale hover:grayscale-0 transition-all duration-1000 scale-110 group-hover:scale-100"
+                  className="object-cover transition-all duration-1000 scale-110 group-hover:scale-100"
                   priority
                 />
                 <div className="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-all duration-500" />
@@ -100,7 +119,7 @@ export default function AboutPage() {
         <div className="absolute inset-0 z-0">
           <Image 
             src="https://images.pexels.com/photos/3825586/pexels-photo-3825586.jpeg" 
-            className="object-cover opacity-30 grayscale group-hover:scale-110 transition-transform duration-[3000ms]"
+            className="object-cover opacity-30 group-hover:scale-110 transition-transform duration-[3000ms]"
             alt="Laboratory background"
             fill
           />

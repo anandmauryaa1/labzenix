@@ -23,7 +23,7 @@ export default function PageBanner({
   backUrl = '/products' 
 }: PageBannerProps) {
   return (
-    <section className="bg-primary py-5 md:py-10">
+    <section className="bg-primary py-4 md:py-8">
       <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row md:items-center justify-between gap-8">
         {/* Title & Description */}
         <div className="flex-1 flex items-start gap-6">
@@ -38,11 +38,11 @@ export default function PageBanner({
             <h1 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter leading-tight">
               {title}
             </h1>
-            {description && (
+            {/* {description && (
               <p className="mt-2 text-white/90 font-medium text-sm md:text-base max-w-2xl leading-relaxed">
                 {description}
               </p>
-            )}
+            )} */}
           </div>
         </div>
 
