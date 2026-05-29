@@ -8,6 +8,8 @@ export interface AuthUser {
   role: 'admin' | 'seo' | 'marketing';
   username: string;
   permissions: string[];
+  name?: string;
+  email?: string;
 }
 
 interface JWTPayload {
@@ -15,6 +17,8 @@ interface JWTPayload {
   role: 'admin' | 'seo' | 'marketing';
   username: string;
   permissions: string[];
+  name?: string;
+  email?: string;
 }
 
 export async function getAuthUser(req: NextRequest): Promise<AuthUser | null> {
@@ -37,7 +41,9 @@ export async function getAuthUser(req: NextRequest): Promise<AuthUser | null> {
       id: decoded.id,
       role: decoded.role,
       username: decoded.username,
-      permissions: decoded.permissions || []
+      permissions: decoded.permissions || [],
+      name: decoded.name,
+      email: decoded.email
     };
   } catch (err) {
     return null;
