@@ -10,6 +10,8 @@ export interface AuthenticatedUser {
   name: string;
   email: string;
   permissions: string[];
+  name?: string;
+  email?: string;
 }
 
 interface JWTPayload {
@@ -19,6 +21,8 @@ interface JWTPayload {
   name: string;
   email: string;
   permissions: string[];
+  name?: string;
+  email?: string;
 }
 
 export async function getAuthUser(req: NextRequest): Promise<AuthenticatedUser | null> {
