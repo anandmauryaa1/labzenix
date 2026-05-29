@@ -2,11 +2,7 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   // ============================================================================
-  // SERVER ACTIONS & SECURITY
-  // ============================================================================
-  serverActions: {
-    allowedOrigins: ['82.25.105.115', 'localhost:3000'],
-  },
+
 
   // ============================================================================
   // PERFORMANCE & OPTIMIZATION
@@ -117,6 +113,9 @@ const nextConfig: NextConfig = {
   experimental: {
     // Enable optimizations
     optimizeServerReact: true,
+    serverActions: {
+      allowedOrigins: ['82.25.105.115', 'localhost:3000'],
+    },
   },
 
   // Production source maps for better error tracking (disable for smaller bundle)
