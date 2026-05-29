@@ -2,6 +2,13 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   // ============================================================================
+  // SERVER ACTIONS & SECURITY
+  // ============================================================================
+  serverActions: {
+    allowedOrigins: ['82.25.105.115', 'localhost:3000'],
+  },
+
+  // ============================================================================
   // PERFORMANCE & OPTIMIZATION
   // ============================================================================
   
@@ -75,7 +82,8 @@ const nextConfig: NextConfig = {
   
   async redirects() {
     return [
-      // Redirect http to https in production
+      // Redirect http to https in production - Disabled for IP testing
+      /*
       {
         source: '/:path*',
         destination: 'https://app.labzenix.com/:path*',
@@ -88,6 +96,7 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      */
     ];
   },
 
