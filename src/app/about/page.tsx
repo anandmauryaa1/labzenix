@@ -16,7 +16,7 @@ export async function generateMetadata() {
 
 export default async function AboutPage() {
   await dbConnect();
-  let stats = [];
+  let stats: { label: string; value: string }[] = [];
   try {
     const rawStats = await CompanyStat.find({ active: true }).sort({ order: 1 });
     // Convert to simple objects so they can be passed to client components if needed, or mapped cleanly
