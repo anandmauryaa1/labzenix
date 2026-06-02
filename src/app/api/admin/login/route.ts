@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
 
     const cookie = serialize('admin_token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === 'production' && !process.env.NEXT_PUBLIC_SITE_URL?.startsWith('http://'),
       sameSite: 'strict',
       path: '/',
       maxAge: 60 * 60 * 12, // 12 hours

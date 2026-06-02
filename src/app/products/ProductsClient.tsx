@@ -26,6 +26,7 @@ interface Category {
   name: string;
   slug: string;
   description: string;
+  image?: string;
 }
 
 interface Application {
@@ -44,6 +45,7 @@ function ProductsContent() {
   const [products, setProducts]     = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
+  const [certificateImage, setCertificateImage] = useState<string | null>(null);
   const [loading, setLoading]       = useState(true);
   const searchTerm = searchParam;
 
@@ -95,6 +97,16 @@ function ProductsContent() {
     fetch('/api/applications')
       .then(res => res.ok ? res.json() : [])
       .then(data => setApplications(Array.isArray(data) ? data : []))
+      .catch(() => {});
+
+    // Fetch Certificates
+    fetch('/api/company-certificates')
+      .then(res => res.ok ? res.json() : [])
+      .then(data => {
+        if (data && data.length > 0 && data[0].fileUrl) {
+          setCertificateImage(data[0].fileUrl);
+        }
+      })
       .catch(() => {});
   }, []);
 
@@ -172,8 +184,8 @@ function ProductsContent() {
               <FadeIn direction="left" className="hidden md:block w-full max-w-sm">
                 <div className="aspect-[4/5] bg-gray-100 border-2 border-primary/20 p-4 relative shadow-2xl">
                   <Image
-                    src="https://images.unsplash.com/photo-1579313101805-39180766150e?auto=format&fit=crop&q=80&w=800"
-                    alt="Industrial Instrument"
+                    src={certificateImage || "https://images.unsplash.com/photo-1579313101805-39180766150e?auto=format&fit=crop&q=80&w=800"}
+                    alt="LabZenix Certified"
                     fill
                     className="object-cover brightness-90 transition-all duration-700"
                     priority
@@ -205,10 +217,20 @@ function ProductsContent() {
                       className="flex flex-col border border-gray-100 bg-white group hover:shadow-2xl transition-all duration-500 overflow-hidden cursor-pointer"
                     >
                       <Link href={`/products?category=${encodeURIComponent(cat.name)}`} className="flex flex-col h-full">
+                        <div className="w-full h-64 bg-gray-50 overflow-hidden flex items-center justify-center relative">
+                          {cat.image ? (
+                            <Image
+                              src={cat.image}
+                              alt={cat.name}
+                              fill
+                              className="object-cover group-hover:scale-110 transition-transform duration-700"
+                            />
+                          ) : (
+                            <Grid3X3 className="w-16 h-16 text-gray-200" />
+                          )}
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500 z-10" />
+                        </div>
                         <div className="p-8 pb-4">
-                          <div className="w-16 h-16 bg-primary text-white flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6 mb-8 shadow-lg shadow-primary/20">
-                            <Grid3X3 className="w-8 h-8" />
-                          </div>
                           <h2 className="text-4xl font-black text-secondary uppercase mb-4 tracking-tighter group-hover:text-primary transition-colors leading-none">
                             {cat.name}
                           </h2>
@@ -300,15 +322,6 @@ function ProductsContent() {
                           ) : (
                             <Package className="w-16 h-16 text-gray-200" />
                           )}
-                          <div className="absolute top-0 right-0 p-4 z-20">
-                            <span className={`inline-block px-4 py-2 text-[10px] font-black uppercase tracking-widest shadow-xl ${
-                              product.usage === 'Laboratory'  ? 'bg-blue-600 text-white' :
-                              product.usage === 'Production'  ? 'bg-orange-600 text-white' :
-                                                               'bg-green-600 text-white'
-                            }`}>
-                              {product.usage}
-                            </span>
-                          </div>
                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500 z-10" />
                         </div>
 
@@ -319,12 +332,9 @@ function ProductsContent() {
                               REF: {product.modelNumber}
                             </p>
                           )}
-                          <h3 className="text-2xl font-black text-secondary uppercase tracking-tighter mb-4 group-hover:text-primary transition-colors line-clamp-2 leading-none">
+                          <h3 className="text-2xl font-black text-secondary uppercase tracking-tighter mb-8 group-hover:text-primary transition-colors line-clamp-2 leading-none flex-grow">
                             {product.title}
                           </h3>
-                          <p className="text-sm text-gray-500 font-medium leading-relaxed mb-8 flex-grow line-clamp-3">
-                            {product.description}
-                          </p>
                           <div className="flex items-center justify-between pt-6 border-t border-gray-100">
                             <span className="text-[10px] font-black uppercase tracking-widest text-secondary group-hover:text-primary transition-colors">
                               Explore Specs

@@ -205,7 +205,7 @@ export default function ContactForm() {
                 <div className="md:col-span-2 space-y-2">
                   <label className="text-sm font-medium text-secondary">Your Message *</label>
                   <textarea 
-                    className="w-full h-32 px-4 py-3 bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
+                    className="w-full h-64 px-4 py-3 bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
                     placeholder="Tell us about your requirements..."
                     value={form.message}
                     onChange={(e) => setForm({...form, message: e.target.value})}
@@ -233,7 +233,7 @@ export default function ContactForm() {
       <FadeIn direction="up">
         <section className="h-[500px] w-full bg-gray-100 mt-12 relative overflow-hidden group">
           <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3430.2!2d76.7!3d30.7!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390fef!2sIndustrial%20Area%2C%20Phase%20II%2C%20SAS%20Nagar%2C%20Punjab!5e0!3m2!1sen!2sin!4v1612345678901"
+            src={settings?.communication?.googleMapUrl || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3430.2!2d76.7!3d30.7!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390fef!2sIndustrial%20Area%2C%20Phase%20II%2C%20SAS%20Nagar%2C%20Punjab!5e0!3m2!1sen!2sin!4v1612345678901"}
             className="w-full h-full border-0 transition-all duration-700 group-hover:scale-105"
             allowFullScreen
             loading="lazy"

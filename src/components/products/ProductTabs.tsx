@@ -40,6 +40,7 @@ interface ProductTabsProps {
     specificationText?: string;
     specs?: Record<string, unknown>;
     features?: string[];
+    featuresText?: string;
     youtubeUrl?: string;
     reviews?: Review[];
     faqs?: FAQ[];
@@ -113,60 +114,47 @@ export default function ProductTabs({ product }: ProductTabsProps) {
         {activeTab === 'overview' && (
           <Panel id="overview">
             <SectionHeader icon={<Box className="w-5 h-5" />} title="Product Overview & Applications" />
-            {/* <p className="mt-6 text-gray-700 leading-relaxed font-medium text-lg border-l-4 border-primary/20 pl-6 italic">
-              {product.description}
-            </p> */}
-            {product.specificationText && (
-              <div className="mt-8 shadow-lg rounded-sm p-6 bg-white">
-                <h3 className="text-lg font-black text-secondary uppercase tracking-tight mb-4">Standards</h3>
-                <p className="text-gray-700 leading-relaxed">{product.specificationText}</p>
-              </div>
+            {product.description && (
+              <div 
+                className="mt-6 text-gray-700 leading-relaxed font-medium text-lg border-l-4 border-primary/20 pl-6 blog-content max-w-none"
+                dangerouslySetInnerHTML={{ __html: product.description }}
+              />
             )}
           </Panel>
         )}
 
         {activeTab === 'specs' && (
           <Panel id="specs">
-            <SectionHeader icon={<SettingsIcon className="w-5 h-5" />} title="Key Specifications" />
-            <div className="mt-8 shadow-lg rounded-sm p-6 bg-white">
-              {product.specs && Object.keys(product.specs).length > 0 ? (
-                <div className="overflow-x-auto border border-gray-200">
-                  <table className="w-full">
-                    <thead className="bg-primary/5 border-b-2 border-primary/20">
-                      <tr>
-                        <th className="px-6 py-5 text-left text-[10px] font-black text-secondary uppercase tracking-[0.2em]">Technical Parameter</th>
-                        <th className="px-6 py-5 text-left text-[10px] font-black text-secondary uppercase tracking-[0.2em]">Metric Value</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                      {Array.isArray(product.specs) 
-                        ? product.specs.map((spec: any, idx) => (
-                            <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                              <td className="px-6 py-4 font-bold text-gray-700">{spec.key || spec.name}</td>
-                              <td className="px-6 py-4 text-gray-600">{String(spec.value)}</td>
-                            </tr>
-                          ))
-                        : Object.entries(product.specs || {}).map(([key, value]) => (
-                            <tr key={key} className="hover:bg-gray-50 transition-colors">
-                              <td className="px-6 py-4 font-bold text-gray-700">{key}</td>
-                              <td className="px-6 py-4 text-gray-600">{String(value)}</td>
-                            </tr>
-                          ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
+            <SectionHeader icon={<SettingsIcon className="w-5 h-5" />} title="Specifications" />
+            
+            {product.specificationText ? (
+              <div className="mt-8 shadow-lg rounded-sm p-6 bg-white">
+                <div 
+                  className="blog-content max-w-none text-gray-700" 
+                  dangerouslySetInnerHTML={{ __html: product.specificationText }} 
+                />
+              </div>
+            ) : (
+              <div className="mt-8 shadow-lg rounded-sm p-6 bg-white">
                 <EmptyState icon={<SettingsIcon className="w-10 h-10 text-gray-300" />} message="No specifications listed for this product yet." />
-              )}
-            </div>
+              </div>
+            )}
           </Panel>
         )}
 
         {activeTab === 'features' && (
           <Panel id="features">
             <SectionHeader icon={<Zap className="w-5 h-5" />} title="Features" />
-            <div className="mt-8 shadow-lg rounded-sm p-6 bg-white">
-              {product.features && product.features.length > 0 ? (
+            
+            {product.featuresText ? (
+              <div className="mt-8 shadow-lg rounded-sm p-6 bg-white">
+                <div 
+                  className="blog-content max-w-none text-gray-700" 
+                  dangerouslySetInnerHTML={{ __html: product.featuresText }} 
+                />
+              </div>
+            ) : product.features && product.features.length > 0 ? (
+              <div className="mt-8 shadow-lg rounded-sm p-6 bg-white">
                 <ul className="grid grid-cols-1 gap-4">
                   {product.features.map((feature, i) => (
                     <li key={i} className="flex items-center space-x-4 p-5 bg-gray-50 border border-gray-100 hover:border-primary/30 transition-all duration-300 hover:shadow-md group">
@@ -177,10 +165,12 @@ export default function ProductTabs({ product }: ProductTabsProps) {
                     </li>
                   ))}
                 </ul>
-              ) : (
+              </div>
+            ) : (
+              <div className="mt-8 shadow-lg rounded-sm p-6 bg-white">
                 <EmptyState icon={<Zap className="w-10 h-10 text-gray-300" />} message="No features listed for this product yet." />
-              )}
-            </div>
+              </div>
+            )}
           </Panel>
         )}
 

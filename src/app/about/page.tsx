@@ -53,7 +53,7 @@ export default async function AboutPage() {
           <FadeIn direction="up">
             <div className="text-center max-w-3xl mx-auto">
               <span className="text-primary font-black tracking-[0.3em] uppercase text-[10px] mb-4 block">Our Legacy</span>
-              <h1 className="text-4xl md:text-7xl font-black text-secondary mb-8 uppercase tracking-tighter leading-none">
+              <h1 className="text-4xl md:text-6xl font-black text-secondary mb-8 uppercase tracking-tighter leading-none">
                 Precision in <br />
                 <span className="text-primary italic">Quality Testing</span>
               </h1>
@@ -76,7 +76,7 @@ export default async function AboutPage() {
                 </div>
                 <div className="space-y-4">
                   <h3 className="text-xl md:text-2xl font-black text-secondary uppercase tracking-tight">Our Mission</h3>
-                  <p className="text-gray-600 leading-relaxed font-medium text-sm md:text-base">
+                  <p className="text-gray-600 leading-relaxed font-medium text-base md:text-lg">
                     To provide technologically advanced, reliable, and cost-effective testing solutions that empower manufacturers to deliver superior products to the global market.
                   </p>
                 </div>
@@ -87,7 +87,7 @@ export default async function AboutPage() {
                 </div>
                 <div className="space-y-4">
                   <h3 className="text-xl md:text-2xl font-black text-secondary uppercase tracking-tight">Customer First</h3>
-                  <p className="text-gray-600 leading-relaxed font-medium text-sm md:text-base">
+                  <p className="text-gray-600 leading-relaxed font-medium text-base md:text-lg">
                     We believe in building long-term partnerships through exceptional pre-sales guidance and post-installation support, ensuring our clients stay ahead in quality.
                   </p>
                 </div>
@@ -136,14 +136,14 @@ export default async function AboutPage() {
                     <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-full -mr-12 -mt-12 group-hover/card:scale-150 transition-transform duration-700" />
                     
                     <div className="relative z-10">
-                      <div className="text-5xl md:text-6xl font-black text-primary tracking-tighter mb-4 flex items-baseline">
+                      <div className="text-4xl md:text-5xl font-black text-primary tracking-tighter mb-4 flex items-baseline">
                         <AnimatedCounter 
                           value={parseInt(stat.value.replace(/\+/g, ''))} 
                           suffix={stat.value.includes('+') ? '+' : ''}
                         />
                       </div>
                       <div className="w-12 h-[2px] bg-primary/30 mb-6 group-hover/card:w-full transition-all duration-700" />
-                      <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-[0.4em] font-black leading-relaxed">
+                      <p className="text-xs md:text-sm text-gray-400 uppercase tracking-[0.2em] font-black leading-relaxed">
                         {stat.label}
                       </p>
                     </div>
@@ -175,7 +175,7 @@ export default async function AboutPage() {
                     {item.icon}
                   </div>
                   <h3 className="text-2xl font-black mb-4 text-secondary uppercase tracking-tight">{item.title}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed font-medium">{item.desc}</p>
+                  <p className="text-gray-500 text-base leading-relaxed font-medium">{item.desc}</p>
                 </div>
               ))}
             </div>

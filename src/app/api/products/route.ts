@@ -19,6 +19,7 @@ const productSchema = z.object({
   usage: z.string().optional(),
   images: z.array(z.string()).optional(),
   features: z.array(z.string()).optional(),
+  featuresText: z.string().optional(),
   specificationText: z.string().optional(),
   specs: z.record(z.string(), z.any()).optional(),
   youtubeUrl: z.string().optional(),

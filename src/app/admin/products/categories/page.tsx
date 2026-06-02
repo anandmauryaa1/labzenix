@@ -234,6 +234,7 @@ export default function CategoryManagement() {
     }
   };
 
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -279,6 +280,7 @@ export default function CategoryManagement() {
     setForm(prev => ({ ...prev, catalogUrl: '', catalogPublicId: '' }));
     toast.success('File removed');
   };
+
 
   // which list to show in the table
   const displayList = reorderMode ? orderedCategories : categories;
@@ -559,47 +561,64 @@ export default function CategoryManagement() {
                   />
                 </div>
 
-                <div className="space-y-4 pt-4 border-t border-gray-100">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-2">Technical Catalog Asset (PDF)</label>
-                  
-                  {form.catalogUrl ? (
-                    <div className="p-4 bg-green-50 border border-green-100 flex items-center justify-between group">
-                      <div className="flex items-center space-x-3">
-                        <FileText className="w-5 h-5 text-green-600" />
-                        <span className="text-[10px] font-black text-green-800 uppercase tracking-widest">Master Catalog Loaded</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-100">
+                  <div className="space-y-4">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-2">Category Image</label>
+                    {form.image ? (
+                      <div className="p-4 bg-green-50 border border-green-100 flex flex-col items-center justify-between group h-32 relative">
+                        <img src={form.image} alt="Category" className="w-full h-full object-contain mix-blend-multiply" />
+                        <button 
+                          type="button"
+                          onClick={removeImage}
+                          className="absolute top-2 right-2 p-1.5 bg-white rounded-full text-red-500 shadow-sm hover:scale-110 transition-transform"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
                       </div>
-                      <button 
-                        type="button"
-                        onClick={removeCatalog}
-                        className="p-2 text-green-300 hover:text-red-500 transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ) : (
-                    <label className={`w-full border-2 border-dashed rounded-sm p-8 flex flex-col items-center justify-center transition-all cursor-pointer ${
-                      isUploading ? 'bg-gray-50 border-gray-200' : 'border-gray-200 hover:border-primary hover:bg-primary/5'
-                    }`}>
-                      <input 
-                        type="file" 
-                        accept=".pdf" 
-                        onChange={handleFileUpload} 
-                        className="hidden"
-                        disabled={isUploading}
-                      />
-                      {isUploading ? (
-                        <>
-                          <Loader2 className="w-8 h-8 text-primary animate-spin mb-3" />
-                          <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Syncing Asset...</span>
-                        </>
-                      ) : (
-                        <>
-                          <UploadCloud className="w-8 h-8 text-gray-200 mb-3 group-hover:scale-110 transition-transform" />
-                          <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-primary">Click to Upload Catalog PDF</span>
-                        </>
-                      )}
-                    </label>
-                  )}
+                    ) : (
+                      <label className={`w-full h-32 border-2 border-dashed rounded-sm p-4 flex flex-col items-center justify-center transition-all cursor-pointer ${
+                        isImageUploading ? 'bg-gray-50 border-gray-200' : 'border-gray-200 hover:border-primary hover:bg-primary/5'
+                      }`}>
+                        <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={isImageUploading} />
+                        {isImageUploading ? (
+                          <Loader2 className="w-6 h-6 text-primary animate-spin mb-2" />
+                        ) : (
+                          <UploadCloud className="w-6 h-6 text-gray-300 mb-2 group-hover:scale-110 transition-transform" />
+                        )}
+                        <span className="text-[9px] font-black uppercase tracking-widest text-gray-400 text-center">Upload Image</span>
+                      </label>
+                    )}
+                  </div>
+
+
+                  <div className="space-y-4">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-2">Technical Catalog (PDF)</label>
+                    {form.catalogUrl ? (
+                      <div className="p-4 bg-green-50 border border-green-100 flex flex-col items-center justify-center group h-32 relative">
+                        <FileText className="w-8 h-8 text-green-600 mb-2" />
+                        <span className="text-[10px] font-black text-green-800 uppercase tracking-widest text-center">Catalog Loaded</span>
+                        <button 
+                          type="button"
+                          onClick={removeCatalog}
+                          className="absolute top-2 right-2 p-1.5 bg-white rounded-full text-red-500 shadow-sm hover:scale-110 transition-transform"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ) : (
+                      <label className={`w-full h-32 border-2 border-dashed rounded-sm p-4 flex flex-col items-center justify-center transition-all cursor-pointer ${
+                        isUploading ? 'bg-gray-50 border-gray-200' : 'border-gray-200 hover:border-primary hover:bg-primary/5'
+                      }`}>
+                        <input type="file" accept=".pdf" onChange={handleFileUpload} className="hidden" disabled={isUploading} />
+                        {isUploading ? (
+                          <Loader2 className="w-6 h-6 text-primary animate-spin mb-2" />
+                        ) : (
+                          <UploadCloud className="w-6 h-6 text-gray-300 mb-2 group-hover:scale-110 transition-transform" />
+                        )}
+                        <span className="text-[9px] font-black uppercase tracking-widest text-gray-400 text-center">Upload Catalog</span>
+                      </label>
+                    )}
+                  </div>
                 </div>
 
                 <button 

@@ -127,7 +127,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
             <div className="lg:col-span-8">
               <article className="space-y-6 text-gray-700 leading-relaxed">
                 <div 
-                  className="blog-content space-y-6"
+                  className="blog-content"
                   dangerouslySetInnerHTML={{ __html: blog.content }}
                 />
               </article>

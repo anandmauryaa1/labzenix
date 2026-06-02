@@ -10,6 +10,7 @@ export interface IProduct extends Document {
   usage: 'Laboratory' | 'Production' | 'R&D';
   images: string[];
   features: string[];
+  featuresText: string;
   specificationText: string;
   specs: Record<string, any>;
   youtubeUrl: string;
@@ -35,6 +36,7 @@ const ProductSchema = new mongoose.Schema<IProduct>({
   },
   images:            { type: [String], default: [] },
   features:          { type: [String], default: [] },
+  featuresText:      { type: String,   default: '',  trim: true },
   specificationText: { type: String,   default: '',  trim: true },
   specs:             { type: mongoose.Schema.Types.Mixed, default: {} },
   youtubeUrl:        { type: String,   default: '',  trim: true },

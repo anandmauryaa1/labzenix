@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import dynamic from 'next/dynamic';
+
+const RichTextEditor = dynamic(() => import('@/components/ui/RichTextEditor'), { ssr: false });
 
 export default function AboutContentManagement() {
   const [loading, setLoading] = useState(true);
@@ -111,13 +114,12 @@ export default function AboutContentManagement() {
 
           <div className="space-y-2">
             <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Description Text</label>
-            <textarea 
-              required
-              rows={6}
-              className="w-full border border-gray-200 px-4 py-3 outline-none focus:border-primary text-sm font-medium transition-all resize-none"
-              value={formData.description}
-              onChange={(e) => setFormData({...formData, description: e.target.value})}
-            />
+            <div className="bg-white border border-gray-200">
+              <RichTextEditor 
+                value={formData.description}
+                onChange={(value) => setFormData({...formData, description: value})}
+              />
+            </div>
           </div>
 
           <div className="pt-4 border-t border-gray-100 flex justify-end">

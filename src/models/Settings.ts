@@ -12,6 +12,7 @@ export interface ISettings extends Document {
     seoEmail: string;
     seoPhone: string;
     address: string;
+    googleMapUrl?: string;
   };
   social: {
     facebook: string;
@@ -28,6 +29,8 @@ export interface ISettings extends Document {
     nightlyBackup: boolean;
     googleAnalyticsId: string;
     googleAnalyticsUrl: string;
+    googleSearchConsoleUrl: string;
+    googleSiteVerification: string;
   };
   updatedAt: Date;
 }
@@ -44,6 +47,7 @@ const SettingsSchema = new mongoose.Schema<ISettings>({
     seoEmail: { type: String, default: 'seo@labzenix.com' },
     seoPhone: { type: String, default: '+91 98765 00004' },
     address: { type: String, default: 'Industrial Park, Sector 4, New Delhi' },
+    googleMapUrl: { type: String, default: '' },
   },
   social: {
     facebook: { type: String, default: '' },
@@ -59,7 +63,9 @@ const SettingsSchema = new mongoose.Schema<ISettings>({
     inquiryCapture: { type: Boolean, default: true },
     nightlyBackup: { type: Boolean, default: false },
     googleAnalyticsId: { type: String, default: '' },
-    googleAnalyticsUrl: { type: String, default: 'https://analytics.google.com/' }
+    googleAnalyticsUrl: { type: String, default: 'https://analytics.google.com/' },
+    googleSearchConsoleUrl: { type: String, default: '' },
+    googleSiteVerification: { type: String, default: '' }
   },
   updatedAt: { type: Date, default: Date.now }
 });

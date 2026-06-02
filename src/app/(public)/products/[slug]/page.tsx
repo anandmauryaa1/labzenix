@@ -207,7 +207,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             {product.description && (
               <div>
                 <p className="text-gray-600 leading-relaxed font-medium text-md border-primary/30 pl-4">
-                  {product.description}
+                  {product.description.length > 200 ? `${product.description.substring(0, 200)}...` : product.description}
                 </p>
               </div>
             )}

@@ -24,7 +24,7 @@ import SEOMetrics from '@/components/admin/SEOMetrics';
 import Input from '@/components/ui/Input';
 import TextArea from '@/components/ui/TextArea';
 
-const RichTextEditor = dynamic(() => import('@/components/blog/RichTextEditor'), { ssr: false });
+const RichTextEditor = dynamic(() => import('@/components/ui/RichTextEditor'), { ssr: false });
 
 export default function BlogForm({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
   const params = use(paramsPromise);

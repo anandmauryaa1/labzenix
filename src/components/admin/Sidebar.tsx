@@ -186,6 +186,13 @@ export default function Sidebar() {
           permission: 'settings'
         },
         { 
+          title: 'Company Certificates', 
+          href: '/admin/company-certificates', 
+          icon: ShieldCheck,
+          roles: ['admin', 'marketing'],
+          permission: 'settings'
+        },
+        { 
           title: 'Company Stats', 
           href: '/admin/company-stats', 
           icon: BarChart3,

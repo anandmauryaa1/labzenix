@@ -22,13 +22,17 @@ import {
   Star,
   HelpCircle,
   MessageSquare,
-  X
+  X,
+  Copy
 } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import SEOMetrics from '@/components/admin/SEOMetrics';
 import Input from '@/components/ui/Input';
 import TextArea from '@/components/ui/TextArea';
+import dynamic from 'next/dynamic';
+
+const RichTextEditor = dynamic(() => import('@/components/ui/RichTextEditor'), { ssr: false });
 
 export default function ProductForm({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
   const params = use(paramsPromise);
@@ -44,6 +48,7 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
     usage: 'Laboratory',
     images: [] as string[],
     features: [] as string[],
+    featuresText: '',
     specificationText: '',
     specs: {} as Record<string, string>,
     youtubeUrl: '',
@@ -97,6 +102,7 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
             category: data.category || '',
             usage: data.usage || 'Laboratory',
             features: data.features || [],
+            featuresText: data.featuresText || '',
             specificationText: data.specificationText || '',
             specs: data.specs || {},
             images: data.images || [],
@@ -197,6 +203,7 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
           category: saved.category || '',
           usage: saved.usage || 'Laboratory',
           features: saved.features || [],
+          featuresText: saved.featuresText || '',
           specificationText: saved.specificationText || '',
           specs: saved.specs || {},
           images: saved.images || [],
@@ -330,6 +337,16 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
     }
   };
 
+  const copyProductUrl = () => {
+    if (!form.slug) return;
+    const url = `${window.location.origin}/products/${form.slug}`;
+    navigator.clipboard.writeText(url).then(() => {
+      toast.success('Product URL copied to clipboard');
+    }).catch(() => {
+      toast.error('Failed to copy URL');
+    });
+  };
+
   if (fetching) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
@@ -391,15 +408,25 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
         
         <div className="flex items-center space-x-3">
           {!isNew && (
-            <button 
-              type="button"
-              onClick={handleDelete}
-              disabled={loading}
-              className="flex items-center space-x-2 px-6 py-4 bg-white text-red-600 text-xs font-black uppercase tracking-widest hover:bg-red-50 transition-all border border-red-100 disabled:opacity-50"
-              title="Purge Product"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
+            <>
+              <button 
+                type="button"
+                onClick={copyProductUrl}
+                className="flex items-center space-x-2 px-6 py-4 bg-white text-gray-600 text-xs font-black uppercase tracking-widest hover:bg-gray-50 transition-all border border-gray-200"
+                title="Copy Product URL"
+              >
+                <Copy className="w-4 h-4" />
+              </button>
+              <button 
+                type="button"
+                onClick={handleDelete}
+                disabled={loading}
+                className="flex items-center space-x-2 px-6 py-4 bg-white text-red-600 text-xs font-black uppercase tracking-widest hover:bg-red-50 transition-all border border-red-100 disabled:opacity-50"
+                title="Purge Product"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </>
           )}
           <button 
             type="button"
@@ -488,15 +515,20 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
                     />
                   </div>
 
-                  <TextArea 
-                    label="Product Description"
-                    value={form.description || ''} 
-                    onChange={(e) => setForm({...form, description: e.target.value})}
-                    placeholder="Provide a detailed description of the product, its features, and applications..."
-                    rows={6}
-                    error={errors.description}
-                    info="This description appears on product listing and detail pages."
-                  />
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+                      Product Description
+                    </label>
+                    <RichTextEditor 
+                      value={form.description || ''} 
+                      onChange={(value) => setForm({...form, description: value})}
+                      placeholder="Provide a detailed description of the product, its features, and applications..."
+                    />
+                    {errors.description && (
+                      <p className="text-red-500 text-xs font-bold mt-1">{errors.description}</p>
+                    )}
+                    <p className="text-[10px] font-bold text-gray-400">This description appears on product listing and detail pages.</p>
+                  </div>
                 </div>
               )}
 
@@ -511,117 +543,31 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
                       <Zap className="w-6 h-6 text-primary" />
                     </div>
                     
-                    <div className="flex space-x-2">
-                      <input 
-                        type="text" 
-                        placeholder="e.g. Servo-driven high precision control"
-                        value={newFeature}
-                        onChange={(e) => setNewFeature(e.target.value)}
-                        className="flex-1 p-4 bg-gray-50 border border-gray-100 text-sm font-bold outline-none focus:border-primary transition-all"
-                        onKeyPress={(e) => e.key === 'Enter' && addFeature()}
-                      />
-                      <button 
-                        type="button"
-                        onClick={addFeature}
-                        className="px-8 py-4 bg-secondary text-white text-[10px] font-black uppercase tracking-widest hover:bg-primary transition-all shadow-md active:scale-95"
-                      >
-                        Add
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-3">
-                      {form.features.map((feature, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-4 bg-white border border-gray-100 group hover:border-primary/20 transition-all">
-                          <div className="flex items-center space-x-4">
-                            <div className="w-2 h-2 bg-primary rounded-full" />
-                            <span className="text-sm font-bold text-secondary">{feature}</span>
-                          </div>
-                          <button 
-                            type="button"
-                            onClick={() => removeFeature(idx)}
-                            className="p-2 text-gray-300 hover:text-red-500 transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-6 pt-6 ">
-                    <div className="flex items-center justify-between border-b border-gray-100 pb-4">
-                      <div>
-                        <h3 className="text-secondary font-black uppercase tracking-tighter text-lg">Technical Specification</h3>
-                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Deep Narrative / Protocol Details</p>
-                      </div>
-                      <FileText className={`w-6 h-6 ${errors.specificationText ? 'text-red-500 animate-pulse' : 'text-primary'}`} />
-                    </div>
-                    <TextArea 
-                      value={form.specificationText || ''} 
-                      onChange={(e: any) => setForm({...form, specificationText: e.target.value})}
-                      placeholder="Enter detailed technical narrative, material compatibility, and engineering standards..."
-                      rows={10}
-                      error={errors.specificationText}
-                      info="Detailed engineering standards and material compatibility analysis."
+                    <RichTextEditor 
+                      value={form.featuresText || ''} 
+                      onChange={(value) => setForm({...form, featuresText: value})}
+                      placeholder="List the key features and selling points of this product..."
                     />
                   </div>
+
                 </div>
               )}
 
               {activeTab === 'specs' && (
                 <div className="space-y-10 animate-in fade-in slide-in-from-right-4">
-                  <div className={`${errors.specs ? 'bg-red-50 border-red-200 shadow-[0_0_15px_rgba(239,68,68,0.1)]' : 'bg-secondary border-transparent'} p-8 text-white relative transition-all duration-500 overflow-hidden group`}>
-                    <div className="relative z-10">
-                      <h4 className={`font-black text-xs uppercase tracking-widest mb-2 flex items-center ${errors.specs ? 'text-red-600' : 'text-white'}`}>
-                        {errors.specs ? <AlertCircle className="w-4 h-4 mr-2" /> : <ShieldAlert className="w-4 h-4 mr-2 text-primary" />}
-                        Technical Specifications
-                        {errors.specs && <span className="ml-2">— Required</span>}
-                      </h4>
-                      <p className={`text-sm max-w-md ${errors.specs ? 'text-red-900/60' : 'text-white/50'}`}>Define specific technical parameters that will appear in product comparisons.</p>
-                    </div>
-                    <Settings className={`absolute -bottom-4 -right-4 w-32 h-32 transition-transform duration-1000 ${errors.specs ? 'text-red-600/10' : 'text-white/5'}`} />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-gray-50 p-6 border border-gray-100">
-                    <input 
-                      type="text" 
-                      placeholder="Parameter (e.g. Load Range)"
-                      value={newSpec.key || ''}
-                      onChange={(e) => setNewSpec({...newSpec, key: e.target.value})}
-                      className="p-4 bg-white border border-gray-200 text-xs font-black uppercase tracking-widest outline-none focus:border-primary"
-                    />
-                    <input 
-                      type="text" 
-                      placeholder="Value (e.g. 1 - 5000N)"
-                      value={newSpec.value || ''}
-                      onChange={(e) => setNewSpec({...newSpec, value: e.target.value})}
-                      className="p-4 bg-white border border-gray-200 text-sm font-bold outline-none focus:border-primary"
-                    />
-                    <button 
-                      type="button"
-                      onClick={addSpec}
-                      className="px-6 py-4 bg-primary text-white text-[10px] font-black uppercase tracking-widest hover:bg-secondary transition-all shadow-md active:scale-95"
-                    >
-                      Append Spec
-                    </button>
-                  </div>
-
-                  <div className="space-y-2">
-                    {Object.entries(form.specs).map(([key, value]) => (
-                      <div key={key} className="flex items-center justify-between p-5 border border-gray-100 bg-white group hover:border-primary/20 transition-all">
-                        <div className="flex items-center space-x-12">
-                          <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 w-32">{key}</span>
-                          <span className="text-sm font-bold text-secondary">{value}</span>
-                        </div>
-                        <button 
-                          type="button"
-                          onClick={() => removeSpec(key)}
-                          className="p-2 text-gray-300 hover:text-red-500 transition-colors"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                  <div className="space-y-6 pt-6 border-gray-100">
+                    <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+                      <div>
+                        <h3 className="text-secondary font-black uppercase tracking-tighter text-lg">Detailed Specifications Document</h3>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Rich Text Support</p>
                       </div>
-                    ))}
+                      <FileText className="w-6 h-6 text-primary" />
+                    </div>
+                    <RichTextEditor 
+                      value={form.specificationText || ''} 
+                      onChange={(value) => setForm({...form, specificationText: value})}
+                      placeholder="Enter detailed technical narrative, material compatibility, and engineering standards..."
+                    />
                   </div>
                 </div>
               )}

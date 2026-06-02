@@ -35,6 +35,7 @@ export default function AdminSettings() {
       seoEmail: '',
       seoPhone: '',
       address: '',
+      googleMapUrl: '',
     },
     social: {
       facebook: '',
@@ -50,7 +51,9 @@ export default function AdminSettings() {
       inquiryCapture: true,
       nightlyBackup: false,
       googleAnalyticsId: '',
-      googleAnalyticsUrl: ''
+      googleAnalyticsUrl: '',
+      googleSearchConsoleUrl: '',
+      googleSiteVerification: ''
     }
   });
 
@@ -319,6 +322,16 @@ export default function AdminSettings() {
                            className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary outline-none transition-all font-medium text-gray-600 resize-none" 
                          />
                       </div>
+                      <div className="space-y-2 mt-4">
+                         <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Google Map Embedded URL</label>
+                         <input 
+                           type="text"
+                           value={config.communication.googleMapUrl || ''}
+                           onChange={(e) => setConfig({...config, communication: {...config.communication, googleMapUrl: e.target.value}})}
+                           placeholder="https://www.google.com/maps/embed?..." 
+                           className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary outline-none transition-all font-medium text-gray-600" 
+                         />
+                      </div>
                     </div>
                   </div>
 
@@ -406,7 +419,7 @@ export default function AdminSettings() {
                     <div className="pt-8 border-t border-gray-100">
                       <h3 className="text-xs font-black uppercase tracking-widest text-secondary flex items-center mb-6">
                         <BarChart3 className="w-4 h-4 mr-2 text-primary" />
-                        Google Analytics Configuration
+                        Google Analytics & Search Console
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
@@ -429,6 +442,28 @@ export default function AdminSettings() {
                              className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary outline-none transition-all font-bold text-secondary" 
                            />
                            <p className="text-[10px] text-gray-400 mt-1 italic">Enter your GA4 report URL to display it in the Analytics dashboard section.</p>
+                        </div>
+                        <div className="space-y-2">
+                           <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Search Console URL</label>
+                           <input 
+                             type="text" 
+                             value={config.integrations.googleSearchConsoleUrl}
+                             onChange={(e) => setConfig({...config, integrations: {...config.integrations, googleSearchConsoleUrl: e.target.value}})}
+                             placeholder="https://search.google.com/..."
+                             className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary outline-none transition-all font-bold text-secondary" 
+                           />
+                           <p className="text-[10px] text-gray-400 mt-1 italic">Enter your Google Search Console report URL to display it in the Analytics dashboard section.</p>
+                        </div>
+                        <div className="space-y-2">
+                           <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Search Console Verification Tag</label>
+                           <input 
+                             type="text" 
+                             value={config.integrations.googleSiteVerification}
+                             onChange={(e) => setConfig({...config, integrations: {...config.integrations, googleSiteVerification: e.target.value}})}
+                             placeholder="Verification ID (e.g. yXXXX...)"
+                             className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary outline-none transition-all font-bold text-secondary" 
+                           />
+                           <p className="text-[10px] text-gray-400 mt-1 italic">The verification code provided by Google Search Console to verify site ownership.</p>
                         </div>
                       </div>
                     </div>

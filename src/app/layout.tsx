@@ -37,16 +37,55 @@ export const metadata: Metadata = {
   },
 };
 
+import Script from "next/script";
+import dbConnect from "@/lib/dbConnect";
+import SettingsModel from "@/models/Settings";
 import ConditionalWrapper from "@/components/layout/ConditionalWrapper";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  let gaId = '';
+  let gscVerification = '';
+
+  try {
+    await dbConnect();
+    const settings = await SettingsModel.findOne({ configKey: 'global' }).lean();
+    if (settings && settings.integrations) {
+      gaId = settings.integrations.googleAnalyticsId || '';
+      gscVerification = settings.integrations.googleSiteVerification || '';
+    }
+  } catch (error) {
+    console.error('Failed to fetch global settings for layout:', error);
+  }
+
   return (
     <html lang="en" className="h-full scroll-smooth" suppressHydrationWarning>
+      <head>
+        {gscVerification ? (
+          <meta name="google-site-verification" content={gscVerification} />
+        ) : null}
+      </head>
       <body className="min-h-full flex flex-col font-display bg-white text-secondary" suppressHydrationWarning>
+        {gaId ? (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){window.dataLayer.push(arguments);}
+                gtag('js', new Date());
+
+                gtag('config', '${gaId}');
+              `}
+            </Script>
+          </>
+        ) : null}
         <ConditionalWrapper>
           {children}
         </ConditionalWrapper>
@@ -54,4 +93,3 @@ export default function RootLayout({
     </html>
   );
 }
-

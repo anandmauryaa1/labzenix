@@ -16,7 +16,8 @@ import {
   Filter,
   Eye,
   ChevronLeft,
-  X
+  X,
+  Copy
 } from 'lucide-react';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
@@ -91,6 +92,15 @@ function ProductListingContent() {
       toast.error('Operation failed');
     }
   }
+
+  const copyProductUrl = (slug: string) => {
+    const url = `${window.location.origin}/products/${slug}`;
+    navigator.clipboard.writeText(url).then(() => {
+      toast.success('Product URL copied to clipboard');
+    }).catch(() => {
+      toast.error('Failed to copy URL');
+    });
+  };
 
   async function bulkDelete() {
     if (!confirm(`Delete ${selectedIds.length} selected products? This action cannot be undone.`)) return;
@@ -300,6 +310,13 @@ function ProductListingContent() {
                           <Eye className="w-4 h-4" />
                         </button>
                       </Link>
+                      <button 
+                        onClick={() => copyProductUrl(product.slug)}
+                        className="p-2 text-gray-300 hover:text-primary transition-colors tooltip"
+                        title="Copy Product URL"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
                       <Link href={`/admin/products/${product._id}`}>
                         <button className="p-2 text-gray-300 hover:text-secondary transition-colors" title="Edit Configuration">
                           <Edit2 className="w-4 h-4" />
