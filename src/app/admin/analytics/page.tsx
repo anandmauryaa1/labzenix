@@ -88,33 +88,31 @@ export default function AnalyticsDashboard() {
         </button>
       </div>
 
-      <div className="flex-1 min-h-[750px] bg-white border border-gray-100 overflow-hidden relative group">
+      <div className="flex-1 min-h-[500px] bg-white border border-gray-100 overflow-hidden relative group flex flex-col">
         {(activeTab === 'ga' ? gaUrl : gscUrl) ? (
-          <div className="w-full h-full relative flex flex-col">
-             <div className="absolute top-0 right-0 z-10 p-4">
-                <a 
-                  href={activeTab === 'ga' ? gaUrl : gscUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-6 py-3 bg-primary text-white text-xs font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-primary/20 flex items-center space-x-2"
-                >
-                  <span>Open Direct Link</span>
-                  <ExternalLink className="w-4 h-4" />
-                </a>
-             </div>
-             <iframe 
-                src={activeTab === 'ga' ? gaUrl : gscUrl}
-                className="w-full h-full flex-1 border-none min-h-[600px]"
-                title={`${activeTab === 'ga' ? 'Google Analytics' : 'Search Console'} Dashboard`}
-                allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-                sandbox="allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-downloads"
-             />
-             <div className="absolute top-0 left-0 w-full p-2 bg-primary/5 border-b border-primary/10 text-[10px] font-bold text-primary uppercase tracking-widest text-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                Secure Analytics Tunnel Active
-             </div>
+          <div className="w-full h-full flex-1 flex flex-col items-center justify-center p-12 text-center space-y-8">
+            <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center text-green-500 mb-2 shadow-inner ring-4 ring-green-50/50">
+              <BarChart3 className="w-12 h-12" />
+            </div>
+            <div className="max-w-md space-y-3">
+              <h3 className="text-2xl font-black text-secondary uppercase tracking-tight">{activeTab === 'ga' ? 'Google Analytics' : 'Search Console'} Ready</h3>
+              <p className="text-gray-500 text-sm font-medium leading-relaxed">
+                Your {activeTab === 'ga' ? 'Google Analytics' : 'Search Console'} dashboard is connected. For security reasons, Google requires these dashboards to be opened in a new secure tab rather than embedded directly.
+              </p>
+            </div>
+            
+            <a 
+              href={activeTab === 'ga' ? gaUrl : gscUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-10 py-5 bg-primary text-white text-sm font-black uppercase tracking-widest hover:bg-secondary hover:scale-105 transition-all duration-300 shadow-xl shadow-primary/20 flex items-center space-x-3 group"
+            >
+              <span>Launch Dashboard</span>
+              <ExternalLink className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+            </a>
           </div>
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center p-12 text-center space-y-6">
+          <div className="w-full h-full flex-1 flex flex-col items-center justify-center p-12 text-center space-y-6">
             <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-gray-300">
               <BarChart3 className="w-10 h-10" />
             </div>
@@ -123,14 +121,6 @@ export default function AnalyticsDashboard() {
               <p className="text-gray-500 text-sm font-medium">
                 To view your live performance data, you need to provide a {activeTab === 'ga' ? 'Google Analytics' : 'Search Console'} dashboard URL in the system settings.
               </p>
-            </div>
-            <div className="bg-amber-50 border border-amber-100 p-4 rounded-none max-w-lg">
-              <div className="flex items-start space-x-3 text-amber-800 text-left">
-                <ShieldAlert className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                <p className="text-xs font-medium leading-relaxed">
-                  <span className="font-bold">Security Note:</span> Some dashboard views may block embedding. For the best experience, use a "Shareable Link" or ensure your property allows embedding.
-                </p>
-              </div>
             </div>
             <Link 
               href="/admin/settings"

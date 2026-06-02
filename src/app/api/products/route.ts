@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
 
     const products = await Product.find(query)
       .populate({ path: 'author', model: User, select: 'name' })
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: 1 })
       .lean()
       .select('-__v');
     
