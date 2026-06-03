@@ -35,6 +35,9 @@ export const metadata: Metadata = {
     description: 'Manufacturer of high-quality laboratory testing instruments for Paper, Packaging, PET, Plastic, and Paint industries.',
     images: ['/og-image.png'],
   },
+  verification: {
+    google: 'APkZJ_LKvfE6cuHkChOJpQ-2jWVFvg9FEta6Ku6j6rE',
+  },
 };
 
 import Script from "next/script";

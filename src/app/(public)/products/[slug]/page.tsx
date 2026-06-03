@@ -30,7 +30,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!product) return { title: 'Not Found' };
   
   const title = product.metaTitle || product.title;
-  const description = product.metaDescription || product.description?.substring(0, 160) || '';
+  const stripHtml = (html: string) => (html || '').replace(/<[^>]*>?/gm, '').trim();
+  const description = product.metaDescription || stripHtml(product.description).substring(0, 160) || '';
 
   return { 
     title: `${title} | LabZenix`, 
@@ -85,16 +86,6 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       img.startsWith('http') ? img : `${siteUrl}${img}`
     ),
     url: productUrl,
-    offers: {
-      '@type': 'Offer',
-      url: productUrl,
-      priceCurrency: 'INR',
-      availability: 'https://schema.org/InStock',
-      seller: {
-        '@type': 'Organization',
-        name: 'LabZenix',
-      },
-    },
   };
 
   // AggregateRating — only if there are reviews
@@ -207,7 +198,11 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             {product.description && (
               <div>
                 <p className="text-gray-600 leading-relaxed font-medium text-md border-primary/30 pl-4">
-                  {product.description.length > 200 ? `${product.description.substring(0, 200)}...` : product.description}
+                  {(() => {
+                    const stripHtml = (html: string) => (html || '').replace(/<[^>]*>?/gm, '').trim();
+                    const plainDesc = stripHtml(product.description);
+                    return plainDesc.length > 200 ? `${plainDesc.substring(0, 200)}...` : plainDesc;
+                  })()}
                 </p>
               </div>
             )}
@@ -325,6 +320,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             specificationText: product.specificationText,
             specs: product.specs,
             features: product.features,
+            featuresText: product.featuresText,
             youtubeUrl: product.youtubeUrl,
             reviews: reviews,
             faqs: faqs,
