@@ -90,6 +90,7 @@ export default function Hero() {
                 src={slides[current].image} 
                 alt="Hero Banner"
                 className="w-full h-auto cursor-pointer block"
+                fetchPriority={current === 0 ? "high" : "auto"}
               />
             </Link>
           </motion.div>

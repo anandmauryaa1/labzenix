@@ -57,6 +57,7 @@ export default function DynamicProductRange() {
                       src={range.image} 
                       alt={range.title} 
                       fill 
+                      priority={index === 0}
                       className="object-cover group-hover:scale-110 transition-transform duration-700"
                     />
                     <div className="absolute inset-0 bg-secondary/0 group-hover:bg-secondary/10 transition-colors duration-500" />
