@@ -264,7 +264,7 @@ function ProductsContent() {
         showBackButton={!!(categoryParam || applicationParam || searchParam)}
       />
       
-      <section className="py-24 px-4 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-24 px-4 bg-gradient-to-b from-gray-200 to-white-50">
         <div className="max-w-7xl mx-auto">
           {/* Search */}
           {/* <FadeIn direction="up" delay={0.1}>
@@ -305,7 +305,7 @@ function ProductsContent() {
             </div>
           ) : (
             <FadeIn stagger direction="none" delay={0.2}>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-8">
                 {filteredProducts.map(product => (
                   <motion.div key={product._id} variants={itemVariant}>
                     <Link href={`/products/${product.slug}`}>

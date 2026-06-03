@@ -35,9 +35,9 @@ export default function ProductCarousel() {
         
         // Ensure data is an array before sorting
         if (Array.isArray(data)) {
-          // Get top 5 most viewed products
+          // Get top 6 most viewed products
           const sortedData = [...data].sort((a: Product, b: Product) => (b.views || 0) - (a.views || 0));
-          setProducts(sortedData.slice(0, 5));
+          setProducts(sortedData.slice(0, 6));
         } else {
           console.error('API did not return an array of products:', data);
           setProducts([]);
@@ -149,7 +149,7 @@ export default function ProductCarousel() {
                             {product.title}
                           </h3>
                           <p className="text-sm text-gray-500 font-medium line-clamp-3 mb-6 flex-grow">
-                            {product.description}
+                            {product.description ? product.description.replace(/<[^>]*>?/gm, '').trim() : ''}
                           </p>
                           <div className="inline-flex items-center text-primary font-black text-[10px] uppercase tracking-widest group-hover:translate-x-3 transition-transform duration-300">
                              Explore Details <span className="ml-2 text-sm">→</span>
@@ -164,45 +164,47 @@ export default function ProductCarousel() {
           </FadeIn>
 
           {/* Navigation Buttons */}
-          <FadeIn direction="up" delay={0.4}>
-            <div className="flex justify-center items-center gap-6 mt-16">
-              <button
-                onClick={handlePrev}
-                disabled={currentIndex === 0}
-                className="p-4 rounded-none border border-gray-200 text-secondary hover:bg-secondary hover:text-white transition-all disabled:opacity-20 disabled:cursor-not-allowed group cursor-pointer"
-                aria-label="Previous products"
-              >
-                <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-              </button>
+          {products.length > itemsPerSlide && (
+            <FadeIn direction="up" delay={0.4}>
+              <div className="flex justify-center items-center gap-6 mt-16">
+                <button
+                  onClick={handlePrev}
+                  disabled={currentIndex === 0}
+                  className="p-4 rounded-none border border-gray-200 text-secondary hover:bg-secondary hover:text-white transition-all disabled:opacity-20 disabled:cursor-not-allowed group cursor-pointer"
+                  aria-label="Previous products"
+                >
+                  <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                </button>
 
-              {/* Indicator Dots */}
-              <div className="flex gap-3">
-                {Array.from({ length: Math.ceil(products.length / itemsPerSlide) }).map(
-                  (_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentIndex(index * itemsPerSlide)}
-                      className={`h-1.5 rounded-none transition-all duration-500 ${
-                        index === Math.floor(currentIndex / itemsPerSlide)
-                          ? 'bg-primary w-12'
-                          : 'bg-gray-200 hover:bg-gray-300 w-6'
-                      }`}
-                      aria-label={`Go to slide ${index + 1}`}
-                    />
-                  )
-                )}
+                {/* Indicator Dots */}
+                <div className="flex gap-3">
+                  {Array.from({ length: Math.ceil(products.length / itemsPerSlide) }).map(
+                    (_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentIndex(index * itemsPerSlide)}
+                        className={`h-1.5 rounded-none transition-all duration-500 ${
+                          index === Math.floor(currentIndex / itemsPerSlide)
+                            ? 'bg-primary w-12'
+                            : 'bg-gray-200 hover:bg-gray-300 w-6'
+                        }`}
+                        aria-label={`Go to slide ${index + 1}`}
+                      />
+                    )
+                  )}
+                </div>
+
+                <button
+                  onClick={handleNext}
+                  disabled={!canScrollNext}
+                  className="p-4 rounded-none border border-gray-200 text-secondary hover:bg-secondary hover:text-white transition-all disabled:opacity-20 disabled:cursor-not-allowed group cursor-pointer"
+                  aria-label="Next products"
+                >
+                  <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </button>
               </div>
-
-              <button
-                onClick={handleNext}
-                disabled={!canScrollNext}
-                className="p-4 rounded-none border border-gray-200 text-secondary hover:bg-secondary hover:text-white transition-all disabled:opacity-20 disabled:cursor-not-allowed group cursor-pointer"
-                aria-label="Next products"
-              >
-                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </button>
-            </div>
-          </FadeIn>
+            </FadeIn>
+          )}
         </div>
       </div>
     </section>
