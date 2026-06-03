@@ -127,7 +127,7 @@ export default function ProductTabs({ product }: ProductTabsProps) {
           <Panel id="specs">
             <SectionHeader icon={<SettingsIcon className="w-5 h-5" />} title="Specifications" />
             
-            {product.specificationText ? (
+            {product.specificationText && product.specificationText.replace(/<[^>]*>?/gm, '').trim() !== '' ? (
               <div className="mt-8 shadow-lg rounded-sm p-6 bg-white">
                 <div 
                   className="blog-content max-w-none text-gray-700" 
@@ -146,7 +146,7 @@ export default function ProductTabs({ product }: ProductTabsProps) {
           <Panel id="features">
             <SectionHeader icon={<Zap className="w-5 h-5" />} title="Features" />
             
-            {product.featuresText ? (
+            {product.featuresText && product.featuresText.replace(/<[^>]*>?/gm, '').trim() !== '' ? (
               <div className="mt-8 shadow-lg rounded-sm p-6 bg-white">
                 <div 
                   className="blog-content max-w-none text-gray-700" 
