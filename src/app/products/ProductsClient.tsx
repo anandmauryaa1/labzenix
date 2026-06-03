@@ -166,7 +166,7 @@ function ProductsContent() {
         />
         
         {/* Hero */}
-        <section className="bg-gray-50 py-24 border-b border-gray-100">
+        <section className="bg-gray-50 py-24 border-b border-gray-100 bg-gradient-to-b from-gray-200 to-white-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-12">
               <FadeIn direction="right" className="max-w-2xl">
