@@ -109,10 +109,10 @@ export default function Navbar() {
               
               <span>{settings?.communication?.supportPhone || '+91-9565453120'}</span>
             </a>
-            <a href={`tel:${settings?.communication?.salesPhone || '+919876500002'}`} className="flex items-center hover:text-gray-200 transition-colors">
+            <a href={`tel:${settings?.communication?.salesPhone || '+919354572961'}`} className="flex items-center hover:text-gray-200 transition-colors">
               <Phone className="w-3.5 h-3.5 mr-2" />
               
-              <span>{settings?.communication?.salesPhone || '+91-98765-00002'}</span>
+              <span>{settings?.communication?.salesPhone || '+91-93545-72961'}</span>
             </a>
             <a href={`mailto:${settings?.communication?.supportEmail || 'info@labzenix.com'}`} className="hidden lg:flex items-center hover:text-gray-200 transition-colors">
               <Mail className="w-3.5 h-3.5 mr-2" />
