@@ -5,38 +5,19 @@ import { ChevronDown } from 'lucide-react';
 import FadeIn from '../ui/FadeIn';
 import { motion, AnimatePresence } from 'framer-motion';
 
-interface FAQ {
+export interface FAQ {
   _id: string;
   question: string;
   answer: string;
 }
 
-export default function FAQSection() {
-  const [faqs, setFaqs] = useState<FAQ[]>([]);
-  const [openId, setOpenId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+export default function FAQSection({ initialFaqs }: { initialFaqs?: FAQ[] }) {
+  const faqs = initialFaqs || [];
+  
+  // Try to open the first FAQ initially if available
+  const [openId, setOpenId] = useState<string | null>(faqs.length > 0 ? faqs[0]._id : null);
 
-  useEffect(() => {
-    const fetchFaqs = async () => {
-      try {
-        const res = await fetch('/api/faqs?active=true');
-        if (res.ok) {
-          const data = await res.json();
-          setFaqs(data);
-          if (data.length > 0) {
-            setOpenId(data[0]._id); // Open first FAQ by default
-          }
-        }
-      } catch (error) {
-        console.error('Failed to fetch FAQs:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchFaqs();
-  }, []);
-
-  if (loading || faqs.length === 0) return null;
+  if (faqs.length === 0) return null;
 
   return (
     <section className="py-14 px-4 bg-gray-50 border-t border-gray-100">

@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import FadeIn from '../ui/FadeIn';
 import { motion, AnimatePresence } from 'framer-motion';
 
-interface Product {
+export interface Product {
   _id: string;
   title: string;
   slug: string;
@@ -18,39 +18,10 @@ interface Product {
   views?: number;
 }
 
-export default function ProductCarousel() {
-  const [products, setProducts] = useState<Product[]>([]);
+export default function ProductCarousel({ initialProducts }: { initialProducts?: Product[] }) {
+  const products = initialProducts || [];
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
   const itemsPerSlide = 4;
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch('/api/products');
-        if (!response.ok) {
-          throw new Error(`Failed to fetch products: ${response.status}`);
-        }
-        const data = await response.json();
-        
-        // Ensure data is an array before sorting
-        if (Array.isArray(data)) {
-          // Get top 6 most viewed products
-          const sortedData = [...data].sort((a: Product, b: Product) => (b.views || 0) - (a.views || 0));
-          setProducts(sortedData.slice(0, 6));
-        } else {
-          console.error('API did not return an array of products:', data);
-          setProducts([]);
-        }
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, []);
 
   const handlePrev = () => {
     setCurrentIndex((prevIndex) =>
@@ -64,17 +35,7 @@ export default function ProductCarousel() {
     );
   };
 
-  if (isLoading) {
-    return (
-      <section className="py-24 px-4 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="h-96 flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
-          </div>
-        </div>
-      </section>
-    );
-  }
+
 
   if (products.length === 0) {
     return null;
@@ -127,6 +88,7 @@ export default function ProductCarousel() {
                               src={product.images[0]}
                               alt={product.title}
                               fill
+                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                               className="object-cover group-hover:scale-110 transition-transform duration-700"
                             />
                           ) : (

@@ -8,7 +8,7 @@ import Button from '../ui/Button';
 import FadeIn from '../ui/FadeIn';
 import { motion } from 'framer-motion';
 
-interface ProductRangeItem {
+export interface ProductRangeItem {
   _id: string;
   title: string;
   slug: string;
@@ -16,26 +16,10 @@ interface ProductRangeItem {
   image: string;
 }
 
-export default function ProductRange() {
-  const [ranges, setRanges] = useState<ProductRangeItem[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function ProductRange({ initialRanges }: { initialRanges?: ProductRangeItem[] }) {
+  const ranges = initialRanges || [];
 
-  useEffect(() => {
-    fetch('/api/complete-product-ranges')
-      .then(res => res.ok ? res.json() : [])
-      .then(data => {
-        setRanges(Array.isArray(data) ? data : []);
-      })
-      .catch(err => console.error('Fetch error:', err))
-      .finally(() => setLoading(false));
-  }, []);
-
-  const itemVariant = {
-    hidden: { opacity: 0, x: -10 },
-    visible: { opacity: 1, x: 0 }
-  };
-
-  if (loading || ranges.length === 0) return null;
+  if (ranges.length === 0) return null;
 
   return (
     <section aria-labelledby="complete-ranges-heading" id="productrange" className="py-8 md:py-14 bg-white overflow-hidden">
@@ -90,6 +74,7 @@ export default function ProductRange() {
                       src={cat.image} 
                       alt={cat.title}
                       fill
+                      sizes="(max-width: 1024px) 100vw, 50vw"
                       className="object-cover transition-transform duration-1000 group-hover:scale-110"
                     />
                   )}

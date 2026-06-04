@@ -2,20 +2,15 @@
 
 import { useState, useEffect } from 'react';
 
-export default function AboutSummary() {
-  const [content, setContent] = useState<{
-    subtitle?: string;
-    title?: string;
-    titleHighlight?: string;
-    description?: string;
-  } | null>(null);
+export interface AboutContent {
+  subtitle?: string;
+  title?: string;
+  titleHighlight?: string;
+  description?: string;
+}
 
-  useEffect(() => {
-    fetch('/api/about-content')
-      .then(res => res.ok ? res.json() : null)
-      .then(data => setContent(data))
-      .catch(err => console.error('Fetch error:', err));
-  }, []);
+export default function AboutSummary({ initialContent }: { initialContent?: AboutContent | null }) {
+  const content = initialContent;
 
   if (!content) return null;
 

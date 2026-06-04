@@ -7,7 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-interface HeroSlide {
+export interface HeroSlide {
   _id?: string;
   title?: string;
   description?: string;
@@ -34,29 +34,9 @@ const fallbackSlides = [
   }
 ];
 
-export default function Hero() {
+export default function Hero({ initialSlides }: { initialSlides?: HeroSlide[] }) {
   const [current, setCurrent] = useState(0);
-  const [slides, setSlides] = useState<HeroSlide[]>(fallbackSlides);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchSlides() {
-      try {
-        const res = await fetch('/api/hero-slides');
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data) && data.length > 0) {
-            setSlides(data);
-          }
-        }
-      } catch (err) {
-        console.error('Failed to fetch hero slides:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchSlides();
-  }, []);
+  const slides = initialSlides && initialSlides.length > 0 ? initialSlides : fallbackSlides;
 
   useEffect(() => {
     if (slides.length <= 1) return;
@@ -68,10 +48,6 @@ export default function Hero() {
 
   const nextSlide = () => setCurrent((prev) => (prev + 1) % slides.length);
   const prevSlide = () => setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
-
-  if (loading && slides === fallbackSlides) {
-    // Optionally show a skeleton or just wait for fallback
-  }
 
   return (
     <section className="relative bg-white overflow-hidden">
@@ -86,12 +62,16 @@ export default function Hero() {
             className="w-full"
           >
             <Link href={slides[current].link || '/'}>
-              <img 
-                src={slides[current].image} 
-                alt="Hero Banner"
-                className="w-full h-auto cursor-pointer block"
-                fetchPriority={current === 0 ? "high" : "auto"}
-              />
+              <div className="relative w-full aspect-[16/9] md:aspect-[21/9]">
+                <Image 
+                  src={slides[current].image} 
+                  alt="Hero Banner"
+                  fill
+                  sizes="100vw"
+                  className="object-cover cursor-pointer"
+                  priority={current === 0}
+                />
+              </div>
             </Link>
           </motion.div>
         </AnimatePresence>

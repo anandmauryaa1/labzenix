@@ -5,7 +5,7 @@ import * as Icons from 'lucide-react';
 import FadeIn from '../ui/FadeIn';
 import { motion } from 'framer-motion';
 
-interface CoreValueItem {
+export interface CoreValueItem {
   _id: string;
   title: string;
   description: string;
@@ -13,26 +13,15 @@ interface CoreValueItem {
   order: number;
 }
 
-export default function WhyChooseUs() {
-  const [reasons, setReasons] = useState<CoreValueItem[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch('/api/core-values')
-      .then(res => res.ok ? res.json() : [])
-      .then(data => {
-        setReasons(Array.isArray(data) ? data : []);
-      })
-      .catch(err => console.error('Fetch error:', err))
-      .finally(() => setLoading(false));
-  }, []);
+export default function WhyChooseUs({ initialReasons }: { initialReasons?: CoreValueItem[] }) {
+  const reasons = initialReasons || [];
 
   const itemVariant = {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0 }
   };
 
-  if (loading || reasons.length === 0) return null;
+  if (reasons.length === 0) return null;
 
   return (
     <section className="py-14 px-4 bg-gray-50 border-y border-gray-100 relative overflow-hidden">

@@ -6,36 +6,18 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import FadeIn from '../ui/FadeIn';
 
-interface Partner {
+export interface Partner {
   _id: string;
   name: string;
   logo: string;
   website?: string;
 }
 
-export default function Partners() {
-  const [partners, setPartners] = useState<Partner[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function Partners({ initialPartners }: { initialPartners?: Partner[] }) {
+  const partners = initialPartners || [];
   const [currentPage, setCurrentPage] = useState(0);
 
-  useEffect(() => {
-    const fetchPartners = async () => {
-      try {
-        const res = await fetch('/api/partners?active=true');
-        if (res.ok) {
-          const data = await res.json();
-          setPartners(data);
-        }
-      } catch (error) {
-        console.error('Failed to fetch partners:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPartners();
-  }, []);
-
-  if (loading || partners.length === 0) return null;
+  if (partners.length === 0) return null;
 
   // 5 columns, 2 rows = 10 partners per page
   const partnersPerPage = 10;
@@ -106,6 +88,7 @@ export default function Partners() {
                     src={partner.logo}
                     alt={partner.name}
                     fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                     className="object-contain p-2 transform group-hover:scale-105 transition-transform duration-300"
                   />
                   <h1 className="absolute -bottom-10 left-1/2 -translate-x-1/2 text-sm sm:text-base font-semibold text-secondary uppercase tracking-tight">

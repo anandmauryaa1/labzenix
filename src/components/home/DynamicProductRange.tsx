@@ -7,7 +7,7 @@ import Link from 'next/link';
 import FadeIn from '../ui/FadeIn';
 import { motion } from 'framer-motion';
 
-interface ProductRange {
+export interface ProductRange {
   _id: string;
   title: string;
   slug: string;
@@ -15,21 +15,10 @@ interface ProductRange {
   image: string;
 }
 
-export default function DynamicProductRange() {
-  const [ranges, setRanges] = useState<ProductRange[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function DynamicProductRange({ initialRanges }: { initialRanges?: ProductRange[] }) {
+  const ranges = initialRanges || [];
 
-  useEffect(() => {
-    fetch('/api/product-ranges')
-      .then(res => res.ok ? res.json() : [])
-      .then(data => {
-        setRanges(Array.isArray(data) ? data : []);
-      })
-      .catch(err => console.error('Fetch error:', err))
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading || ranges.length === 0) return null;
+  if (ranges.length === 0) return null;
 
   return (
     <section aria-labelledby="dynamic-ranges-heading" className="py-14 px-4 bg-gray-50 overflow-hidden">
@@ -57,6 +46,7 @@ export default function DynamicProductRange() {
                       src={range.image} 
                       alt={range.title} 
                       fill 
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
                       priority={index === 0}
                       className="object-cover group-hover:scale-110 transition-transform duration-700"
                     />
