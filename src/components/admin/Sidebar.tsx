@@ -23,7 +23,8 @@ import {
   HelpCircle,
   Handshake,
   Grid3X3,
-  Quote
+  Quote,
+  Scale
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -276,6 +277,13 @@ export default function Sidebar() {
           title: 'Settings', 
           href: '/admin/settings', 
           icon: Settings,
+          roles: ['admin'],
+          permission: 'settings'
+        },
+        { 
+          title: 'Legal Pages', 
+          href: '/admin/settings?tab=legal', 
+          icon: Scale,
           roles: ['admin'],
           permission: 'settings'
         }

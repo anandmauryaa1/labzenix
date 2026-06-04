@@ -32,6 +32,10 @@ export interface ISettings extends Document {
     googleSearchConsoleUrl: string;
     googleSiteVerification: string;
   };
+  legal: {
+    termsAndConditions: string;
+    privacyPolicy: string;
+  };
   updatedAt: Date;
 }
 
@@ -66,6 +70,10 @@ const SettingsSchema = new mongoose.Schema<ISettings>({
     googleAnalyticsUrl: { type: String, default: 'https://analytics.google.com/' },
     googleSearchConsoleUrl: { type: String, default: '' },
     googleSiteVerification: { type: String, default: '' }
+  },
+  legal: {
+    termsAndConditions: { type: String, default: '' },
+    privacyPolicy: { type: String, default: '' },
   },
   updatedAt: { type: Date, default: Date.now }
 });

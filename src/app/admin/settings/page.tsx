@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { 
   Settings as SettingsIcon, 
   Globe, 
@@ -13,15 +14,24 @@ import {
   Lock,
   Share2,
   Circle,
-  BarChart3
+  BarChart3,
+  Scale
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import dynamic from 'next/dynamic';
 
-export default function AdminSettings() {
+const RichTextEditor = dynamic(() => import('@/components/ui/RichTextEditor'), { ssr: false });
+
+import React from 'react';
+
+function AdminSettings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [loadingUsers, setLoadingUsers] = useState(false);
-  const [activeTab, setActiveTab] = useState<'general' | 'seo' | 'security'>('general');
+  const searchParams = useSearchParams();
+  const initialTab = (searchParams.get('tab') as 'general' | 'seo' | 'security' | 'legal') || 'general';
+  
+  const [activeTab, setActiveTab] = useState<'general' | 'seo' | 'security' | 'legal'>(initialTab);
   const [users, setUsers] = useState<any[]>([]);
   
   const [config, setConfig] = useState({
@@ -54,6 +64,10 @@ export default function AdminSettings() {
       googleAnalyticsUrl: '',
       googleSearchConsoleUrl: '',
       googleSiteVerification: ''
+    },
+    legal: {
+      termsAndConditions: '',
+      privacyPolicy: '',
     }
   });
 
@@ -71,6 +85,7 @@ export default function AdminSettings() {
           social: { ...prev.social, ...(data.social || {}) },
           seo: { ...prev.seo, ...(data.seo || {}) },
           integrations: { ...prev.integrations, ...(data.integrations || {}) },
+          legal: { ...prev.legal, ...(data.legal || {}) },
         }));
       }
     } catch (err) {
@@ -198,6 +213,15 @@ export default function AdminSettings() {
           >
             <Lock className="w-4 h-4" />
             <span>Personnel & Access</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab('legal')}
+            className={`w-full flex items-center space-x-3 px-4 py-4 text-xs font-black uppercase tracking-widest transition-all ${
+              activeTab === 'legal' ? 'bg-secondary text-white' : 'text-gray-400 hover:text-secondary hover:bg-gray-50'
+            }`}
+          >
+            <Scale className="w-4 h-4" />
+            <span>Legal Pages</span>
           </button>
         </div>
 
@@ -572,10 +596,57 @@ export default function AdminSettings() {
                   )}
                 </div>
               )}
+
+              {activeTab === 'legal' && (
+                <div className="space-y-10 animate-in fade-in slide-in-from-right-4">
+                  <div className="bg-primary/5 p-6 border-l-4 border-primary">
+                    <h4 className="font-black text-xs uppercase tracking-widest text-primary mb-2">Legal & Compliance</h4>
+                    <p className="text-sm text-secondary/70 font-medium">
+                      Manage dynamic content for your Terms & Conditions and Privacy Policy pages.
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-secondary flex items-center">
+                      <Scale className="w-4 h-4 mr-2 text-primary" />
+                      Terms and Conditions
+                    </h3>
+                    <div className="bg-white border border-gray-100 rounded-sm">
+                      <RichTextEditor 
+                        value={config.legal.termsAndConditions} 
+                        onChange={(val) => setConfig({...config, legal: {...config.legal, termsAndConditions: val}})}
+                        placeholder="Enter terms and conditions here..."
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-secondary flex items-center">
+                      <Scale className="w-4 h-4 mr-2 text-primary" />
+                      Privacy Policy
+                    </h3>
+                    <div className="bg-white border border-gray-100 rounded-sm">
+                      <RichTextEditor 
+                        value={config.legal.privacyPolicy} 
+                        onChange={(val) => setConfig({...config, legal: {...config.legal, privacyPolicy: val}})}
+                        placeholder="Enter privacy policy here..."
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AdminSettingsWrapper() {
+  return (
+    <React.Suspense fallback={<div>Loading...</div>}>
+      <AdminSettings />
+    </React.Suspense>
   );
 }

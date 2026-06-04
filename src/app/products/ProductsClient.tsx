@@ -317,7 +317,7 @@ function ProductsContent() {
                               src={product.images[0]}
                               alt={product.title}
                               fill
-                              className="object-cover group-hover:scale-110 transition-transform duration-700"
+                              className="object-contain p-4 group-hover:scale-110 transition-transform duration-700"
                             />
                           ) : (
                             <Package className="w-16 h-16 text-gray-200" />
@@ -332,7 +332,7 @@ function ProductsContent() {
                               REF: {product.modelNumber}
                             </p>
                           )}
-                          <h3 className="text-2xl font-black text-secondary uppercase tracking-tighter mb-8 group-hover:text-primary transition-colors line-clamp-2 leading-none flex-grow">
+                          <h3 className="text-lg font-bold text-secondary uppercase tracking-tighter mb-8 group-hover:text-primary transition-colors line-clamp-2 leading-none flex-grow">
                             {product.title}
                           </h3>
                           <div className="flex items-center justify-between pt-6 border-t border-gray-100">

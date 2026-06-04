@@ -145,7 +145,7 @@ export default function ProductCarousel() {
                           <p className="text-[10px] text-primary font-black uppercase tracking-[0.2em] mb-2">
                             {product.modelNumber}
                           </p>
-                          <h3 className="text-lg font-black text-secondary mb-3 line-clamp-2 group-hover:text-primary transition-colors leading-tight uppercase tracking-tight">
+                          <h3 className="text-lg font-bold text-secondary mb-3 group-hover:text-primary transition-colors leading-tight uppercase tracking-tight">
                             {product.title}
                           </h3>
                           <p className="text-sm text-gray-500 font-medium line-clamp-3 mb-6 flex-grow">
