@@ -4,6 +4,7 @@ import Settings from '@/models/Settings';
 import { handleProductionError } from '@/lib/errorHandler';
 import { getAuthUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
+import { revalidatePath } from 'next/cache';
 
 export async function GET(req: NextRequest) {
   try {
@@ -53,6 +54,10 @@ export async function POST(req: NextRequest) {
       { $set: flattenedBody },
       { new: true, upsert: true, strict: false }
     );
+
+    revalidatePath('/privacy');
+    revalidatePath('/terms');
+    revalidatePath('/'); // For footer/social links
 
     logger.info('Global settings updated', { user: user.username });
     return NextResponse.json(settings);
