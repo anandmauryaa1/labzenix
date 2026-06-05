@@ -16,21 +16,24 @@ export interface HeroSlide {
   order: number;
 }
 
-const fallbackSlides = [
+const fallbackSlides: HeroSlide[] = [
   {
-    link: "/products?category=paper-packaging",
-    image: "https://images.pexels.com/photos/8015709/pexels-photo-8015709.jpeg",
+    _id: '1',
+    image: '',
+    link: '',
+    order: 0
+  },
+  {
+    _id: '2',
+    image: '',
+    link: '',
     order: 1
   },
   {
-    link: "/products?category=pet-preform",
-    image: "https://images.pexels.com/photos/19724422/pexels-photo-19724422.png",
+    _id: '3',
+    image: '',
+    link: '',
     order: 2
-  },
-  {
-    link: "/products?category=plastic-poly",
-    image: "https://images.pexels.com/photos/15158323/pexels-photo-15158323.jpeg",
-    order: 3
   }
 ];
 

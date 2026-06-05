@@ -1,9 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap');
-
 @import "tailwindcss";
 
 @theme {
-  --font-display: Inter, sans-serif;
+  --font-display: var(--font-inter), sans-serif;
   --color-primary: #004aad;
   --color-secondary: #000000;
   --color-accent: #f8fafc;

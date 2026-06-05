@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { notFound } from 'next/navigation';
 import dbConnect from '@/lib/dbConnect';
 import Product, { IProduct } from '@/models/Product';
@@ -17,7 +17,7 @@ import CatalogButton from '@/components/products/CatalogButton';
 import PageBanner from '@/components/ui/PageBanner';
 import ProductRange from '@/components/home/ProductRange';
 
-// Always fetch fresh — reviews and FAQs must appear immediately after admin saves
+// Always fetch fresh ΓÇö reviews and FAQs must appear immediately after admin saves
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
@@ -64,7 +64,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   // Fetch linked applications
   const linkedApplications = await Application.find({ _id: { $in: product.applications || [] } }).lean() as IApplication[];
 
-  /* ─── JSON-LD Structured Data ─────────────────────────── */
+  /* ΓöÇΓöÇΓöÇ JSON-LD Structured Data ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
   const reviews: { author: string; rating: number; comment: string; date?: string; images?: string[] }[] = JSON.parse(JSON.stringify(rawReviews ?? []));
   const faqs:    { question: string; answer: string }[]                                 = JSON.parse(JSON.stringify(rawFaqs ?? []));
 
@@ -88,7 +88,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     url: productUrl,
   };
 
-  // AggregateRating — only if there are reviews
+  // AggregateRating ΓÇö only if there are reviews
   if (reviews.length > 0) {
     const totalRating = reviews.reduce((sum, r) => sum + (r.rating ?? 0), 0);
     const avgRating   = totalRating / reviews.length;
@@ -113,7 +113,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     }));
   }
 
-  // FAQPage schema — only if FAQs exist
+  // FAQPage schema ΓÇö only if FAQs exist
   const faqSchema = faqs.length > 0
     ? {
         '@context': 'https://schema.org',
@@ -131,7 +131,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
 
   return (
     <div className="bg-white">
-      {/* ── JSON-LD Structured Data (in <head> via Next.js) ── */}
+      {/* ΓöÇΓöÇ JSON-LD Structured Data (in <head> via Next.js) ΓöÇΓöÇ */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
@@ -194,7 +194,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
               )} */}
             </div>
 
-             {/* Product Overview & Applications — description content */}
+             {/* Product Overview & Applications ΓÇö description content */}
             {product.description && (
               <div>
                 <p className="text-gray-600 leading-relaxed font-medium text-md border-primary/30 pl-4">

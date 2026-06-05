@@ -40,10 +40,23 @@ export const metadata: Metadata = {
   },
 };
 
+import { Inter } from 'next/font/google';
 import Script from "next/script";
 import dbConnect from "@/lib/dbConnect";
 import SettingsModel from "@/models/Settings";
 import ConditionalWrapper from "@/components/layout/ConditionalWrapper";
+import { cache } from 'react';
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
+
+const getGlobalSettings = cache(async () => {
+  await dbConnect();
+  return SettingsModel.findOne({ configKey: 'global' }).lean();
+});
 
 export default async function RootLayout({
   children,
@@ -54,8 +67,7 @@ export default async function RootLayout({
   let gscVerification = '';
 
   try {
-    await dbConnect();
-    const settings = await SettingsModel.findOne({ configKey: 'global' }).lean();
+    const settings = await getGlobalSettings();
     if (settings && settings.integrations) {
       gaId = settings.integrations.googleAnalyticsId || '';
       gscVerification = settings.integrations.googleSiteVerification || '';
@@ -71,7 +83,7 @@ export default async function RootLayout({
           <meta name="google-site-verification" content={gscVerification} />
         ) : null}
       </head>
-      <body className="min-h-full flex flex-col font-display bg-white text-secondary" suppressHydrationWarning>
+      <body className={`min-h-full flex flex-col font-display bg-white text-secondary ${inter.variable}`} suppressHydrationWarning>
         {gaId ? (
           <>
             <Script

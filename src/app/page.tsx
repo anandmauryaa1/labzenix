@@ -45,7 +45,7 @@ export default async function Home() {
   ] = await Promise.all([
     HeroSlide.find({}).sort({ order: 1 }).lean().exec(),
     ProductRangeModel.find({ active: true }).sort({ order: 1 }).lean().exec(),
-    Product.find({}).lean().exec(),
+    Product.find({}).sort({ views: -1 }).limit(6).lean().exec(),
     AboutContent.find({}).lean().exec(),
     CoreValue.find({}).sort({ order: 1 }).lean().exec(),
     Partner.find({ isActive: true }).sort({ order: 1 }).lean().exec(),
@@ -54,7 +54,7 @@ export default async function Home() {
     SiteFaq.find({ isActive: true }).sort({ order: 1, createdAt: -1 }).lean().exec(),
   ]);
 
-  const topProducts = products.sort((a: any, b: any) => (b.views || 0) - (a.views || 0)).slice(0, 6);
+  const topProducts = products;
   const aboutContent = aboutContentList.length > 0 ? aboutContentList[0] : null;
 
   // Next.js Server Components require passing plain objects to Client Components
