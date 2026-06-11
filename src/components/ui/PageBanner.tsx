@@ -26,10 +26,10 @@ export default function PageBanner({
     <section className="bg-primary py-4 md:py-8">
       <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row md:items-center justify-between gap-8">
         {/* Title & Description */}
-        <div className="flex-1 flex items-start gap-6">
+        <div className="flex-1 flex items-center gap-6">
           {showBackButton && (
             <Link href={backUrl}>
-              <button className="mt-2 p-3 bg-white/10 hover:bg-white/20 text-white transition-all rounded-none border border-white/20">
+              <button className="p-3 bg-white/10 hover:bg-white/20 text-white transition-all rounded-none border border-white/20">
                 <ArrowLeft className="w-5 h-5" />
               </button>
             </Link>

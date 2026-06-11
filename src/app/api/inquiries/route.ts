@@ -13,7 +13,7 @@ const inquirySchema = z.object({
   subject: z.string().optional(),
   message: z.string().min(1, 'Message is required').trim(),
   productId: z.string().optional(),
-  source: z.enum(['contact form', 'product page', 'download catalog']).default('contact form'),
+  source: z.string().default('contact form'),
 });
 
 // POST: Public lead capture

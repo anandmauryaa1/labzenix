@@ -9,6 +9,8 @@
   --color-linkedin: #0A66C2;
   --color-twitter: #1DA1F2;
   --color-instagram: #E4405F;
+  --tracking-tighter: 0.5px;
+  --tracking-tight: 0.5px;
 }
 
 @layer base {
@@ -19,7 +21,8 @@
     @apply bg-white text-gray-800 antialiased selection:bg-primary selection:text-white leading-relaxed;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display tracking-tight text-secondary leading-tight;
+    @apply font-display text-secondary leading-tight;
+    letter-spacing: 0.5px;
   }
   p {
     @apply leading-relaxed mb-4;
@@ -81,19 +84,19 @@
 
 /* Blog Content Styling */
 .blog-content h1 {
-  @apply text-4xl md:text-5xl font-black text-secondary mb-6 mt-8 uppercase tracking-tighter leading-tight;
+  @apply text-4xl md:text-5xl font-bold text-secondary mb-6 mt-8 uppercase tracking-[0.5px] leading-tight;
 }
 
 .blog-content h2 {
-  @apply text-3xl md:text-4xl font-black text-secondary mb-4 mt-8 uppercase tracking-tighter leading-tight;
+  @apply text-3xl md:text-4xl font-bold text-secondary mb-4 mt-8 uppercase tracking-[0.5px] leading-tight;
 }
 
 .blog-content h3 {
-  @apply text-2xl md:text-3xl font-bold text-secondary mb-4 mt-6 uppercase tracking-tight;
+  @apply text-2xl md:text-3xl font-semibold text-secondary mb-4 mt-6 uppercase tracking-[0.5px];
 }
 
 .blog-content h4 {
-  @apply text-xl font-bold text-secondary mb-3 mt-5 uppercase tracking-wide;
+  @apply text-xl font-semibold text-secondary mb-3 mt-5 uppercase tracking-[0.5px];
 }
 
 .blog-content p {
@@ -106,7 +109,7 @@
 
 .blog-content strong,
 .blog-content b {
-  @apply font-black text-secondary;
+  @apply font-bold text-secondary;
 }
 
 .blog-content em,

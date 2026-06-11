@@ -7,7 +7,7 @@ export interface IInquiry extends Document {
   subject?: string;
   message: string;
   productId?: mongoose.Types.ObjectId;
-  source: 'contact form' | 'product page' | 'download catalog';
+  source: string;
   createdAt: Date;
 }
 
@@ -20,7 +20,6 @@ const InquirySchema = new Schema<IInquiry>({
   productId: { type: Schema.Types.ObjectId, ref: 'Product' },
   source: { 
     type: String, 
-    enum: ['contact form', 'product page', 'download catalog'],
     default: 'contact form' 
   }
 }, {
@@ -28,5 +27,10 @@ const InquirySchema = new Schema<IInquiry>({
 });
 
 InquirySchema.index({ source: 1, createdAt: -1 });
+
+// Clear the model cache in development to ensure schema changes apply immediately
+if (process.env.NODE_ENV !== 'production') {
+  delete mongoose.models.Inquiry;
+}
 
 export default mongoose.models.Inquiry || mongoose.model<IInquiry>('Inquiry', InquirySchema);

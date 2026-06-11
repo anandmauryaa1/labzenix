@@ -6,6 +6,8 @@ import { Calendar, User, ArrowRight, Share2, Globe, MessageSquare, Link as LinkI
 import Link from 'next/link';
 import Image from 'next/image';
 import Button from '@/components/ui/Button';
+import SidebarContactForm from '@/components/blogs/SidebarContactForm';
+import PageBanner from '@/components/ui/PageBanner';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -83,40 +85,16 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
 
   return (
     <div className="bg-white min-h-screen">
-      {/* Blog Hero/Header */}
-      <section className="relative h-[50vh] min-h-[400px] overflow-hidden bg-secondary">
-        <Image 
-          src={blog.image} 
-          fill
-          className="object-cover opacity-40"
-          alt={blog.title} 
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-secondary via-secondary/60 to-secondary/40" />
-        
-        <div className="absolute inset-0 flex items-end">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pb-16">
-            <div className="max-w-3xl">
-              <span className="inline-block px-4 py-1 bg-primary text-white text-[10px] font-black uppercase tracking-[0.3em] mb-6">
-                {blog.category}
-              </span>
-              <h1 className="text-4xl md:text-6xl font-black text-white leading-tight uppercase tracking-tighter mb-8 drop-shadow-lg">
-                {blog.title}
-              </h1>
-              <div className="flex flex-wrap items-center gap-8 text-[14px] font-black uppercase tracking-[0.2em] text-white drop-shadow">
-                <span className="flex items-center">
-                  <Calendar className="w-4 h-4 mr-3 text-primary" />
-                  {new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                </span>
-                <span className="flex items-center">
-                  <User className="w-4 h-4 mr-3 text-primary" />
-                  By {blog.author?.name || 'Editorial Team'}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <PageBanner 
+        title={blog.title} 
+        breadcrumbs={[
+          { label: 'Home', href: '/' },
+          { label: 'Blogs', href: '/blogs' },
+          { label: blog.title }
+        ]} 
+        showBackButton={true}
+        backUrl="/blogs"
+      />
 
       {/* Main Content Area */}
       <section className="py-24 px-4">
@@ -125,56 +103,80 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
             
             {/* Article Body */}
             <div className="lg:col-span-8">
-              <article className="space-y-6 text-gray-700 leading-relaxed">
+              <article className="bg-white border border-gray-100 shadow-md rounded-sm p-8 lg:p-12 space-y-8 text-gray-700 leading-relaxed">
+                {/* Article Header & Image */}
+                <div>
+                  <div className="flex flex-wrap items-center gap-6 text-[12px] font-bold uppercase tracking-[0.1em] text-gray-500 mb-8">
+                    <span className="flex items-center">
+                      <Calendar className="w-4 h-4 mr-2 text-primary" />
+                      {new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                    </span>
+                    <span className="flex items-center">
+                      <User className="w-4 h-4 mr-2 text-primary" />
+                      By {blog.author?.name || 'Editorial Team'}
+                    </span>
+                  </div>
+
+                  <div className="relative w-full aspect-video overflow-hidden rounded-lg bg-gray-50">
+                    <Image 
+                      src={blog.image} 
+                      fill
+                      className="object-contain p-4"
+                      alt={blog.title} 
+                      priority
+                    />
+                  </div>
+                </div>
+
                 <div 
                   className="blog-content"
                   dangerouslySetInnerHTML={{ __html: blog.content }}
                 />
-              </article>
 
-              <div className="mt-20 pt-12 border-t border-gray-200 space-y-8">
-                {/* Share Section */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
-                  <div>
-                    <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 mb-4">Share this Article</h4>
-                    <div className="flex items-center space-x-3">
-                      <button className="w-10 h-10 flex items-center justify-center bg-gray-100 text-secondary hover:bg-primary hover:text-white transition-all duration-300 rounded">
-                        <Globe className="w-4 h-4" />
-                      </button>
-                      <button className="w-10 h-10 flex items-center justify-center bg-gray-100 text-secondary hover:bg-primary hover:text-white transition-all duration-300 rounded">
-                        <MessageSquare className="w-4 h-4" />
-                      </button>
-                      <button className="w-10 h-10 flex items-center justify-center bg-gray-100 text-secondary hover:bg-primary hover:text-white transition-all duration-300 rounded">
-                        <LinkIcon className="w-4 h-4" />
-                      </button>
-                      <button className="w-10 h-10 flex items-center justify-center bg-gray-100 text-secondary hover:bg-primary hover:text-white transition-all duration-300 rounded">
-                        <Mail className="w-4 h-4" />
-                      </button>
+                <div className="mt-12 pt-12 border-t border-gray-200 space-y-8">
+                  {/* Share Section */}
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+                    <div>
+                      <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-500 mb-4">Share this Article</h4>
+                      <div className="flex items-center space-x-3">
+                        <button className="w-10 h-10 flex items-center justify-center bg-gray-100 text-secondary hover:bg-primary hover:text-white transition-all duration-300 rounded">
+                          <Globe className="w-4 h-4" />
+                        </button>
+                        <button className="w-10 h-10 flex items-center justify-center bg-gray-100 text-secondary hover:bg-primary hover:text-white transition-all duration-300 rounded">
+                          <MessageSquare className="w-4 h-4" />
+                        </button>
+                        <button className="w-10 h-10 flex items-center justify-center bg-gray-100 text-secondary hover:bg-primary hover:text-white transition-all duration-300 rounded">
+                          <LinkIcon className="w-4 h-4" />
+                        </button>
+                        <button className="w-10 h-10 flex items-center justify-center bg-gray-100 text-secondary hover:bg-primary hover:text-white transition-all duration-300 rounded">
+                          <Mail className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
+                    
                   </div>
-                  
                 </div>
-              </div>
+              </article>
             </div>
 
             {/* Sidebar */}
-            <aside className="lg:col-span-4 space-y-16">
-              
+            <aside className="lg:col-span-4 space-y-8">
+
               {/* Recent Posts Section */}
-              <div>
-                <h3 className="text-sm font-black text-secondary uppercase tracking-[0.3em] mb-10 pb-4 border-b-2 border-primary inline-block">
+              <div className="bg-white border border-gray-100 shadow-md rounded-sm p-8">
+                <h3 className="text-xl font-bold text-secondary uppercase tracking-[0.5px] mb-8 pb-4 border-b border-gray-200">
                     Latest Insights
                 </h3>
-                <div className="space-y-10">
+                <div className="space-y-6">
                   {recentBlogs.map((post: any) => (
                     <Link key={post._id} href={`/blogs/${post.slug}`} className="group block">
-                      <div className="flex gap-6 items-start">
-                        <div className="w-20 h-20 shrink-0 bg-gray-100 overflow-hidden relative">
+                      <div className="flex gap-4 items-start">
+                        <div className="w-16 h-16 shrink-0 bg-white border border-gray-100 overflow-hidden relative">
                           <Image src={post.image} fill className="object-cover transition-transform duration-500 group-hover:scale-110" alt="" />
                         </div>
                         <div>
-                          <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-2">{post.category}</p>
-                          <h4 className="text-sm font-bold text-secondary group-hover:text-primary transition-colors line-clamp-2 leading-snug">
+                          <p className="text-[9px] font-black text-primary uppercase tracking-widest mb-1">{post.category}</p>
+                          <h4 className="text-xs font-bold text-secondary group-hover:text-primary transition-colors line-clamp-2 leading-snug">
                             {post.title}
                           </h4>
                         </div>
@@ -185,23 +187,23 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
               </div>
 
               {/* Popular Posts Section */}
-              <div>
-                <h3 className="text-sm font-black text-secondary uppercase tracking-[0.3em] mb-10 pb-4 border-b-2 border-primary inline-block">
+              <div className="bg-white border border-gray-100 shadow-md rounded-sm p-8">
+                <h3 className="text-xl font-bold text-secondary uppercase tracking-[0.5px] mb-8 pb-4 border-b border-gray-200">
                     Popular Articles
                 </h3>
-                <div className="space-y-10">
+                <div className="space-y-6">
                   {popularBlogs.map((post: any) => (
                     <Link key={post._id} href={`/blogs/${post.slug}`} className="group block">
-                      <div className="flex gap-6 items-start">
-                        <div className="w-20 h-20 shrink-0 bg-gray-100 overflow-hidden relative">
+                      <div className="flex gap-4 items-start">
+                        <div className="w-16 h-16 shrink-0 bg-white border border-gray-100 overflow-hidden relative">
                           <Image src={post.image} fill className="object-cover transition-transform duration-500 group-hover:scale-110" alt="" />
                           <div className="absolute top-0 right-0 bg-secondary text-white text-[8px] font-black px-1 py-0.5">
                             {post.views || 0}
                           </div>
                         </div>
                         <div>
-                          <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-2">{post.category}</p>
-                          <h4 className="text-sm font-bold text-secondary group-hover:text-primary transition-colors line-clamp-2 leading-snug">
+                          <p className="text-[9px] font-black text-primary uppercase tracking-widest mb-1">{post.category}</p>
+                          <h4 className="text-xs font-bold text-secondary group-hover:text-primary transition-colors line-clamp-2 leading-snug">
                             {post.title}
                           </h4>
                         </div>
@@ -214,7 +216,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
               {/* CTA Section */}
               <div className="bg-secondary p-10 relative overflow-hidden">
                 <div className="relative z-10">
-                    <h3 className="text-xl font-black text-white uppercase tracking-tight leading-tight mb-6">
+                    <h3 className="text-xl font-bold text-white uppercase tracking-[0.5px] leading-tight mb-6">
                         Need Custom <span className="text-primary italic">Lab Calibration?</span>
                     </h3>
                     <p className="text-gray-400 text-xs leading-relaxed mb-10">
@@ -230,6 +232,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 -mr-16 -mt-16 rotate-45" />
               </div>
 
+              <SidebarContactForm source={`Blog: ${blog.title}`} />
             </aside>
           </div>
         </div>
@@ -241,7 +244,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
             <div className="max-w-7xl mx-auto">
                 <div className="flex items-center justify-between mb-16 px-4">
                     <div>
-                        <h3 className="text-2xl font-black text-secondary uppercase tracking-tight mb-2">Related Scientific Insights</h3>
+                        <h3 className="text-2xl font-bold text-secondary uppercase tracking-[0.5px] mb-2">Related Scientific Insights</h3>
                         <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Similar Categories</p>
                     </div>
                 </div>
@@ -254,7 +257,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
                             </div>
                             <div className="p-8 flex flex-col flex-grow">
                                 <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-4 inline-block">{post.category}</span>
-                                <h4 className="text-lg font-black text-secondary mb-6 group-hover:text-primary transition-colors leading-tight">{post.title}</h4>
+                                <h4 className="text-lg font-bold text-secondary mb-6 group-hover:text-primary transition-colors leading-tight">{post.title}</h4>
                                 <div className="mt-auto pt-6 border-t border-gray-50 flex items-center justify-between">
                                     <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest flex items-center">
                                         <Calendar className="w-3 h-3 mr-2" />

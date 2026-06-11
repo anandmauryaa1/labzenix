@@ -72,16 +72,13 @@ export default async function BlogPage({
                 {blogs.map((blog: any) => (
                   <FadeIn key={blog._id} direction="up" delay={0.1}>
                     <article className="bg-white border border-gray-100 flex flex-col group overflow-hidden hover:shadow-2xl transition-all duration-500 h-full">
-                      <Link href={`/blogs/${blog.slug}`} className="block overflow-hidden relative aspect-[16/10]">
+                      <Link href={`/blogs/${blog.slug}`} className="block overflow-hidden relative aspect-[16/10] bg-gray-50">
                         <Image 
                           src={blog.image || 'https://images.unsplash.com/photo-1579154341098-e4e158cc7f55?auto=format&fit=crop&q=80&w=800'} 
                           alt={blog.title} 
                           fill
-                          className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                          className="object-contain p-4 transition-transform duration-1000 group-hover:scale-110"
                         />
-                        <div className="absolute top-0 right-0 bg-primary text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 z-20">
-                          {blog.category}
-                        </div>
                         <div className="absolute inset-0 bg-secondary/0 group-hover:bg-secondary/10 transition-colors duration-500 z-10" />
                       </Link>
                       
@@ -91,7 +88,7 @@ export default async function BlogPage({
                           <span className="flex items-center"><User className="w-3 h-3 mr-2 text-primary" /> {blog.author?.name || 'Editorial Team'}</span>
                         </div>
                         
-                        <h2 className="text-2xl font-black text-secondary mb-4 leading-tight group-hover:text-primary transition-colors uppercase tracking-tight line-clamp-2">
+                        <h2 className="text-2xl font-bold text-secondary mb-4 leading-tight group-hover:text-primary transition-colors uppercase tracking-[0.5px]">
                           {blog.title}
                         </h2>
                         
