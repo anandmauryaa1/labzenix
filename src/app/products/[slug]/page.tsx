@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { notFound } from 'next/navigation';
 import dbConnect from '@/lib/dbConnect';
 import Product, { IProduct } from '@/models/Product';
@@ -86,6 +86,13 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       img.startsWith('http') ? img : `${siteUrl}${img}`
     ),
     url: productUrl,
+    offers: {
+      '@type': 'Offer',
+      url: productUrl,
+      priceCurrency: 'INR',
+      price: '0',
+      availability: 'https://schema.org/InStock',
+    },
   };
 
   // AggregateRating ΓÇö only if there are reviews
