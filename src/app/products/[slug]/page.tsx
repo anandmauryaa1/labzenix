@@ -86,13 +86,6 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       img.startsWith('http') ? img : `${siteUrl}${img}`
     ),
     url: productUrl,
-    offers: {
-      '@type': 'Offer',
-      url: productUrl,
-      priceCurrency: 'INR',
-      price: '0',
-      availability: 'https://schema.org/InStock',
-    },
     aggregateRating: {
       '@type': 'AggregateRating',
       ratingValue: '5',
