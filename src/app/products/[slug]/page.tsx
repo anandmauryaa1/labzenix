@@ -86,12 +86,18 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       img.startsWith('http') ? img : `${siteUrl}${img}`
     ),
     url: productUrl,
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: 5,
-      bestRating: 5,
-      worstRating: 1,
-      reviewCount: 1
+    review: {
+      '@type': 'Review',
+      reviewRating: {
+        '@type': 'Rating',
+        ratingValue: 5,
+        bestRating: 5,
+        worstRating: 1
+      },
+      author: {
+        '@type': 'Person',
+        name: 'LabZenix Team'
+      }
     }
   };
 
