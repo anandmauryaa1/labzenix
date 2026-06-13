@@ -88,10 +88,10 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     url: productUrl,
     aggregateRating: {
       '@type': 'AggregateRating',
-      ratingValue: '5',
-      bestRating: '5',
-      worstRating: '1',
-      reviewCount: '1'
+      ratingValue: 5,
+      bestRating: 5,
+      worstRating: 1,
+      reviewCount: 1
     }
   };
 
