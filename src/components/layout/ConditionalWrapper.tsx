@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import FloatingContact from './FloatingContact';
 
 export default function ConditionalWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -19,6 +20,8 @@ export default function ConditionalWrapper({ children }: { children: React.React
         {children}
       </main>
       <Footer />
+      <FloatingContact />
     </>
   );
 }
+
