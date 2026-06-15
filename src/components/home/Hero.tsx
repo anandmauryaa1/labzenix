@@ -65,13 +65,13 @@ export default function Hero({ initialSlides }: { initialSlides?: HeroSlide[] })
             className="w-full"
           >
             <Link href={slides[current].link || '/'}>
-              <div className="relative w-full aspect-[16/9] md:aspect-[21/9]">
+              <div className="relative w-full h-[50vh] md:h-[80vh]">
                 <Image 
                   src={slides[current].image} 
                   alt="Hero Banner"
                   fill
                   sizes="100vw"
-                  className="object-cover cursor-pointer"
+                  className="object-cover object-center cursor-pointer"
                   priority={current === 0}
                 />
               </div>

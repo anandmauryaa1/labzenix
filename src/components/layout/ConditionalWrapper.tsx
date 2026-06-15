@@ -16,7 +16,7 @@ export default function ConditionalWrapper({ children }: { children: React.React
   return (
     <>
       <Navbar />
-      <main className="flex-grow pt-[116px] md:pt-[132px]">
+      <main className="flex-grow pt-[101px] md:pt-[117px]">
         {children}
       </main>
       <Footer />
