@@ -6,6 +6,9 @@ export interface IPageMeta extends Document {
   metaDescription: string;
   h1: string;
   keywords: string[];
+  focusKeyword: string;
+  ogTitle: string;
+  ogDescription: string;
   updatedAt: Date;
 }
 
@@ -27,6 +30,9 @@ const PageMetaSchema = new Schema<IPageMeta>({
     },
     required: true
   },
+  focusKeyword: { type: String, default: '' },
+  ogTitle: { type: String, default: '' },
+  ogDescription: { type: String, default: '' },
   updatedAt: { type: Date, default: Date.now }
 });
 

@@ -19,10 +19,10 @@ export async function getPageMetadata(pageKey: string): Promise<Metadata> {
     return {
       title: `${meta.metaTitle} ${brandSuffix}`,
       description: meta.metaDescription,
-      keywords: meta.keywords,
+      keywords: meta.focusKeyword ? [meta.focusKeyword, ...meta.keywords] : meta.keywords,
       openGraph: {
-        title: `${meta.metaTitle} ${brandSuffix}`,
-        description: meta.metaDescription,
+        title: meta.ogTitle ? `${meta.ogTitle} ${brandSuffix}` : `${meta.metaTitle} ${brandSuffix}`,
+        description: meta.ogDescription || meta.metaDescription,
       }
     };
   } catch (error) {

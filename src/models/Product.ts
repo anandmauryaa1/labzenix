@@ -16,6 +16,9 @@ export interface IProduct extends Document {
   youtubeUrl: string;
   metaTitle: string;
   metaDescription: string;
+  focusKeyword: string;
+  ogTitle: string;
+  ogDescription: string;
   author: mongoose.Types.ObjectId;
   applications: mongoose.Types.ObjectId[];
   views: number;
@@ -54,6 +57,9 @@ const ProductSchema = new mongoose.Schema<IProduct>({
     trim: true,
     maxlength: [165, 'SEO description should be 165 characters or fewer'],
   },
+  focusKeyword: { type: String, default: '', trim: true },
+  ogTitle: { type: String, default: '', trim: true },
+  ogDescription: { type: String, default: '', trim: true },
   author: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

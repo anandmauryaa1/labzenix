@@ -17,6 +17,11 @@ const categoryUpdateSchema = z.object({
   imagePublicId: z.string().optional(),
   catalogUrl: z.string().optional(),
   catalogPublicId: z.string().optional(),
+  metaTitle: z.string().optional(),
+  metaDescription: z.string().optional(),
+  focusKeyword: z.string().optional(),
+  ogTitle: z.string().optional(),
+  ogDescription: z.string().optional(),
 });
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

@@ -10,6 +10,11 @@ export interface ICategory extends Document {
   catalogUrl: string;
   catalogPublicId: string;
   order: number;
+  metaTitle: string;
+  metaDescription: string;
+  focusKeyword: string;
+  ogTitle: string;
+  ogDescription: string;
   createdAt: Date;
 }
 
@@ -22,6 +27,11 @@ const CategorySchema = new mongoose.Schema<ICategory>({
   order: { type: Number, default: 0 },
   catalogUrl: { type: String, default: '' },
   catalogPublicId: { type: String, default: '' },
+  metaTitle: { type: String, default: '' },
+  metaDescription: { type: String, default: '' },
+  focusKeyword: { type: String, default: '' },
+  ogTitle: { type: String, default: '' },
+  ogDescription: { type: String, default: '' },
   createdAt: { type: Date, default: Date.now },
 });
 

@@ -13,6 +13,9 @@ const seoSchema = z.object({
   metaDescription: z.string().min(1, 'Description is required').trim(),
   h1: z.string().optional(),
   keywords: z.union([z.string(), z.array(z.string())]).optional(),
+  focusKeyword: z.string().optional(),
+  ogTitle: z.string().optional(),
+  ogDescription: z.string().optional(),
 });
 
 export async function GET(req: NextRequest) {
@@ -45,7 +48,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Validation failed', details: result.error.format() }, { status: 400 });
     }
 
-    const { pageKey, metaTitle, metaDescription, h1, keywords } = result.data;
+    const { pageKey, metaTitle, metaDescription, h1, keywords, focusKeyword, ogTitle, ogDescription } = result.data;
     
     const keywordsArray = typeof keywords === 'string' 
       ? keywords.split(',').map(k => k.trim()).filter(Boolean)
@@ -53,7 +56,16 @@ export async function POST(req: NextRequest) {
 
     const seo = await PageMeta.findOneAndUpdate(
       { pageKey },
-      { metaTitle, metaDescription, h1, keywords: keywordsArray, updatedAt: new Date() },
+      { 
+        metaTitle, 
+        metaDescription, 
+        h1, 
+        keywords: keywordsArray, 
+        focusKeyword: focusKeyword || '',
+        ogTitle: ogTitle || '',
+        ogDescription: ogDescription || '',
+        updatedAt: new Date() 
+      },
       { returnDocument: 'after', upsert: true, runValidators: true }
     );
 

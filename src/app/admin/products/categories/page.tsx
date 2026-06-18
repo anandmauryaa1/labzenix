@@ -30,7 +30,10 @@ export default function CategoryManagement() {
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: '', description: '', image: '', imagePublicId: '', catalogUrl: '', catalogPublicId: '' });
+  const [form, setForm] = useState({ 
+    name: '', description: '', image: '', imagePublicId: '', catalogUrl: '', catalogPublicId: '',
+    metaTitle: '', metaDescription: '', focusKeyword: '', ogTitle: '', ogDescription: ''
+  });
   const [isAdding, setIsAdding] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isImageUploading, setIsImageUploading] = useState(false);
@@ -87,7 +90,10 @@ export default function CategoryManagement() {
         
         setTimeout(() => {
           setSuccess(false);
-          setForm({ name: '', description: '', image: '', imagePublicId: '', catalogUrl: '', catalogPublicId: '' });
+          setForm({ 
+            name: '', description: '', image: '', imagePublicId: '', catalogUrl: '', catalogPublicId: '',
+            metaTitle: '', metaDescription: '', focusKeyword: '', ogTitle: '', ogDescription: ''
+          });
           setEditingId(null);
           setIsAdding(false);
           fetchCategories();
@@ -127,7 +133,12 @@ export default function CategoryManagement() {
       image: cat.image || '',
       imagePublicId: cat.imagePublicId || '',
       catalogUrl: cat.catalogUrl || '',
-      catalogPublicId: cat.catalogPublicId || ''
+      catalogPublicId: cat.catalogPublicId || '',
+      metaTitle: cat.metaTitle || '',
+      metaDescription: cat.metaDescription || '',
+      focusKeyword: cat.focusKeyword || '',
+      ogTitle: cat.ogTitle || '',
+      ogDescription: cat.ogDescription || ''
     });
     setIsAdding(true);
     setReorderMode(false);
@@ -523,7 +534,10 @@ export default function CategoryManagement() {
                   onClick={() => {
                     setIsAdding(false);
                     setEditingId(null);
-                    setForm({ name: '', description: '', image: '', imagePublicId: '', catalogUrl: '', catalogPublicId: '' });
+                    setForm({ 
+                      name: '', description: '', image: '', imagePublicId: '', catalogUrl: '', catalogPublicId: '',
+                      metaTitle: '', metaDescription: '', focusKeyword: '', ogTitle: '', ogDescription: ''
+                    });
                   }}
                   className="text-gray-400 hover:text-secondary transition-colors"
                 >
@@ -618,6 +632,69 @@ export default function CategoryManagement() {
                         <span className="text-[9px] font-black uppercase tracking-widest text-gray-400 text-center">Upload Catalog</span>
                       </label>
                     )}
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t border-gray-100 space-y-6">
+                  <h4 className="text-xs font-black uppercase tracking-widest text-secondary flex items-center">
+                    Search Engine Optimization
+                  </h4>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Meta Title</label>
+                      <input 
+                        type="text" 
+                        value={form.metaTitle}
+                        onChange={(e) => setForm({...form, metaTitle: e.target.value})}
+                        placeholder="SEO Title..."
+                        className="w-full p-4 bg-gray-50 border border-gray-100 text-sm font-bold outline-none focus:border-primary transition-all"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Focus Keyword</label>
+                      <input 
+                        type="text" 
+                        value={form.focusKeyword}
+                        onChange={(e) => setForm({...form, focusKeyword: e.target.value})}
+                        placeholder="Primary keyword..."
+                        className="w-full p-4 bg-gray-50 border border-gray-100 text-sm font-bold outline-none focus:border-primary transition-all"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2 md:col-span-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Meta Description</label>
+                      <textarea 
+                        value={form.metaDescription}
+                        onChange={(e) => setForm({...form, metaDescription: e.target.value})}
+                        placeholder="Brief summary for search engines..."
+                        rows={3}
+                        className="w-full p-4 bg-gray-50 border border-gray-100 text-sm font-medium outline-none focus:border-primary transition-all resize-none"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Open Graph Title</label>
+                      <input 
+                        type="text" 
+                        value={form.ogTitle}
+                        onChange={(e) => setForm({...form, ogTitle: e.target.value})}
+                        placeholder="Social Media Title..."
+                        className="w-full p-4 bg-gray-50 border border-gray-100 text-sm font-bold outline-none focus:border-primary transition-all"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Open Graph Description</label>
+                      <textarea 
+                        value={form.ogDescription}
+                        onChange={(e) => setForm({...form, ogDescription: e.target.value})}
+                        placeholder="Social Media Description..."
+                        rows={3}
+                        className="w-full p-4 bg-gray-50 border border-gray-100 text-sm font-medium outline-none focus:border-primary transition-all resize-none"
+                      />
+                    </div>
                   </div>
                 </div>
 

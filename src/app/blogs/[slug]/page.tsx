@@ -26,9 +26,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: `${title} | LabZenix Knowledge Center`,
     description: description,
+    keywords: blog.focusKeyword ? [blog.focusKeyword, blog.category, blog.tags?.join(', ')].filter(Boolean) : [blog.category, blog.tags?.join(', ')].filter(Boolean),
     openGraph: {
-      title: `${title} | LabZenix Knowledge Center`,
-      description: description,
+      title: blog.ogTitle ? `${blog.ogTitle} | LabZenix Knowledge Center` : `${title} | LabZenix Knowledge Center`,
+      description: blog.ogDescription || description,
       images: [blog.image],
     },
   };

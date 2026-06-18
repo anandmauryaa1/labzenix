@@ -33,7 +33,10 @@ export default function SEOManagement() {
     metaTitle: '',
     metaDescription: '',
     h1: '',
-    keywords: ''
+    keywords: '',
+    focusKeyword: '',
+    ogTitle: '',
+    ogDescription: ''
   });
 
   useEffect(() => {
@@ -47,10 +50,13 @@ export default function SEOManagement() {
         metaTitle: current.metaTitle || '',
         metaDescription: current.metaDescription || '',
         h1: current.h1 || '',
-        keywords: current.keywords?.join(', ') || ''
+        keywords: current.keywords?.join(', ') || '',
+        focusKeyword: current.focusKeyword || '',
+        ogTitle: current.ogTitle || '',
+        ogDescription: current.ogDescription || ''
       });
     } else {
-      setForm({ metaTitle: '', metaDescription: '', h1: '', keywords: '' });
+      setForm({ metaTitle: '', metaDescription: '', h1: '', keywords: '', focusKeyword: '', ogTitle: '', ogDescription: '' });
     }
   }, [activePage, metaData]);
 
@@ -222,6 +228,44 @@ export default function SEOManagement() {
                         onChange={(e) => setForm({...form, keywords: e.target.value})}
                         placeholder="laboratory, testing, instruments..."
                         className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary focus:bg-white outline-none transition-all font-bold text-secondary text-sm"
+                      />
+                   </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-6 border-t border-gray-50">
+                   {/* Focus Keyword */}
+                   <div className="space-y-2 md:col-span-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Focus Keyword</label>
+                      <input 
+                        type="text" 
+                        value={form.focusKeyword} 
+                        onChange={(e) => setForm({...form, focusKeyword: e.target.value})}
+                        placeholder="Primary targeted keyword..."
+                        className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary focus:bg-white outline-none transition-all font-bold text-secondary text-sm"
+                      />
+                   </div>
+
+                   {/* OG Title */}
+                   <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Open Graph Title (Social Media)</label>
+                      <input 
+                        type="text" 
+                        value={form.ogTitle} 
+                        onChange={(e) => setForm({...form, ogTitle: e.target.value})}
+                        placeholder="Title for Facebook, LinkedIn..."
+                        className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary focus:bg-white outline-none transition-all font-bold text-secondary text-sm"
+                      />
+                   </div>
+
+                   {/* OG Description */}
+                   <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Open Graph Description</label>
+                      <textarea 
+                        value={form.ogDescription} 
+                        onChange={(e) => setForm({...form, ogDescription: e.target.value})}
+                        placeholder="Description for social sharing..."
+                        rows={3}
+                        className="w-full p-4 bg-gray-50 border border-gray-100 focus:border-primary focus:bg-white outline-none transition-all font-medium text-gray-600 text-xs resize-none leading-relaxed"
                       />
                    </div>
                 </div>

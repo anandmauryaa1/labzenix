@@ -51,7 +51,12 @@ export default function ApplicationManagement() {
     image: '',
     order: 0,
     active: true,
-    category: ''
+    category: '',
+    metaTitle: '',
+    metaDescription: '',
+    focusKeyword: '',
+    ogTitle: '',
+    ogDescription: ''
   });
 
   useEffect(() => {
@@ -95,7 +100,12 @@ export default function ApplicationManagement() {
         image: app.image,
         order: app.order || 0,
         active: app.active,
-        category: typeof app.category === 'object' ? app.category._id : app.category || ''
+        category: typeof app.category === 'object' ? app.category._id : app.category || '',
+        metaTitle: (app as any).metaTitle || '',
+        metaDescription: (app as any).metaDescription || '',
+        focusKeyword: (app as any).focusKeyword || '',
+        ogTitle: (app as any).ogTitle || '',
+        ogDescription: (app as any).ogDescription || ''
       });
     } else {
       setEditingApp(null);
@@ -105,7 +115,12 @@ export default function ApplicationManagement() {
         image: '',
         order: applications.length,
         active: true,
-        category: ''
+        category: '',
+        metaTitle: '',
+        metaDescription: '',
+        focusKeyword: '',
+        ogTitle: '',
+        ogDescription: ''
       });
     }
     setIsModalOpen(true);
@@ -421,6 +436,69 @@ export default function ApplicationManagement() {
                       <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 group-hover:text-secondary">Visible on Website</span>
                     </div>
                   </label>
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-gray-100 space-y-6">
+                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-secondary flex items-center">
+                  Search Engine Optimization
+                </h4>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Meta Title</label>
+                    <input 
+                      type="text" 
+                      value={formData.metaTitle}
+                      onChange={(e) => setFormData({...formData, metaTitle: e.target.value})}
+                      placeholder="SEO Title..."
+                      className="w-full border border-gray-200 px-4 py-3 outline-none focus:border-primary text-sm font-medium transition-all"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Focus Keyword</label>
+                    <input 
+                      type="text" 
+                      value={formData.focusKeyword}
+                      onChange={(e) => setFormData({...formData, focusKeyword: e.target.value})}
+                      placeholder="Primary keyword..."
+                      className="w-full border border-gray-200 px-4 py-3 outline-none focus:border-primary text-sm font-medium transition-all"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Meta Description</label>
+                    <textarea 
+                      value={formData.metaDescription}
+                      onChange={(e) => setFormData({...formData, metaDescription: e.target.value})}
+                      placeholder="Brief summary for search engines..."
+                      rows={3}
+                      className="w-full border border-gray-200 px-4 py-3 outline-none focus:border-primary text-sm font-medium transition-all resize-none"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Open Graph Title</label>
+                    <input 
+                      type="text" 
+                      value={formData.ogTitle}
+                      onChange={(e) => setFormData({...formData, ogTitle: e.target.value})}
+                      placeholder="Social Media Title..."
+                      className="w-full border border-gray-200 px-4 py-3 outline-none focus:border-primary text-sm font-medium transition-all"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Open Graph Description</label>
+                    <textarea 
+                      value={formData.ogDescription}
+                      onChange={(e) => setFormData({...formData, ogDescription: e.target.value})}
+                      placeholder="Social Media Description..."
+                      rows={3}
+                      className="w-full border border-gray-200 px-4 py-3 outline-none focus:border-primary text-sm font-medium transition-all resize-none"
+                    />
+                  </div>
                 </div>
               </div>
 

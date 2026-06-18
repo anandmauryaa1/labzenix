@@ -35,12 +35,15 @@ export default function BlogForm({ params: paramsPromise }: { params: Promise<{ 
     title: '', 
     slug: '', 
     content: '', 
-    image: '', 
-    category: '', 
+    image: '',
+    category: '',
     status: 'published',
-    tags: '', 
+    tags: '',
     metaTitle: '', 
-    metaDescription: ''
+    metaDescription: '',
+    focusKeyword: '',
+    ogTitle: '',
+    ogDescription: ''
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
@@ -62,7 +65,10 @@ export default function BlogForm({ params: paramsPromise }: { params: Promise<{ 
           status: data.status || 'published',
           tags: data.tags?.join(', ') || '',
           metaTitle: data.metaTitle || '',
-          metaDescription: data.metaDescription || ''
+          metaDescription: data.metaDescription || '',
+          focusKeyword: data.focusKeyword || '',
+          ogTitle: data.ogTitle || '',
+          ogDescription: data.ogDescription || ''
         }));
     }
   }, [params.id, isNew]);
@@ -270,6 +276,42 @@ export default function BlogForm({ params: paramsPromise }: { params: Promise<{ 
                       info="A brief summary (120-160 chars) that appears beneath your link in search results."
                     />
                   </div>
+               </div>
+               
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-6 border-t border-gray-100">
+                 {/* Focus Keyword */}
+                 <div className="space-y-4 md:col-span-2">
+                    <Input 
+                      label="Focus Keyword"
+                      value={form.focusKeyword || ''} 
+                      onChange={(e) => setForm({...form, focusKeyword: e.target.value})}
+                      placeholder="Primary targeted keyword..."
+                      info="The primary keyword you want this article to rank for."
+                    />
+                 </div>
+
+                 {/* OG Title */}
+                 <div className="space-y-4">
+                    <Input 
+                      label="Open Graph Title"
+                      value={form.ogTitle || ''} 
+                      onChange={(e) => setForm({...form, ogTitle: e.target.value})}
+                      placeholder="Title for Social Media..."
+                      info="Title used when sharing on Facebook, LinkedIn, etc."
+                    />
+                 </div>
+
+                 {/* OG Description */}
+                 <div className="space-y-4">
+                    <TextArea 
+                      label="Open Graph Description"
+                      value={form.ogDescription || ''} 
+                      onChange={(e) => setForm({...form, ogDescription: e.target.value})}
+                      placeholder="Description for Social Media..."
+                      rows={3}
+                      info="Description used when sharing on social media."
+                    />
+                 </div>
                </div>
             </div>
           </div>

@@ -54,6 +54,9 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
     youtubeUrl: '',
     metaTitle: '',
     metaDescription: '',
+    focusKeyword: '',
+    ogTitle: '',
+    ogDescription: '',
     reviews: [] as { author: string; rating: number; comment: string; images?: string[] }[],
     faqs: [] as { question: string; answer: string }[],
     applications: [] as string[]
@@ -109,6 +112,9 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
             youtubeUrl: data.youtubeUrl || '',
             metaTitle: data.metaTitle || '',
             metaDescription: data.metaDescription || '',
+            focusKeyword: data.focusKeyword || '',
+            ogTitle: data.ogTitle || '',
+            ogDescription: data.ogDescription || '',
             reviews: data.reviews || [],
             faqs: data.faqs || [],
             applications: data.applications || []
@@ -212,7 +218,10 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
           metaDescription: saved.metaDescription || '',
           reviews: saved.reviews || [],
           faqs: saved.faqs || [],
-          applications: saved.applications || []
+          applications: saved.applications || [],
+          focusKeyword: saved.focusKeyword || '',
+          ogTitle: saved.ogTitle || '',
+          ogDescription: saved.ogDescription || ''
         };
         setForm(synced);
         formRef.current = synced;
@@ -915,6 +924,45 @@ export default function ProductForm({ params: paramsPromise }: { params: Promise
                         error={errors.metaDescription}
                         info="A brief summary (120-160 chars) that appears beneath your link in search results."
                       />
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-6 border-t border-gray-100">
+                    {/* Focus Keyword */}
+                    <div className="space-y-6 md:col-span-2">
+                       <Input 
+                         label="Focus Keyword"
+                         value={form.focusKeyword || ''} 
+                         onChange={(e) => setForm({...form, focusKeyword: e.target.value})}
+                         placeholder="Primary targeted keyword..."
+                         error={errors.focusKeyword}
+                         info="The primary keyword you want this product to rank for."
+                       />
+                    </div>
+
+                    {/* OG Title */}
+                    <div className="space-y-6">
+                       <Input 
+                         label="Open Graph Title"
+                         value={form.ogTitle || ''} 
+                         onChange={(e) => setForm({...form, ogTitle: e.target.value})}
+                         placeholder="Title for Social Media..."
+                         error={errors.ogTitle}
+                         info="Title used when sharing on Facebook, LinkedIn, etc."
+                       />
+                    </div>
+
+                    {/* OG Description */}
+                    <div className="space-y-6">
+                       <TextArea 
+                         label="Open Graph Description"
+                         value={form.ogDescription || ''} 
+                         onChange={(e) => setForm({...form, ogDescription: e.target.value})}
+                         placeholder="Description for Social Media..."
+                         rows={4}
+                         error={errors.ogDescription}
+                         info="Description used when sharing on social media."
+                       />
                     </div>
                   </div>
                 </div>

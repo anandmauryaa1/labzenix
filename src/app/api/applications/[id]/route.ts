@@ -15,6 +15,11 @@ const updateSchema = z.object({
   order: z.number().optional(),
   active: z.boolean().optional(),
   category: z.string().optional().nullable(),
+  metaTitle: z.string().optional(),
+  metaDescription: z.string().optional(),
+  focusKeyword: z.string().optional(),
+  ogTitle: z.string().optional(),
+  ogDescription: z.string().optional(),
 });
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

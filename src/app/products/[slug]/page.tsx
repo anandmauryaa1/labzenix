@@ -36,10 +36,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return { 
     title: `${title} | LabZenix`, 
     description: description,
-    keywords: [product.category, product.title, product.modelNumber],
+    keywords: product.focusKeyword ? [product.focusKeyword, product.category, product.title, product.modelNumber] : [product.category, product.title, product.modelNumber],
     openGraph: {
-      title: `${title} | LabZenix`,
-      description: description,
+      title: product.ogTitle ? `${product.ogTitle} | LabZenix` : `${title} | LabZenix`,
+      description: product.ogDescription || description,
       images: [product.images?.[0] || '/og-image.png'],
     }
   };

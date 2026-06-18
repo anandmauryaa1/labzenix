@@ -11,6 +11,11 @@ import { jwtVerify } from 'jose';
  */
 
 export async function middleware(request: NextRequest) {
+  // Prevent X-Original-URL / X-Rewrite-URL attacks
+  if (request.headers.has('x-original-url') || request.headers.has('x-rewrite-url')) {
+    return new NextResponse('Forbidden', { status: 403 });
+  }
+
   const path = request.nextUrl.pathname;
   const response = NextResponse.next();
 

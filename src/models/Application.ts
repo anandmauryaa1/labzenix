@@ -10,6 +10,11 @@ export interface IApplication extends Document {
   order: number;
   active: boolean;
   category?: mongoose.Types.ObjectId;
+  metaTitle: string;
+  metaDescription: string;
+  focusKeyword: string;
+  ogTitle: string;
+  ogDescription: string;
   createdAt: Date;
 }
 
@@ -22,6 +27,11 @@ const ApplicationSchema = new mongoose.Schema<IApplication>({
   order: { type: Number, default: 0 },
   active: { type: Boolean, default: true },
   category: { type: mongoose.Schema.Types.ObjectId, ref: 'ApplicationCategory' },
+  metaTitle: { type: String, default: '' },
+  metaDescription: { type: String, default: '' },
+  focusKeyword: { type: String, default: '' },
+  ogTitle: { type: String, default: '' },
+  ogDescription: { type: String, default: '' },
   createdAt: { type: Date, default: Date.now },
 });
 
