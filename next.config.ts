@@ -123,16 +123,7 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      // Static assets can be cached aggressively — override Cache-Control
-      {
-        source: '/_next/static/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
+      // Custom public static assets can be cached aggressively
       {
         source: '/static/:path*',
         headers: [
