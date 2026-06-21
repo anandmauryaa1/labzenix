@@ -35,29 +35,23 @@ const nextConfig: NextConfig = {
   async headers() {
     // Build the Content-Security-Policy directives
     const ContentSecurityPolicy = [
-      // Only allow resources from the same origin by default
       `default-src 'self'`,
-      // Scripts: self + Next.js inline scripts + eval + Tawk.to live chat
-      `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://embed.tawk.to https://cdn.jsdelivr.net`,
-      // Styles: self + inline (CSS-in-JS / Tailwind) + Google Fonts
-      `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
-      // Images: self + data URIs + blob (for canvas) + trusted CDNs + Tawk.to
-      `img-src 'self' data: blob: https://res.cloudinary.com https://images.pexels.com https://images.unsplash.com https://*.tawk.to`,
-      // Fonts: self + Google Fonts
-      `font-src 'self' https://fonts.gstatic.com`,
-      // API fetch / WebSocket connections + Tawk.to chat socket
-      `connect-src 'self' https://*.tawk.to wss://*.tawk.to`,
-      // Media (video/audio): self + Cloudinary
-      `media-src 'self' https://res.cloudinary.com`,
-      // Allow Tawk.to iframe (chat widget renders inside an iframe)
-      `frame-src https://tawk.to https://*.tawk.to`,
-      // Iframes: forbid embedding THIS site in external sites (clickjacking protection)
-      `frame-ancestors 'none'`,
-      // Only allow forms to submit to same origin
+      // Next.js requires unsafe-inline + unsafe-eval; Tawk.to loads from embed.tawk.to
+      `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://embed.tawk.to https://*.tawk.to https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com`,
+      `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.tawk.to`,
+      // Cloudinary images + Tawk.to agent avatars
+      `img-src 'self' data: blob: https://res.cloudinary.com https://images.pexels.com https://images.unsplash.com https://*.tawk.to https://www.googletagmanager.com`,
+      `font-src 'self' https://fonts.gstatic.com https://*.tawk.to`,
+      // Tawk.to uses wss:// WebSocket for real-time chat
+      `connect-src 'self' https://*.tawk.to wss://*.tawk.to https://www.google-analytics.com https://stats.g.doubleclick.net`,
+      `media-src 'self' https://res.cloudinary.com https://*.tawk.to`,
+      // Tawk.to widget renders inside an iframe — must allow it
+      `frame-src 'self' https://tawk.to https://*.tawk.to`,
+      // Prevent THIS site from being embedded inside other sites (anti-clickjacking)
+      // Note: 'none' here means no external site can embed us — Tawk.to embeds itself, not us
+      `frame-ancestors 'self'`,
       `form-action 'self'`,
-      // Block all plugins (Flash, Java, etc.)
       `object-src 'none'`,
-      // Upgrade insecure HTTP requests to HTTPS automatically
       `upgrade-insecure-requests`,
     ].join('; ');
 
