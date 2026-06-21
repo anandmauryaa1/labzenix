@@ -74,7 +74,18 @@ const ProductSchema = new mongoose.Schema<IProduct>({
   createdAt: { type: Date, default: Date.now, index: true },
 });
 
+// Compound query index
 ProductSchema.index({ category: 1, usage: 1 });
+ProductSchema.index({ createdAt: -1 });
+ProductSchema.index({ slug: 1 });
 
+// Full-text search index — used by $text queries on the catalog
+ProductSchema.index(
+  { title: 'text', modelNumber: 'text', description: 'text', featuresText: 'text', category: 'text' },
+  {
+    weights: { title: 10, modelNumber: 8, description: 5, featuresText: 3, category: 2 },
+    name: 'ProductTextIndex'
+  }
+);
 
 export default mongoose.models.Product || mongoose.model<IProduct>('Product', ProductSchema);

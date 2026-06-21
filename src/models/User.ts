@@ -82,4 +82,19 @@ UserSchema.methods.comparePassword = async function(candidatePassword: string) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
+// Query indexes
+UserSchema.index({ email: 1 });
+UserSchema.index({ username: 1 });
+UserSchema.index({ role: 1 });
+UserSchema.index({ active: 1 });
+
+// Full-text search index for admin user directory
+UserSchema.index(
+  { name: 'text', email: 'text', username: 'text' },
+  {
+    weights: { name: 10, email: 8, username: 5 },
+    name: 'UserTextIndex'
+  }
+);
+
 export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema);

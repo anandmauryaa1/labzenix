@@ -39,4 +39,10 @@ CrmDealSchema.index({ value: -1 });
 CrmDealSchema.index({ createdAt: -1 });
 CrmDealSchema.index({ stage: 1, value: -1 });
 
+// Full-text search
+CrmDealSchema.index(
+  { title: 'text' },
+  { weights: { title: 10 }, name: 'CrmDealTextIndex' }
+);
+
 export default mongoose.models.CrmDeal || mongoose.model<ICrmDeal>('CrmDeal', CrmDealSchema);

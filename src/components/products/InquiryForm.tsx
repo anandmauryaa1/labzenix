@@ -11,7 +11,7 @@ interface InquiryFormProps {
 }
 
 export default function InquiryForm({ productId, productName }: InquiryFormProps) {
-  const [form, setForm] = useState({ name: '', email: '', message: '' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -24,7 +24,7 @@ export default function InquiryForm({ productId, productName }: InquiryFormProps
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...form, productId, productName, source: 'product page' }),
       });
-      setForm({ name: '', email: '', message: '' });
+      setForm({ name: '', email: '', phone: '', message: '' });
       setSubmitted(true);
       toast.success('Inquiry submitted successfully');
     } catch (err) {
@@ -53,10 +53,11 @@ export default function InquiryForm({ productId, productName }: InquiryFormProps
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <Input label="Name" value={form.name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, name: e.target.value })} required />
-      <Input label="Email" type="email" value={form.email} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, email: e.target.value })} required />
+      <Input label="Your Name *" placeholder="Enter your full name" value={form.name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, name: e.target.value })} required />
+      <Input label="Email Address *" placeholder="Enter your business email" type="email" value={form.email} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, email: e.target.value })} required />
+      <Input label="Phone Number *" placeholder="+91-0000000000" type="tel" value={form.phone} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, phone: e.target.value })} required />
       <div className="space-y-1">
-        <label className="text-sm font-medium text-secondary">Message</label>
+        <label className="text-sm font-medium text-secondary">Your Message *</label>
         <textarea 
           className="w-full px-4 py-3 bg-white border border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none h-32" 
           placeholder="Tell us about your requirements..." 

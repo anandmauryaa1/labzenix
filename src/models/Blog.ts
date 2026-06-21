@@ -37,4 +37,20 @@ const BlogSchema = new Schema<IBlog>({
   timestamps: true
 });
 
+// Query indexes
+BlogSchema.index({ status: 1, createdAt: -1 });
+BlogSchema.index({ category: 1, status: 1 });
+BlogSchema.index({ slug: 1 });
+BlogSchema.index({ author: 1 });
+BlogSchema.index({ views: -1 });
+
+// Full-text search index
+BlogSchema.index(
+  { title: 'text', tags: 'text', content: 'text' },
+  {
+    weights: { title: 10, tags: 5, content: 2 },
+    name: 'BlogTextIndex'
+  }
+);
+
 export default mongoose.models.Blog || mongoose.model<IBlog>('Blog', BlogSchema);

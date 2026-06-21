@@ -27,6 +27,17 @@ const InquirySchema = new Schema<IInquiry>({
 });
 
 InquirySchema.index({ source: 1, createdAt: -1 });
+InquirySchema.index({ productId: 1 });
+InquirySchema.index({ createdAt: -1 });
+
+// Full-text search index for admin inquiry search
+InquirySchema.index(
+  { name: 'text', email: 'text', subject: 'text', message: 'text' },
+  {
+    weights: { name: 10, email: 8, subject: 5, message: 2 },
+    name: 'InquiryTextIndex'
+  }
+);
 
 // Clear the model cache in development to ensure schema changes apply immediately
 if (process.env.NODE_ENV !== 'production') {
