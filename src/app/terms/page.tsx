@@ -8,12 +8,17 @@ export const metadata = {
   description: 'Terms and conditions for using LabZenix laboratory instruments and services.',
 };
 
-export const revalidate = 60; // Revalidate every 60 seconds
+export const dynamic = 'force-dynamic';
 
 export default async function TermsAndConditionsPage() {
-  await dbConnect();
-  const settings = await Settings.findOne({ configKey: 'global' });
-  const content = settings?.legal?.termsAndConditions || '<p>Terms and conditions have not been published yet. Please check back later.</p>';
+  let content = '<p>Terms and conditions have not been published yet. Please check back later.</p>';
+  try {
+    await dbConnect();
+    const settings = await Settings.findOne({ configKey: 'global' });
+    content = settings?.legal?.termsAndConditions || content;
+  } catch {
+    // DB unavailable — show fallback
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 pt-20 pb-20">

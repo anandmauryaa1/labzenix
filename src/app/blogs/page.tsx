@@ -11,26 +11,34 @@ export async function generateMetadata() {
   return await getPageMetadata('blogs');
 }
 
+export const dynamic = 'force-dynamic';
+
 export default async function BlogPage({
   searchParams,
 }: {
   searchParams: Promise<{ page?: string }>;
 }) {
-  await dbConnect();
   const searchParamsObj = await searchParams;
   const currentPage = parseInt(searchParamsObj.page || '1');
   const limit = 6;
   const skip = (currentPage - 1) * limit;
 
-  // Include legacy blogs (no status) and published ones
-  const totalBlogs = await Blog.countDocuments({ status: { $ne: 'draft' } });
-  const totalPages = Math.ceil(totalBlogs / limit);
+  let totalBlogs = 0;
+  let totalPages = 1;
+  let blogs: any[] = [];
 
-  const blogs = await Blog.find({ status: { $ne: 'draft' } })
-    .populate('author', 'name')
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit);
+  try {
+    await dbConnect();
+    totalBlogs = await Blog.countDocuments({ status: { $ne: 'draft' } });
+    totalPages = Math.ceil(totalBlogs / limit);
+    blogs = await Blog.find({ status: { $ne: 'draft' } })
+      .populate('author', 'name')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+  } catch {
+    // DB unavailable — render empty state
+  }
 
   return (
     <div className="bg-white overflow-hidden">

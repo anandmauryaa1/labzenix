@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 import toast from 'react-hot-toast';
@@ -11,6 +12,7 @@ interface InquiryFormProps {
 }
 
 export default function InquiryForm({ productId, productName }: InquiryFormProps) {
+  const router = useRouter();
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -25,8 +27,8 @@ export default function InquiryForm({ productId, productName }: InquiryFormProps
         body: JSON.stringify({ ...form, productId, productName, source: 'product page' }),
       });
       setForm({ name: '', email: '', phone: '', message: '' });
-      setSubmitted(true);
       toast.success('Inquiry submitted successfully');
+      router.push('/thank-you');
     } catch (err) {
       toast.error('Failed to submit inquiry');
       console.error(err);

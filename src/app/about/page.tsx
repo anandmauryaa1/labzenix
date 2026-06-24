@@ -14,10 +14,12 @@ export async function generateMetadata() {
   return await getPageMetadata('about');
 }
 
+export const dynamic = 'force-dynamic';
+
 export default async function AboutPage() {
-  await dbConnect();
   let stats: { label: string; value: string }[] = [];
   try {
+    await dbConnect();
     const rawStats = await CompanyStat.find({ active: true }).sort({ order: 1 });
     // Convert to simple objects so they can be passed to client components if needed, or mapped cleanly
     stats = rawStats.map(s => ({

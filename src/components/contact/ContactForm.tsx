@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { Phone, Mail, MapPin, Clock, Send, CheckCircle2 } from 'lucide-react';
@@ -8,6 +9,7 @@ import toast from 'react-hot-toast';
 import FadeIn from '@/components/ui/FadeIn';
 
 export default function ContactForm() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({
@@ -35,8 +37,8 @@ export default function ContactForm() {
       });
 
       if (res.ok) {
-        setSubmitted(true);
         toast.success('Inquiry sent successfully!');
+        router.push('/thank-you');
       } else {
         toast.error('Failed to send inquiry. Please try again.');
       }

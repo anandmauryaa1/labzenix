@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Input from '@/components/ui/Input';
 import TextArea from '@/components/ui/TextArea';
 import Button from '@/components/ui/Button';
 
 export default function SidebarContactForm({ source = 'contact form' }: { source?: string }) {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
@@ -55,6 +57,8 @@ export default function SidebarContactForm({ source = 'contact form' }: { source
 
       setSuccess(true);
       setFormData({ name: '', email: '', mobile: '', companyName: '', message: '' });
+      router.push('/thank-you');
+
     } catch (err: any) {
       setError(err.message || 'An error occurred while submitting.');
     } finally {

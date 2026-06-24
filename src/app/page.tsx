@@ -22,37 +22,49 @@ import CompleteProductRange from '@/models/CompleteProductRange';
 import Testimonial from '@/models/Testimonial';
 import SiteFaq from '@/models/SiteFaq';
 
-export const revalidate = 60; // ISR cache revalidation every 60 seconds
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata() {
   return await getPageMetadata('home');
 }
 
 export default async function Home() {
-  await dbConnect();
+  let heroSlides: any[] = [];
+  let productRanges: any[] = [];
+  let products: any[] = [];
+  let aboutContentList: any[] = [];
+  let coreValues: any[] = [];
+  let partners: any[] = [];
+  let completeRanges: any[] = [];
+  let testimonials: any[] = [];
+  let faqs: any[] = [];
 
-  // Fetch all data in parallel on the server
-  const [
-    heroSlides,
-    productRanges,
-    products,
-    aboutContentList,
-    coreValues,
-    partners,
-    completeRanges,
-    testimonials,
-    faqs,
-  ] = await Promise.all([
-    HeroSlide.find({}).sort({ order: 1 }).lean().exec(),
-    ProductRangeModel.find({ active: true }).sort({ order: 1 }).lean().exec(),
-    Product.find({}).sort({ views: -1 }).limit(6).lean().exec(),
-    AboutContent.find({}).lean().exec(),
-    CoreValue.find({}).sort({ order: 1 }).lean().exec(),
-    Partner.find({ isActive: true }).sort({ order: 1 }).lean().exec(),
-    CompleteProductRange.find({}).sort({ order: 1 }).lean().exec(),
-    Testimonial.find({}).sort({ order: 1 }).lean().exec(),
-    SiteFaq.find({ isActive: true }).sort({ order: 1, createdAt: -1 }).lean().exec(),
-  ]);
+  try {
+    await dbConnect();
+    [
+      heroSlides,
+      productRanges,
+      products,
+      aboutContentList,
+      coreValues,
+      partners,
+      completeRanges,
+      testimonials,
+      faqs,
+    ] = await Promise.all([
+      HeroSlide.find({}).sort({ order: 1 }).lean().exec(),
+      ProductRangeModel.find({ active: true }).sort({ order: 1 }).lean().exec(),
+      Product.find({}).sort({ views: -1 }).limit(6).lean().exec(),
+      AboutContent.find({}).lean().exec(),
+      CoreValue.find({}).sort({ order: 1 }).lean().exec(),
+      Partner.find({ isActive: true }).sort({ order: 1 }).lean().exec(),
+      CompleteProductRange.find({}).sort({ order: 1 }).lean().exec(),
+      Testimonial.find({}).sort({ order: 1 }).lean().exec(),
+      SiteFaq.find({ isActive: true }).sort({ order: 1, createdAt: -1 }).lean().exec(),
+    ]);
+  } catch {
+    // DB unavailable at build time — components will render with empty/fallback data
+  }
 
   const topProducts = products;
   const aboutContent = aboutContentList.length > 0 ? aboutContentList[0] : null;
