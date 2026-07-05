@@ -10,9 +10,9 @@
   RewriteCond %{HTTPS} off
   RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-  # Redirect non-www to www (optional, uncomment if needed)
-  # RewriteCond %{HTTP_HOST} ^labzenix\.com [NC]
-  # RewriteRule ^(.*)$ https://www.labzenix.com/$1 [L,R=301]
+  # Redirect www to non-www (301 permanent)
+  RewriteCond %{HTTP_HOST} ^www\.labzenix\.com [NC]
+  RewriteRule ^(.*)$ https://labzenix.com/$1 [L,R=301]
 </IfModule>
 
 # Disable Directory Browsing

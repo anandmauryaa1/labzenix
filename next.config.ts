@@ -142,6 +142,19 @@ const nextConfig: NextConfig = {
   
   async redirects() {
     return [
+      // ── www → non-www (301 permanent) ─────────────────────────────
+      // Redirects https://www.labzenix.com/* → https://labzenix.com/*
+      {
+        source: '/:path*',
+        destination: 'https://labzenix.com/:path*',
+        permanent: true,
+        has: [
+          {
+            type: 'host',
+            value: 'www.labzenix.com',
+          },
+        ],
+      },
       // Redirect http to https in production - Disabled for IP testing
       /*
       {
