@@ -45,8 +45,8 @@ const nextConfig: NextConfig = {
       // Tawk.to uses wss:// WebSocket for real-time chat
       `connect-src 'self' https://*.tawk.to wss://*.tawk.to https://www.google-analytics.com https://stats.g.doubleclick.net`,
       `media-src 'self' https://res.cloudinary.com https://*.tawk.to`,
-      // Tawk.to widget renders inside an iframe — must allow it
-      `frame-src 'self' https://tawk.to https://*.tawk.to`,
+      // Tawk.to widget renders inside an iframe — must allow it, plus YouTube for product videos (including privacy-enhanced nocookie URLs)
+      `frame-src 'self' https://tawk.to https://*.tawk.to https://www.youtube.com https://youtube.com https://*.youtube.com https://www.youtube-nocookie.com https://youtube-nocookie.com https://*.youtube-nocookie.com`,
       // Prevent THIS site from being embedded inside other sites (anti-clickjacking)
       // Note: 'none' here means no external site can embed us — Tawk.to embeds itself, not us
       `frame-ancestors 'self'`,

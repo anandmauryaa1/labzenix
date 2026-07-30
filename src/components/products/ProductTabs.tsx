@@ -63,8 +63,22 @@ const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
 
 const getYouTubeEmbedUrl = (url: string) => {
   if (!url) return '';
-  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|watch\?v=|watch\?.+&v=))([^&?]+)/);
-  return match ? `https://www.youtube.com/embed/${match[1]}` : url;
+  const trimmedUrl = url.trim();
+  
+  // Regex to match exact 11 characters of YouTube video ID
+  const regExp = /(?:youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/|live\/)([a-zA-Z0-9_-]{11})/;
+  const match = trimmedUrl.match(regExp);
+  
+  if (match && match[1]) {
+    return `https://www.youtube.com/embed/${match[1]}`;
+  }
+  
+  // Fallback if the user just inputs the 11-char ID
+  if (trimmedUrl.length === 11 && !trimmedUrl.includes('/') && !trimmedUrl.includes('.')) {
+    return `https://www.youtube.com/embed/${trimmedUrl}`;
+  }
+  
+  return trimmedUrl;
 };
 
 /* ─── Component ─────────────────────────────────────────── */

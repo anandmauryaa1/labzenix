@@ -5,9 +5,13 @@ import Blog from '@/models/Blog';
 import Inquiry from '@/models/Inquiry';
 import Category from '@/models/Category';
 import { logger } from '@/lib/logger';
+import { getAuthUser } from '@/lib/auth';
 
 export async function GET(req: NextRequest) {
   try {
+    const user = await getAuthUser(req);
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
     await dbConnect();
 
     // 1. Fetch counts
