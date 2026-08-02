@@ -318,10 +318,6 @@ export default function LeadCapturePopup() {
                       </>
                     )}
                   </button>
-
-                  <p className="text-[10px] text-center text-gray-400 font-medium">
-                    We respect your privacy. No spam, ever.
-                  </p>
                 </form>
               </>
             )}
