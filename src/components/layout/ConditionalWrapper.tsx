@@ -4,6 +4,8 @@ import { usePathname } from 'next/navigation';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import FloatingContact from './FloatingContact';
+import LeadCapturePopup from './LeadCapturePopup';
+import { Toaster } from 'react-hot-toast';
 
 export default function ConditionalWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -15,12 +17,14 @@ export default function ConditionalWrapper({ children }: { children: React.React
 
   return (
     <>
+      <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
       <Navbar />
       <main className="flex-grow pt-[101px] md:pt-[117px]">
         {children}
       </main>
       <Footer />
       <FloatingContact />
+      <LeadCapturePopup />
     </>
   );
 }
