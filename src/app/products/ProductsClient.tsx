@@ -37,6 +37,7 @@ interface Application {
 }
 
 const ITEMS_PER_PAGE = 12;
+const productCacheMap = new Map<string, Product[]>();
 
 function ProductsContent() {
   const searchParams = useSearchParams();
@@ -132,12 +133,23 @@ function ProductsContent() {
   }
 
   async function fetchProducts() {
+    const cacheKey = `cat=${categoryParam || ''}&app=${applicationParam || ''}`;
+    if (productCacheMap.has(cacheKey)) {
+      setProducts(productCacheMap.get(cacheKey)!);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
-      let url = '/api/products';
+      let url = '/api/products?fields=card';
       if (applicationParam) {
-        url += `?application=${encodeURIComponent(applicationParam)}`;
+        url += `&application=${encodeURIComponent(applicationParam)}`;
       }
+      if (categoryParam) {
+        url += `&category=${encodeURIComponent(categoryParam)}`;
+      }
+
       const res = await fetch(url);
       if (!res.ok) {
         setProducts([]);
@@ -150,11 +162,16 @@ function ProductsContent() {
         return;
       }
 
-      if (categoryParam) {
+      // Client fallback matching if server regex returns extra items
+      if (categoryParam && data.length > 0) {
         const normTarget = normalizeCategory(categoryParam);
-        data = data.filter(p => p.category && normalizeCategory(p.category) === normTarget);
+        const filtered = data.filter(p => p.category && normalizeCategory(p.category) === normTarget);
+        if (filtered.length > 0) {
+          data = filtered;
+        }
       }
 
+      productCacheMap.set(cacheKey, data);
       setProducts(data);
     } catch (err) {
       console.error('Error fetching products:', err);
@@ -354,6 +371,8 @@ function ProductsContent() {
                               src={product.images[0]}
                               alt={product.title}
                               fill
+                              priority={idx < 4}
+                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
                               className="object-contain p-4 group-hover:scale-110 transition-transform duration-700"
                             />
                           ) : (

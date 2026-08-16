@@ -33,25 +33,54 @@ export async function GET(req: NextRequest) {
     await dbConnect();
     const { searchParams } = new URL(req.url);
     const applicationSlug = searchParams.get('application');
+    const categoryParam = searchParams.get('category');
+    const fieldsParam = searchParams.get('fields');
     
-    let query = {};
+    let query: Record<string, any> = {};
     
     if (applicationSlug) {
       // Find the application ID from slug
       const Application = (await import('@/models/Application')).default;
       const app = await Application.findOne({ slug: applicationSlug }).lean();
       if (app) {
-        query = { applications: app._id };
+        query.applications = app._id;
       }
     }
 
-    const products = await Product.find(query)
-      .populate({ path: 'author', model: User, select: 'name' })
+    if (categoryParam) {
+      const decodedCat = decodeURIComponent(categoryParam).trim();
+      // Build flexible regex pattern matching & or and, hyphens or spaces
+      const escaped = decodedCat.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regexPattern = escaped
+        .replace(/\\&/g, '(\\&|and)')
+        .replace(/[-\s]+/g, '[-\\s]+');
+      query.category = { $regex: new RegExp(`^${regexPattern}$`, 'i') };
+    }
+
+    let selectFields = '-__v';
+    let shouldPopulate = true;
+
+    if (fieldsParam === 'card') {
+      selectFields = '_id title modelNumber slug category images description';
+      shouldPopulate = false;
+    }
+
+    let queryBuilder = Product.find(query)
       .sort({ createdAt: 1 })
       .lean()
-      .select('-__v');
+      .select(selectFields);
+
+    if (shouldPopulate) {
+      queryBuilder = queryBuilder.populate({ path: 'author', model: User, select: 'name' });
+    }
+
+    const products = await queryBuilder;
     
-    return NextResponse.json(JSON.parse(JSON.stringify(products)));
+    return NextResponse.json(JSON.parse(JSON.stringify(products)), {
+      headers: {
+        'Cache-Control': 'public, max-age=120, s-maxage=600, stale-while-revalidate=1200'
+      }
+    });
   } catch (error) {
     return handleProductionError(error);
   }
