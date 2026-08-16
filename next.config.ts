@@ -36,14 +36,14 @@ const nextConfig: NextConfig = {
     // Build the Content-Security-Policy directives
     const ContentSecurityPolicy = [
       `default-src 'self'`,
-      // Next.js requires unsafe-inline + unsafe-eval; Tawk.to loads from embed.tawk.to
-      `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://embed.tawk.to https://*.tawk.to https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com`,
+      // Next.js requires unsafe-inline + unsafe-eval; Tawk.to loads from embed.tawk.to; YouTube player scripts
+      `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://embed.tawk.to https://*.tawk.to https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com https://www.youtube.com https://s.ytimg.com`,
       `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.tawk.to`,
-      // Cloudinary images + Tawk.to agent avatars
-      `img-src 'self' data: blob: https://res.cloudinary.com https://images.pexels.com https://images.unsplash.com https://*.tawk.to https://www.googletagmanager.com`,
+      // Cloudinary images + YouTube thumbnails (i.ytimg.com) + Tawk.to agent avatars
+      `img-src 'self' data: blob: https://res.cloudinary.com https://images.pexels.com https://images.unsplash.com https://*.tawk.to https://www.googletagmanager.com https://i.ytimg.com https://*.youtube.com`,
       `font-src 'self' https://fonts.gstatic.com https://*.tawk.to`,
-      // Tawk.to uses wss:// WebSocket for real-time chat
-      `connect-src 'self' https://*.tawk.to wss://*.tawk.to https://www.google-analytics.com https://stats.g.doubleclick.net`,
+      // Tawk.to uses wss:// WebSocket for real-time chat; YouTube player APIs
+      `connect-src 'self' https://*.tawk.to wss://*.tawk.to https://www.google-analytics.com https://stats.g.doubleclick.net https://www.youtube.com`,
       `media-src 'self' https://res.cloudinary.com https://*.tawk.to`,
       // Tawk.to widget renders inside an iframe — must allow it, plus YouTube for product videos (including privacy-enhanced nocookie URLs)
       `frame-src 'self' https://tawk.to https://*.tawk.to https://www.youtube.com https://youtube.com https://*.youtube.com https://www.youtube-nocookie.com https://youtube-nocookie.com https://*.youtube-nocookie.com`,

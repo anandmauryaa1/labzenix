@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Package, ChevronRight, ArrowLeft, Grid3X3 } from 'lucide-react';
 import Link from 'next/link';
@@ -36,6 +36,8 @@ interface Application {
   description: string;
 }
 
+const ITEMS_PER_PAGE = 12;
+
 function ProductsContent() {
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get('category');
@@ -47,6 +49,9 @@ function ProductsContent() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [certificateImage, setCertificateImage] = useState<string | null>(null);
   const [loading, setLoading]       = useState(true);
+  const [visibleCount, setVisibleCount] = useState<number>(ITEMS_PER_PAGE);
+  const [loadingMore, setLoadingMore] = useState<boolean>(false);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
   const searchTerm = searchParam;
 
   const itemVariant = {
@@ -91,28 +96,40 @@ function ProductsContent() {
     fetch('/api/categories')
       .then(res => res.ok ? res.json() : [])
       .then(data => setCategories(Array.isArray(data) ? data : []))
-      .catch(() => {});
+      .catch((err) => console.error('Error loading categories:', err));
 
     // Fetch Applications
     fetch('/api/applications')
       .then(res => res.ok ? res.json() : [])
       .then(data => setApplications(Array.isArray(data) ? data : []))
-      .catch(() => {});
+      .catch((err) => console.error('Error loading applications:', err));
 
     // Fetch Certificates
     fetch('/api/company-certificates')
       .then(res => res.ok ? res.json() : [])
       .then(data => {
-        if (data && data.length > 0 && data[0].fileUrl) {
+        if (Array.isArray(data) && data.length > 0 && data[0]?.fileUrl) {
           setCertificateImage(data[0].fileUrl);
         }
       })
-      .catch(() => {});
+      .catch((err) => console.error('Error loading certificates:', err));
   }, []);
 
   useEffect(() => {
     fetchProducts();
   }, [categoryParam, applicationParam]);
+
+  // Reset pagination when category, application, or search params change
+  useEffect(() => {
+    setVisibleCount(ITEMS_PER_PAGE);
+  }, [categoryParam, applicationParam, searchTerm]);
+
+  function normalizeCategory(str: string): string {
+    return decodeURIComponent(str)
+      .toLowerCase()
+      .replace(/&/g, 'and')
+      .replace(/[^a-z0-9]/g, '');
+  }
 
   async function fetchProducts() {
     setLoading(true);
@@ -122,7 +139,10 @@ function ProductsContent() {
         url += `?application=${encodeURIComponent(applicationParam)}`;
       }
       const res = await fetch(url);
-      if (!res.ok) throw new Error('Failed to fetch');
+      if (!res.ok) {
+        setProducts([]);
+        return;
+      }
       let data: Product[] = await res.json();
 
       if (!Array.isArray(data)) {
@@ -131,15 +151,13 @@ function ProductsContent() {
       }
 
       if (categoryParam) {
-        data = data.filter(p =>
-          p.category === categoryParam ||
-          p.category?.toLowerCase().replace(/\s+/g, '-') === categoryParam
-        );
+        const normTarget = normalizeCategory(categoryParam);
+        data = data.filter(p => p.category && normalizeCategory(p.category) === normTarget);
       }
 
       setProducts(data);
     } catch (err) {
-      toast.error('Failed to load products');
+      console.error('Error fetching products:', err);
       setProducts([]);
     } finally {
       setLoading(false);
@@ -153,6 +171,37 @@ function ProductsContent() {
         p.modelNumber?.toLowerCase().includes(searchTerm.toLowerCase())
       )
     : products;
+
+  const displayedProducts = filteredProducts.slice(0, visibleCount);
+  const hasMore = visibleCount < filteredProducts.length;
+
+  useEffect(() => {
+    if (!hasMore || loading || loadingMore) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setLoadingMore(true);
+          setVisibleCount((prev) => prev + ITEMS_PER_PAGE);
+          requestAnimationFrame(() => {
+            setLoadingMore(false);
+          });
+        }
+      },
+      { threshold: 0.1, rootMargin: '300px' }
+    );
+
+    const currentSentinel = sentinelRef.current;
+    if (currentSentinel) {
+      observer.observe(currentSentinel);
+    }
+
+    return () => {
+      if (currentSentinel) {
+        observer.unobserve(currentSentinel);
+      }
+    };
+  }, [hasMore, loading, loadingMore, displayedProducts.length]);
 
 
   // If searching across all products (no category filter/search/application) — show grid directly
@@ -266,23 +315,6 @@ function ProductsContent() {
       
       <section className="py-24 px-4 bg-gradient-to-b from-gray-200 to-white-50">
         <div className="max-w-7xl mx-auto">
-          {/* Search */}
-          {/* <FadeIn direction="up" delay={0.1}>
-            <div className="mb-16">
-              <div className="flex items-center p-1 bg-white border-2 border-gray-200 shadow-sm max-w-xl group focus-within:border-primary transition-colors">
-                <Search className="w-5 h-5 text-gray-400 mx-5 group-focus-within:text-primary transition-colors" />
-                <input
-                  type="text"
-                  placeholder={searchParam ? `Filtering within "${searchParam}"...` : 'Search instruments...'}
-                  value={searchParam ? '' : localSearch}
-                  onChange={e => setLocalSearch(e.target.value)}
-                  readOnly={!!searchParam}
-                  className="flex-grow px-3 py-5 outline-none text-gray-700 font-bold uppercase tracking-widest text-xs"
-                />
-              </div>
-            </div>
-          </FadeIn>*/}
-
           {/* Products grid */}
           {loading ? (
             <div className="flex justify-center py-32">
@@ -304,10 +336,15 @@ function ProductsContent() {
               )}
             </div>
           ) : (
-            <FadeIn stagger direction="none" delay={0.2}>
+            <div>
               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-8">
-                {filteredProducts.map(product => (
-                  <motion.div key={product._id} variants={itemVariant}>
+                {displayedProducts.map((product, idx) => (
+                  <motion.div
+                    key={product._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, delay: (idx % ITEMS_PER_PAGE) * 0.04 }}
+                  >
                     <Link href={`/products/${product.slug}`}>
                       <div className="flex flex-col border border-gray-100 bg-white group hover:shadow-2xl transition-all duration-500 overflow-hidden h-full cursor-pointer relative">
                         {/* Image */}
@@ -347,7 +384,25 @@ function ProductsContent() {
                   </motion.div>
                 ))}
               </div>
-            </FadeIn>
+
+              {/* Infinite Scroll Trigger / Loader */}
+              {hasMore && (
+                <div ref={sentinelRef} className="py-12 flex justify-center items-center">
+                  <div className="flex items-center space-x-3 bg-white px-6 py-3 border border-gray-200 shadow-md rounded-full">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary" />
+                    <span className="text-xs font-black uppercase tracking-widest text-secondary">
+                      Loading more products... ({displayedProducts.length} of {filteredProducts.length})
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {!hasMore && filteredProducts.length > ITEMS_PER_PAGE && (
+                <div className="py-12 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">
+                  Showing all {filteredProducts.length} products
+                </div>
+              )}
+            </div>
           )}
         </div>
       </section>

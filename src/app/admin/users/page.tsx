@@ -74,7 +74,7 @@ export default function UsersPage() {
       username: '',
       password: '',
       role: 'marketing',
-      permissions: ['blogs']
+      permissions: ['crm', 'inquiries', 'blogs']
     });
     setShowModal(true);
   };
@@ -393,19 +393,26 @@ export default function UsersPage() {
               </div>
 
               <div className="space-y-4 pb-4">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Access Vector Authorization</label>
-                  <div className="flex space-x-2">
+                  <div className="flex flex-wrap gap-1">
+                    <button 
+                      type="button" 
+                      onClick={() => setForm({ ...form, permissions: ['crm', 'inquiries'] })}
+                      className="text-[8px] font-black uppercase border border-emerald-300 bg-emerald-50 px-2 py-1 text-emerald-700 hover:bg-emerald-100 transition-colors"
+                    >
+                      CRM Specialist Preset
+                    </button>
                     <button 
                       type="button" 
                       onClick={() => setForm({ ...form, permissions: ['seo', 'blogs'] })}
                       className="text-[8px] font-black uppercase border border-blue-200 bg-blue-50 px-2 py-1 text-blue-600 hover:bg-blue-100 transition-colors"
                     >
-                      SEO Strategist Template
+                      SEO Strategist Preset
                     </button>
                     <button 
                       type="button" 
-                      onClick={() => setForm({ ...form, permissions: ['blogs', 'products', 'categories', 'inquiries'] })}
+                      onClick={() => setForm({ ...form, permissions: ['blogs', 'products', 'categories', 'inquiries', 'crm'] })}
                       className="text-[8px] font-black uppercase border border-purple-200 bg-purple-50 px-2 py-1 text-purple-600 hover:bg-purple-100 transition-colors"
                     >
                       Marketing Preset
@@ -414,11 +421,12 @@ export default function UsersPage() {
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   {[
+                    { id: 'crm', label: 'CRM Full Suite' },
+                    { id: 'inquiries', label: 'CRM Leads & Inquiries' },
                     { id: 'blogs', label: 'Blogs' },
                     { id: 'products', label: 'Products' },
                     { id: 'categories', label: 'Categories' },
                     { id: 'seo', label: 'SEO' },
-                    { id: 'inquiries', label: 'Inquiries' },
                     { id: 'users', label: 'Identity' },
                     { id: 'settings', label: 'Settings' }
                   ].map(perm => (

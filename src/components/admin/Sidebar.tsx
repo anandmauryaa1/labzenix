@@ -24,7 +24,8 @@ import {
   Handshake,
   Grid3X3,
   Quote,
-  Scale
+  Scale,
+  Wrench
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -246,6 +247,62 @@ export default function Sidebar() {
           icon: MessageSquare,
           roles: ['admin', 'marketing'],
           permission: 'inquiries'
+        },
+        { 
+          title: 'CRM Dashboard', 
+          href: '/admin/crm', 
+          icon: LayoutDashboard,
+          roles: ['admin', 'marketing'],
+          permission: 'inquiries'
+        },
+        { 
+          title: 'Contacts', 
+          href: '/admin/crm/contacts', 
+          icon: UserCircle,
+          roles: ['admin', 'marketing'],
+          permission: 'inquiries'
+        },
+        { 
+          title: 'Deals Board', 
+          href: '/admin/crm/deals', 
+          icon: Handshake,
+          roles: ['admin', 'marketing'],
+          permission: 'inquiries'
+        },
+        { 
+          title: 'Quotations', 
+          href: '/admin/crm/quotations', 
+          icon: FileText,
+          roles: ['admin', 'marketing'],
+          permission: 'inquiries'
+        },
+        { 
+          title: 'Service Tickets', 
+          href: '/admin/crm/service-tickets', 
+          icon: Wrench,
+          roles: ['admin', 'marketing'],
+          permission: 'inquiries'
+        },
+        { 
+          title: 'AMC & Calibration', 
+          href: '/admin/crm/amc', 
+          icon: ShieldCheck,
+          roles: ['admin', 'marketing'],
+          permission: 'inquiries'
+        },
+        { 
+          title: 'CRM Tasks', 
+          href: '/admin/crm/tasks', 
+          icon: Quote,
+          roles: ['admin', 'marketing'],
+          permission: 'inquiries'
+        },
+        { 
+          title: 'Notifications', 
+          href: '/admin/crm/notifications', 
+          icon: MessageSquare,
+          roles: ['admin', 'marketing'],
+          permission: 'inquiries'
         }
       ]
     },
@@ -364,7 +421,14 @@ export default function Sidebar() {
                       // Keep the original map (Admin sees everything)
                     } else {
                       // Check permissions for non-admins
-                      if (item.permission && !permissions.includes(item.permission)) return null;
+                      if (item.permission) {
+                        if (item.permission === 'inquiries' || item.permission === 'crm') {
+                          const hasCrmAccess = permissions.includes('crm') || permissions.includes('inquiries');
+                          if (!hasCrmAccess) return null;
+                        } else if (!permissions.includes(item.permission)) {
+                          return null;
+                        }
+                      }
                     }
 
                     const hasSubItems = item.subItems && item.subItems.length > 0;
