@@ -10,6 +10,7 @@ const inquirySchema = z.object({
   name: z.string().min(1, 'Name is required').trim(),
   email: z.string().email('Invalid email address').trim().toLowerCase(),
   phone: z.string().optional(),
+  company: z.string().optional(),
   subject: z.string().optional(),
   message: z.string().min(1, 'Message is required').trim(),
   productId: z.string().optional(),

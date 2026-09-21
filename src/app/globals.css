@@ -5,6 +5,9 @@
   --color-primary: #004aad;
   --color-secondary: #000000;
   --color-accent: #f8fafc;
+  --color-light: #ffffff;
+  --color-dark: #0f172a;
+  --color-border: #e2e8f0;
   --color-facebook: #1877F2;
   --color-linkedin: #0A66C2;
   --color-twitter: #1DA1F2;
@@ -181,4 +184,19 @@
 
 .animate-scan {
   animation: scan 4s linear infinite;
+}
+
+/* Custom scrollbar for admin sidebar nav */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #d1d5db;
 }

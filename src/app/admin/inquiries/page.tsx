@@ -104,7 +104,14 @@ export default function InquiryManagement() {
                     {lead.name[0]?.toUpperCase()}
                   </div>
                   <div>
-                    <h3 className="text-lg font-black text-secondary tracking-tight">{lead.name}</h3>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-lg font-black text-secondary tracking-tight">{lead.name}</h3>
+                      {lead.company && (
+                        <span className="text-[11px] font-bold text-slate-700 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-none uppercase tracking-wider">
+                          {lead.company}
+                        </span>
+                      )}
+                    </div>
                     <div className="flex flex-wrap items-center gap-y-2 gap-x-4 mt-2">
                       <span className="flex items-center text-[10px] font-bold text-gray-500 uppercase tracking-widest">
                         <Mail className="w-3.5 h-3.5 mr-1.5 text-primary" />
@@ -126,7 +133,9 @@ export default function InquiryManagement() {
 
                 <div className="flex flex-col items-end gap-2">
                   <div className={`flex items-center space-x-1.5 px-3 py-1 border transition-all ${
-                    lead.source === 'download catalog' 
+                    lead.source?.startsWith('campaign')
+                      ? 'bg-purple-50 border-purple-200 text-purple-700'
+                      : lead.source === 'download catalog' 
                       ? 'bg-amber-50 border-amber-200 text-amber-700' 
                       : lead.source === 'product page'
                       ? 'bg-blue-50 border-blue-200 text-blue-700'
@@ -269,6 +278,12 @@ export default function InquiryManagement() {
                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Phone Number</p>
                    <p className="text-secondary font-bold">{selectedInquiry.phone || 'N/A'}</p>
                  </div>
+                 {selectedInquiry.company && (
+                   <div className="md:col-span-2 space-y-1">
+                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Company / Organization</p>
+                     <p className="text-secondary font-bold">{selectedInquiry.company}</p>
+                   </div>
+                 )}
                  <div className="md:col-span-2 space-y-1">
                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Inquiry Source</p>
                    <p className="text-secondary font-bold uppercase">{selectedInquiry.source || 'contact form'}</p>
@@ -297,7 +312,7 @@ export default function InquiryManagement() {
                     </button>
                   </a>
                   <a 
-                    href={`mailto:${salesEmail}?subject=${encodeURIComponent('New Lead Forward: ' + (selectedInquiry.subject || 'Inquiry from LabZenix'))}&body=${encodeURIComponent(`Please review the following new lead:\n\nName: ${selectedInquiry.name}\nEmail: ${selectedInquiry.email}\nPhone: ${selectedInquiry.phone || 'N/A'}\nSubject: ${selectedInquiry.subject || 'N/A'}\n\nMessage:\n${selectedInquiry.message}`)}`} 
+                    href={`mailto:${salesEmail}?subject=${encodeURIComponent('New Lead Forward: ' + (selectedInquiry.subject || 'Inquiry from LabZenix'))}&body=${encodeURIComponent(`Please review the following new lead:\n\nName: ${selectedInquiry.name}\nCompany: ${selectedInquiry.company || 'N/A'}\nEmail: ${selectedInquiry.email}\nPhone: ${selectedInquiry.phone || 'N/A'}\nSubject: ${selectedInquiry.subject || 'N/A'}\nSource: ${selectedInquiry.source || 'contact form'}\n\nMessage:\n${selectedInquiry.message}`)}`} 
                     className="flex-1"
                   >
                     <button className="w-full flex items-center justify-center space-x-3 px-8 py-5 bg-white text-secondary text-xs font-black uppercase tracking-widest hover:bg-gray-50 transition-all border-2 border-secondary">

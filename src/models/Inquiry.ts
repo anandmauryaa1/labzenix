@@ -4,6 +4,7 @@ export interface IInquiry extends Document {
   name: string;
   email: string;
   phone?: string;
+  company?: string;
   subject?: string;
   message: string;
   productId?: mongoose.Types.ObjectId;
@@ -15,6 +16,7 @@ const InquirySchema = new Schema<IInquiry>({
   name: { type: String, required: true },
   email: { type: String, required: true, index: true },
   phone: { type: String },
+  company: { type: String },
   subject: { type: String },
   message: { type: String, required: true },
   productId: { type: Schema.Types.ObjectId, ref: 'Product' },

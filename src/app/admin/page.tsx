@@ -295,25 +295,34 @@ export default function AdminDashboard() {
             <div className="relative z-10">
               <h3 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-6 flex items-center">
                 <TrendingUp className="w-4 h-4 mr-2 text-primary" />
-                Industrial Health
+                Site Health
               </h3>
               <div className="space-y-6">
                 <div>
                   <div className="flex justify-between text-[10px] font-black uppercase tracking-widest mb-2">
-                    <span>Database Load</span>
-                    <span className="text-green-400">Stable</span>
+                    <span>Catalog Fill</span>
+                    <span className="text-green-400">{stats?.products || 0} Products</span>
                   </div>
                   <div className="w-full bg-white/10 h-1 overflow-hidden">
-                    <div className="bg-green-400 h-full w-[12%]" />
+                    <div className="bg-green-400 h-full transition-all duration-700" style={{ width: `${Math.min(100, ((stats?.products || 0) / 50) * 100)}%` }} />
                   </div>
                 </div>
                 <div>
                   <div className="flex justify-between text-[10px] font-black uppercase tracking-widest mb-2">
-                    <span>Edge Processing</span>
-                    <span>42ms</span>
+                    <span>Content Entries</span>
+                    <span>{stats?.blogs || 0} Articles</span>
                   </div>
                   <div className="w-full bg-white/10 h-1 overflow-hidden">
-                    <div className="bg-primary h-full w-[65%]" />
+                    <div className="bg-primary h-full transition-all duration-700" style={{ width: `${Math.min(100, ((stats?.blogs || 0) / 30) * 100)}%` }} />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between text-[10px] font-black uppercase tracking-widest mb-2">
+                    <span>Open Inquiries</span>
+                    <span className="text-yellow-400">{stats?.inquiries || 0} Pending</span>
+                  </div>
+                  <div className="w-full bg-white/10 h-1 overflow-hidden">
+                    <div className="bg-yellow-400 h-full transition-all duration-700" style={{ width: `${Math.min(100, ((stats?.inquiries || 0) / 20) * 100)}%` }} />
                   </div>
                 </div>
               </div>

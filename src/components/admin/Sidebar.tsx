@@ -25,7 +25,8 @@ import {
   Grid3X3,
   Quote,
   Scale,
-  Wrench
+  Wrench,
+  Megaphone
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -45,15 +46,11 @@ export default function Sidebar() {
   useEffect(() => {
     async function checkAuth() {
       try {
-        const res = await fetch('/api/admin/stats'); // We'll update stats to also return user info or use a dedicated route
-        if (res.status === 401) {
+        const resUser = await fetch('/api/admin/me');
+        if (resUser.status === 401) {
           router.push('/admin/login');
           return;
         }
-        // For now, we'll get role from a simpler check or just mock until we have a dedicated /api/me
-        // Let's assume the session cookie exists and the middleware is doing the heavy lifting.
-        // We'll create a dedicated user info route next.
-        const resUser = await fetch('/api/admin/me');
         if (resUser.ok) {
           const data = await resUser.json();
           setRole(data.role);
@@ -233,6 +230,13 @@ export default function Sidebar() {
           title: 'FAQs', 
           href: '/admin/faqs', 
           icon: HelpCircle,
+          roles: ['admin', 'marketing', 'seo'],
+          permission: 'settings'
+        },
+        { 
+          title: 'Campaigns', 
+          href: '/admin/campaigns', 
+          icon: Megaphone,
           roles: ['admin', 'marketing', 'seo'],
           permission: 'settings'
         }
@@ -558,25 +562,4 @@ export default function Sidebar() {
   );
 }
 
-// Add these custom scrollbar styles to your global CSS or keep it here for simplicity if allowed
-const scrollbarStyles = `
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #e5e7eb;
-    border-radius: 10px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #d1d5db;
-  }
-`;
 
-if (typeof document !== 'undefined') {
-  const style = document.createElement('style');
-  style.textContent = scrollbarStyles;
-  document.head.appendChild(style);
-}
