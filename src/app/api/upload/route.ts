@@ -8,10 +8,10 @@ export async function POST(req: NextRequest) {
     const file = formData.get('file') as File;
     if (!file) return NextResponse.json({ error: 'No file provided' }, { status: 400 });
 
-    // Validate file size (max 5MB)
-    const MAX_FILE_SIZE = 5 * 1024 * 1024;
+    // Validate file size (max 2MB)
+    const MAX_FILE_SIZE = 2 * 1024 * 1024;
     if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json({ error: 'File size exceeds 5MB limit' }, { status: 400 });
+      return NextResponse.json({ error: 'Image file size should be below 2MB' }, { status: 400 });
     }
 
     const bytes = await file.arrayBuffer();

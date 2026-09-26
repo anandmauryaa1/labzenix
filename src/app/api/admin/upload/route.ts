@@ -10,7 +10,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'];
 
 export async function POST(req: NextRequest) {
@@ -35,7 +35,11 @@ export async function POST(req: NextRequest) {
     }
 
     const user = await getAuthUser(req);
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!user) {
+      return NextResponse.json({ 
+        error: 'Unauthorized: Session expired or invalid. Please log in again.' 
+      }, { status: 401 });
+    }
 
     const formData = await req.formData();
     const file = formData.get('file') as File;
@@ -46,12 +50,12 @@ export async function POST(req: NextRequest) {
 
     // Validate file size
     if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json({ error: 'File size too large (max 5MB)' }, { status: 400 });
+      return NextResponse.json({ error: 'Image file size should be below 2MB' }, { status: 400 });
     }
 
     // Validate file type
     if (!ALLOWED_TYPES.includes(file.type)) {
-      return NextResponse.json({ error: 'Invalid file type. Only images and PDFs are allowed.' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid file format. Allowed formats: JPG, PNG, WEBP, GIF, PDF' }, { status: 400 });
     }
 
     const bytes = await file.arrayBuffer();

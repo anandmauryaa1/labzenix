@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { Save, ArrowLeft, Plus, Trash2, GripVertical, ChevronDown, ChevronUp, Eye, EyeOff, Upload, ImageIcon, X } from 'lucide-react';
+import { Save, ArrowLeft, Plus, Trash2, GripVertical, ChevronDown, ChevronUp, Eye, EyeOff, Upload, ImageIcon, X, AlertCircle, AlertTriangle, Info } from 'lucide-react';
 import Link from 'next/link';
 import HeroSection from '@/components/campaigns/HeroSection';
 import VideoSection from '@/components/campaigns/VideoSection';
@@ -13,15 +13,45 @@ import {
 import toast from 'react-hot-toast';
 import Image from 'next/image';
 
-// ─── Cloudinary Upload Helper ───────────────────────────────────────────────
+// ─── Image Upload Criteria & Helpers ─────────────────────────────────────────
+const MAX_IMAGE_SIZE_MB = 2;
+const MAX_IMAGE_SIZE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+const ALLOWED_IMAGE_LABEL = 'JPG, PNG, WEBP, GIF';
+
 async function uploadImage(file: File): Promise<string> {
+  // Client-side pre-validation: Format
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+    throw new Error(`Invalid format (${file.type || 'unknown'}). Allowed formats: ${ALLOWED_IMAGE_LABEL}.`);
+  }
+
+  // Client-side pre-validation: Size
+  if (file.size > MAX_IMAGE_SIZE_BYTES) {
+    const sizeInMB = (file.size / (1024 * 1024)).toFixed(1);
+    throw new Error(`Image file size should be below ${MAX_IMAGE_SIZE_MB}MB (Selected file is ${sizeInMB}MB).`);
+  }
+
   const formData = new FormData();
   formData.append('file', file);
-  const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
+
+  let res: Response;
+  try {
+    res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
+  } catch (err: any) {
+    throw new Error('Network error during upload. Please check your connection and try again.');
+  }
+
   if (!res.ok) {
+    if (res.status === 401) {
+      throw new Error('Unauthorized: Your session has expired. Please refresh and log in again to upload.');
+    }
+    if (res.status === 413) {
+      throw new Error(`Image file size should be below ${MAX_IMAGE_SIZE_MB}MB (Request payload too large).`);
+    }
     const data = await res.json().catch(() => ({}));
     throw new Error(data.error || 'Upload failed');
   }
+
   const data = await res.json();
   return data.url as string;
 }
@@ -31,24 +61,60 @@ function ImageUploadField({
   value,
   onChange,
   label = 'Image',
-  placeholder = 'https://...'
+  placeholder = 'https://...',
+  recommendedNote,
 }: {
   value: string;
   onChange: (url: string) => void;
   label?: string;
   placeholder?: string;
+  recommendedNote?: string;
 }) {
   const [uploading, setUploading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [warningMessage, setWarningMessage] = useState<string | null>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    setErrorMessage(null);
+    setWarningMessage(null);
+
+    const sizeInMB = file.size / (1024 * 1024);
+
+    // Validate file size client-side immediately
+    if (file.size > MAX_IMAGE_SIZE_BYTES) {
+      const msg = `Image file size should be below ${MAX_IMAGE_SIZE_MB}MB (Selected file is ${sizeInMB.toFixed(1)}MB)`;
+      setErrorMessage(msg);
+      toast.error(msg);
+      e.target.value = '';
+      return;
+    }
+
+    // Validate file type
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      const msg = `Invalid format (${file.type || 'unknown'}). Allowed formats: ${ALLOWED_IMAGE_LABEL}.`;
+      setErrorMessage(msg);
+      toast.error(msg);
+      e.target.value = '';
+      return;
+    }
+
+    // Warning for large images approaching limit (> 1.5MB)
+    if (sizeInMB > 1.5) {
+      setWarningMessage(`Large image detected (${sizeInMB.toFixed(1)}MB). Uploading may take a few moments.`);
+    }
+
     setUploading(true);
     try {
       const url = await uploadImage(file);
       onChange(url);
-      toast.success('Image uploaded');
+      setErrorMessage(null);
+      setWarningMessage(null);
+      toast.success('Image uploaded successfully');
     } catch (err: any) {
+      setErrorMessage(err.message || 'Upload failed');
       toast.error(err.message || 'Upload failed');
     } finally {
       setUploading(false);
@@ -57,42 +123,90 @@ function ImageUploadField({
   };
 
   return (
-    <div>
-      <label className="block text-xs font-bold text-gray-700 uppercase mb-1">{label}</label>
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between">
+        <label className="block text-xs font-bold text-gray-700 uppercase">{label}</label>
+        <span className="text-[11px] text-gray-400 font-medium">
+          {ALLOWED_IMAGE_LABEL} &bull; Max {MAX_IMAGE_SIZE_MB}MB
+        </span>
+      </div>
+
       <div className="flex gap-2 items-start">
         {/* Thumbnail */}
         {value ? (
-          <div className="relative w-16 h-16 shrink-0 border border-gray-200 bg-gray-50 overflow-hidden">
+          <div className="relative w-16 h-16 shrink-0 border border-gray-200 bg-gray-50 overflow-hidden rounded-sm group">
             <Image src={value} alt="preview" fill className="object-cover" sizes="64px" />
+            <button
+              type="button"
+              onClick={() => { onChange(''); setErrorMessage(null); setWarningMessage(null); }}
+              className="absolute top-0 right-0 bg-black/70 hover:bg-red-600 text-white p-0.5 opacity-0 group-hover:opacity-100 transition-all"
+              title="Remove image"
+            >
+              <X className="w-3 h-3" />
+            </button>
           </div>
         ) : (
-          <div className="w-16 h-16 shrink-0 border border-dashed border-gray-300 bg-gray-50 flex items-center justify-center text-gray-300">
+          <div className="w-16 h-16 shrink-0 border border-dashed border-gray-300 bg-gray-50 flex items-center justify-center text-gray-300 rounded-sm">
             <ImageIcon className="w-6 h-6" />
           </div>
         )}
+
         {/* URL input + Upload button */}
-        <div className="flex-1 flex gap-2">
-          <input
-            type="text"
-            className="flex-1 border border-gray-300 p-2 outline-none focus:border-primary text-sm"
-            value={value}
-            onChange={e => onChange(e.target.value)}
-            placeholder={placeholder}
-          />
-          <label
-            className={`shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wider border cursor-pointer transition-all ${
-              uploading
-                ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
-                : 'bg-primary/5 text-primary border-primary/20 hover:bg-primary hover:text-white'
-            }`}
-          >
-            {uploading ? (
-              <><div className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" /> Uploading...</>
-            ) : (
-              <><Upload className="w-3 h-3" /> Upload</>
-            )}
-            <input type="file" className="hidden" accept="image/*" disabled={uploading} onChange={handleFileChange} />
-          </label>
+        <div className="flex-1 flex flex-col gap-1.5">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              className="flex-1 border border-gray-300 p-2 outline-none focus:border-primary text-sm rounded-sm"
+              value={value}
+              onChange={e => {
+                onChange(e.target.value);
+                if (errorMessage) setErrorMessage(null);
+              }}
+              placeholder={placeholder}
+            />
+            <label
+              className={`shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wider border cursor-pointer transition-all rounded-sm ${
+                uploading
+                  ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                  : 'bg-primary/5 text-primary border-primary/20 hover:bg-primary hover:text-white'
+              }`}
+            >
+              {uploading ? (
+                <><div className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" /> Uploading...</>
+              ) : (
+                <><Upload className="w-3 h-3" /> Upload</>
+              )}
+              <input
+                type="file"
+                className="hidden"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                disabled={uploading}
+                onChange={handleFileChange}
+              />
+            </label>
+          </div>
+
+          {/* Criteria info line */}
+          <div className="flex items-center gap-1.5 text-[11px] text-gray-500">
+            <Info className="w-3 h-3 text-primary/70 shrink-0" />
+            <span>Criteria: {ALLOWED_IMAGE_LABEL} below {MAX_IMAGE_SIZE_MB}MB{recommendedNote ? ` &bull; ${recommendedNote}` : ''}</span>
+          </div>
+
+          {/* Inline Error Message */}
+          {errorMessage && (
+            <div className="flex items-center gap-1.5 text-xs text-red-600 bg-red-50 border border-red-200 px-2.5 py-1.5 rounded">
+              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+              <span>{errorMessage}</span>
+            </div>
+          )}
+
+          {/* Inline Warning Message */}
+          {warningMessage && !errorMessage && (
+            <div className="flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1.5 rounded">
+              <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+              <span>{warningMessage}</span>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -108,16 +222,50 @@ function MultiImageUploadField({
   onChange: (images: string[]) => void;
 }) {
   const [uploading, setUploading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [warningMessage, setWarningMessage] = useState<string | null>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    setErrorMessage(null);
+    setWarningMessage(null);
+
+    const sizeInMB = file.size / (1024 * 1024);
+
+    // Validate file size client-side immediately
+    if (file.size > MAX_IMAGE_SIZE_BYTES) {
+      const msg = `Image file size should be below ${MAX_IMAGE_SIZE_MB}MB (Selected file is ${sizeInMB.toFixed(1)}MB)`;
+      setErrorMessage(msg);
+      toast.error(msg);
+      e.target.value = '';
+      return;
+    }
+
+    // Validate file type
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      const msg = `Invalid format (${file.type || 'unknown'}). Allowed formats: ${ALLOWED_IMAGE_LABEL}.`;
+      setErrorMessage(msg);
+      toast.error(msg);
+      e.target.value = '';
+      return;
+    }
+
+    // Warning for large images approaching limit (> 1.5MB)
+    if (sizeInMB > 1.5) {
+      setWarningMessage(`Large image detected (${sizeInMB.toFixed(1)}MB). Uploading may take a few moments.`);
+    }
+
     setUploading(true);
     try {
       const url = await uploadImage(file);
       onChange([...images, url]);
-      toast.success('Image uploaded');
+      setErrorMessage(null);
+      setWarningMessage(null);
+      toast.success('Image uploaded successfully');
     } catch (err: any) {
+      setErrorMessage(err.message || 'Upload failed');
       toast.error(err.message || 'Upload failed');
     } finally {
       setUploading(false);
@@ -136,11 +284,17 @@ function MultiImageUploadField({
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-2">
-        <label className="text-xs font-bold text-gray-700 uppercase">Images</label>
+    <div className="space-y-2">
+      <div className="flex items-center justify-between pb-1 border-b border-gray-100">
+        <div>
+          <label className="text-xs font-bold text-gray-700 uppercase">Images / Gallery</label>
+          <div className="flex items-center gap-1.5 text-[11px] text-gray-500 mt-0.5">
+            <Info className="w-3 h-3 text-primary/70 shrink-0" />
+            <span>Criteria: {ALLOWED_IMAGE_LABEL} &bull; Max {MAX_IMAGE_SIZE_MB}MB per image</span>
+          </div>
+        </div>
         <label
-          className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider border cursor-pointer transition-all ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider border cursor-pointer transition-all rounded-sm ${
             uploading
               ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
               : 'bg-primary/5 text-primary border-primary/20 hover:bg-primary hover:text-white'
@@ -151,13 +305,35 @@ function MultiImageUploadField({
           ) : (
             <><Upload className="w-3 h-3" /> Upload Image</>
           )}
-          <input type="file" className="hidden" accept="image/*" disabled={uploading} onChange={handleFileChange} />
+          <input
+            type="file"
+            className="hidden"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            disabled={uploading}
+            onChange={handleFileChange}
+          />
         </label>
       </div>
 
+      {/* Inline Error Message */}
+      {errorMessage && (
+        <div className="flex items-center gap-1.5 text-xs text-red-600 bg-red-50 border border-red-200 px-2.5 py-1.5 rounded">
+          <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+          <span>{errorMessage}</span>
+        </div>
+      )}
+
+      {/* Inline Warning Message */}
+      {warningMessage && !errorMessage && (
+        <div className="flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1.5 rounded">
+          <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+          <span>{warningMessage}</span>
+        </div>
+      )}
+
       {images.length === 0 && (
-        <p className="text-xs text-gray-400 italic border border-dashed border-gray-200 text-center py-3">
-          No images yet — upload one or paste a URL below.
+        <p className="text-xs text-gray-400 italic border border-dashed border-gray-200 text-center py-4 bg-gray-50/50 rounded-sm">
+          No images yet &mdash; click &quot;Upload Image&quot; (under {MAX_IMAGE_SIZE_MB}MB) or paste image URL below.
         </p>
       )}
 
@@ -440,6 +616,7 @@ export default function CampaignForm() {
               label="Image"
               value={data.image || ''}
               onChange={url => setField('image', url)}
+              recommendedNote="Recommended: 1200x800px"
             />
 
             {/* Features Editor */}
@@ -1051,6 +1228,7 @@ export default function CampaignForm() {
                       label="Photo"
                       value={ex.image || ''}
                       onChange={url => setExamples(examples.map((item: any, idx: number) => idx === ei ? { ...item, image: url } : item))}
+                      recommendedNote="Recommended: 400x400px"
                     />
                   </div>
                 ))}
@@ -1148,6 +1326,7 @@ export default function CampaignForm() {
                       label="Product Image"
                       value={prod.image || ''}
                       onChange={url => setProducts(products.map((p: any, idx: number) => idx === pi ? { ...p, image: url } : p))}
+                      recommendedNote="Recommended: 600x600px"
                     />
 
                     <div>
