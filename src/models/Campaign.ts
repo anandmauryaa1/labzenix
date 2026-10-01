@@ -54,4 +54,8 @@ const CampaignSchema = new mongoose.Schema({
 CampaignSchema.index({ status: 1, slug: 1 });          // E: status, E: slug
 CampaignSchema.index({ status: 1, createdAt: -1 });     // E: status, S: createdAt (newest campaigns first)
 
+if (mongoose.models.Campaign) {
+  delete (mongoose.models as any).Campaign;
+}
+
 export default mongoose.models.Campaign || mongoose.model('Campaign', CampaignSchema);

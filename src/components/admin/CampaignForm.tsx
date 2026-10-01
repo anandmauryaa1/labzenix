@@ -1,14 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+
+const RichTextEditor = dynamic(() => import('@/components/ui/RichTextEditor'), { ssr: false });
 import { useRouter, useParams } from 'next/navigation';
 import { Save, ArrowLeft, Plus, Trash2, GripVertical, ChevronDown, ChevronUp, Eye, EyeOff, Upload, ImageIcon, X, AlertCircle, AlertTriangle, Info } from 'lucide-react';
 import Link from 'next/link';
 import HeroSection from '@/components/campaigns/HeroSection';
 import VideoSection from '@/components/campaigns/VideoSection';
-import { 
-  FeaturesSection, SpecificationsSection, ComparisonSection, FeedbackSection, 
-  ApplicationsSection, FAQSection, TabbedContentSection, ProductTabsSection, DownloadsSection, ContactSection, RelatedProductsSection 
+import {
+  FeaturesSection, SpecificationsSection, ComparisonSection, FeedbackSection,
+  ApplicationsSection, FAQSection, DownloadsSection, ContactSection, RelatedProductsSection
 } from '@/components/campaigns/Sections';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
@@ -165,11 +168,10 @@ function ImageUploadField({
               placeholder={placeholder}
             />
             <label
-              className={`shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wider border cursor-pointer transition-all rounded-sm ${
-                uploading
-                  ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
-                  : 'bg-primary/5 text-primary border-primary/20 hover:bg-primary hover:text-white'
-              }`}
+              className={`shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wider border cursor-pointer transition-all rounded-sm ${uploading
+                ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                : 'bg-primary/5 text-primary border-primary/20 hover:bg-primary hover:text-white'
+                }`}
             >
               {uploading ? (
                 <><div className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" /> Uploading...</>
@@ -294,11 +296,10 @@ function MultiImageUploadField({
           </div>
         </div>
         <label
-          className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider border cursor-pointer transition-all rounded-sm ${
-            uploading
-              ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
-              : 'bg-primary/5 text-primary border-primary/20 hover:bg-primary hover:text-white'
-          }`}
+          className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider border cursor-pointer transition-all rounded-sm ${uploading
+            ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+            : 'bg-primary/5 text-primary border-primary/20 hover:bg-primary hover:text-white'
+            }`}
         >
           {uploading ? (
             <><div className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" /> Uploading...</>
@@ -391,8 +392,6 @@ const SECTION_TYPES = [
   'ApplicationExamples',
   'CustomerFeedback',
   'Downloads',
-  'TabbedContent',
-  'ProductTabs',
   'RelatedProducts',
   'Video'
 ];
@@ -521,17 +520,15 @@ export default function CampaignForm() {
 
   const updateSectionData = (index: number, field: string, value: any) => {
     setFormData((prev: any) => {
-      const newSections = [...prev.sections];
-      if (!newSections[index].data) newSections[index].data = {};
-      
-      if (field === '') {
-        newSections[index].data = value;
-      } else {
-        newSections[index].data = {
-          ...newSections[index].data,
-          [field]: value
+      const newSections = prev.sections.map((sec: any, idx: number) => {
+        if (idx !== index) return sec;
+        const currentData = sec.data || {};
+        const updatedData = field === '' ? value : { ...currentData, [field]: value };
+        return {
+          ...sec,
+          data: updatedData
         };
-      }
+      });
       return { ...prev, sections: newSections };
     });
   };
@@ -540,26 +537,100 @@ export default function CampaignForm() {
     const data = section.data || {};
     const setField = (field: string, value: any) => updateSectionData(index, field, value);
 
-    switch(section.type) {
-      case 'Hero':
+    switch (section.type) {
+      case 'Hero': {
+        const rawTabs = data.tabs;
+        let tabs: any[] = [];
+        if (Array.isArray(rawTabs)) tabs = rawTabs;
+        else if (typeof rawTabs === 'string') {
+          try { const p = JSON.parse(rawTabs); if (Array.isArray(p)) tabs = p; } catch (e) { }
+        }
+        const setTabs = (updated: any[]) => setField('tabs', updated);
+
         return (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div>
               <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Title Override</label>
-              <input type="text" className="w-full border border-gray-300 p-2 outline-none focus:border-primary"
+              <input type="text" className="w-full border border-gray-300 p-2 outline-none focus:border-primary text-sm"
                 value={data.title || ''} onChange={e => setField('title', e.target.value)} placeholder="Leave blank to use campaign title" />
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Description (HTML)</label>
-              <textarea rows={3} className="w-full border border-gray-300 p-2 outline-none focus:border-primary"
+              <textarea rows={3} className="w-full border border-gray-300 p-2 outline-none focus:border-primary text-sm"
                 value={data.description || ''} onChange={e => setField('description', e.target.value)} />
             </div>
             <MultiImageUploadField
               images={data.images || []}
               onChange={urls => setField('images', urls)}
             />
+
+            {/* TABS LIST INSIDE HERO */}
+            <div className="space-y-3 pt-4 border-t-2 border-gray-100">
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="text-xs font-bold text-gray-700 uppercase">TABS</label>
+                  <p className="text-xs text-gray-400">Add tabs with label and detailed content</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setTabs([...tabs, { label: '', content: '' }])}
+                  className="text-xs bg-primary text-white px-3 py-1.5 font-bold hover:bg-primary/90 flex items-center shadow-sm"
+                >
+                  <Plus className="w-3.5 h-3.5 mr-1" /> Add Tab
+                </button>
+              </div>
+
+              {tabs.length === 0 && (
+                <div className="text-xs text-gray-400 text-center py-6 border border-dashed border-gray-200 bg-gray-50/50">
+                  No tabs added yet. Click &quot;Add Tab&quot; to add tabs to the Hero section.
+                </div>
+              )}
+
+              <div className="space-y-3">
+                {tabs.map((tab: any, ti: number) => (
+                  <div key={ti} className="border border-gray-200 p-4 space-y-3 bg-white relative shadow-sm">
+                    <div className="flex items-center justify-between pb-2 border-b border-gray-100">
+                      <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 uppercase tracking-wide">
+                        Tab #{ti + 1}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setTabs(tabs.filter((_: any, idx: number) => idx !== ti))}
+                        className="text-gray-400 hover:text-red-500 transition-colors p-1"
+                        title="Delete tab"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Tab Label</label>
+                      <input
+                        type="text"
+                        className="w-full border border-gray-300 p-2 outline-none focus:border-primary text-sm font-semibold"
+                        value={tab.label || ''}
+                        onChange={e => setTabs(tabs.map((t: any, idx: number) => idx === ti ? { ...t, label: e.target.value } : t))}
+                        placeholder="e.g. Key Features, Test Standards, Applications"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Tab Content</label>
+                      <div className="mt-1">
+                        <RichTextEditor
+                          value={tab.content || ''}
+                          onChange={(val: string) => setTabs(tabs.map((t: any, idx: number) => idx === ti ? { ...t, content: val } : t))}
+                          placeholder="Write detailed tab content, bullet points, formatting..."
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         );
+      }
 
       case 'Video':
         return (
@@ -592,7 +663,7 @@ export default function CampaignForm() {
           try {
             const parsed = JSON.parse(rawFeatures);
             if (Array.isArray(parsed)) features = parsed;
-          } catch (e) {}
+          } catch (e) { }
         }
         const setFeatures = (updated: any[]) => setField('features', updated);
 
@@ -693,7 +764,7 @@ export default function CampaignForm() {
         let specs: any[] = [];
         if (Array.isArray(rawSpecs)) specs = rawSpecs;
         else if (typeof rawSpecs === 'string') {
-          try { const p = JSON.parse(rawSpecs); if (Array.isArray(p)) specs = p; } catch (e) {}
+          try { const p = JSON.parse(rawSpecs); if (Array.isArray(p)) specs = p; } catch (e) { }
         }
         const setSpecs = (updated: any[]) => setField('specs', updated);
 
@@ -780,7 +851,7 @@ export default function CampaignForm() {
         let rows: any[] = [];
         if (Array.isArray(rawRows)) rows = rawRows;
         else if (typeof rawRows === 'string') {
-          try { const p = JSON.parse(rawRows); if (Array.isArray(p)) rows = p; } catch (e) {}
+          try { const p = JSON.parse(rawRows); if (Array.isArray(p)) rows = p; } catch (e) { }
         }
         const setRows = (updated: any[]) => setField('rows', updated);
 
@@ -888,7 +959,7 @@ export default function CampaignForm() {
           </div>
         );
       }
-        
+
       case 'FAQs': {
         const faqs: any[] = data.faqs || [];
         const setFaqs = (updated: any[]) => setField('faqs', updated);
@@ -986,281 +1057,12 @@ export default function CampaignForm() {
         );
       }
 
-            case 'ProductTabs': {
-        const keyFeatures = Array.isArray(data.keyFeatures) ? data.keyFeatures : [];
-        const testStandards = Array.isArray(data.testStandards) ? data.testStandards : [];
-        const applications = Array.isArray(data.applications) ? data.applications : [];
-
-        const updateList = (field: string, list: string[]) => setField(field, list);
-
-        return (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Section Title</label>
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 p-2 outline-none focus:border-primary text-sm"
-                  value={data.title || ''}
-                  onChange={e => setField('title', e.target.value)}
-                  placeholder="e.g. Comprehensive Specifications & Details"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Section Subtitle</label>
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 p-2 outline-none focus:border-primary text-sm"
-                  value={data.subtitle || ''}
-                  onChange={e => setField('subtitle', e.target.value)}
-                  placeholder="e.g. Explore key engineering features, compliant test standards..."
-                />
-              </div>
-            </div>
-
-            {/* TAB 1: Key Features */}
-            <div className="border border-slate-200 p-4 bg-white space-y-3">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-black uppercase text-primary bg-primary/10 px-2 py-1">Tab 1</span>
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">Key Features Points</h4>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => updateList('keyFeatures', [...keyFeatures, ''])}
-                  className="text-xs bg-primary text-white px-3 py-1 font-bold hover:bg-primary/90 flex items-center shadow-sm"
-                >
-                  <Plus className="w-3.5 h-3.5 mr-1" /> Add Feature Point
-                </button>
-              </div>
-
-              {keyFeatures.length === 0 ? (
-                <p className="text-xs text-slate-400 italic py-2">No key features added yet. Click &quot;Add Feature Point&quot; above.</p>
-              ) : (
-                <div className="space-y-2">
-                  {keyFeatures.map((feat: string, fi: number) => (
-                    <div key={fi} className="flex items-center gap-2">
-                      <span className="text-xs text-slate-400 font-mono w-5 shrink-0">{fi + 1}.</span>
-                      <input
-                        type="text"
-                        className="flex-1 border border-slate-300 p-2 text-sm outline-none focus:border-primary"
-                        value={feat}
-                        onChange={e => {
-                          const updated = [...keyFeatures];
-                          updated[fi] = e.target.value;
-                          updateList('keyFeatures', updated);
-                        }}
-                        placeholder="e.g. High-precision servo hydraulic pressure control system"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => updateList('keyFeatures', keyFeatures.filter((_: any, idx: number) => idx !== fi))}
-                        className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-                        title="Remove point"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* TAB 2: Applicable Test Standards */}
-            <div className="border border-slate-200 p-4 bg-white space-y-3">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-black uppercase text-primary bg-primary/10 px-2 py-1">Tab 2</span>
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">Applicable Test Standards</h4>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => updateList('testStandards', [...testStandards, ''])}
-                  className="text-xs bg-primary text-white px-3 py-1 font-bold hover:bg-primary/90 flex items-center shadow-sm"
-                >
-                  <Plus className="w-3.5 h-3.5 mr-1" /> Add Standard
-                </button>
-              </div>
-
-              {testStandards.length === 0 ? (
-                <p className="text-xs text-slate-400 italic py-2">No test standards added yet. Click &quot;Add Standard&quot; above.</p>
-              ) : (
-                <div className="space-y-2">
-                  {testStandards.map((std: string, si: number) => (
-                    <div key={si} className="flex items-center gap-2">
-                      <span className="text-xs text-slate-400 font-mono w-5 shrink-0">{si + 1}.</span>
-                      <input
-                        type="text"
-                        className="flex-1 border border-slate-300 p-2 text-sm outline-none focus:border-primary"
-                        value={std}
-                        onChange={e => {
-                          const updated = [...testStandards];
-                          updated[si] = e.target.value;
-                          updateList('testStandards', updated);
-                        }}
-                        placeholder="e.g. ISO 13938-1 (Hydraulic bursting strength of fabrics)"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => updateList('testStandards', testStandards.filter((_: any, idx: number) => idx !== si))}
-                        className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-                        title="Remove point"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* TAB 3: Applications */}
-            <div className="border border-slate-200 p-4 bg-white space-y-3">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-black uppercase text-primary bg-primary/10 px-2 py-1">Tab 3</span>
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">Applications</h4>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => updateList('applications', [...applications, ''])}
-                  className="text-xs bg-primary text-white px-3 py-1 font-bold hover:bg-primary/90 flex items-center shadow-sm"
-                >
-                  <Plus className="w-3.5 h-3.5 mr-1" /> Add Application
-                </button>
-              </div>
-
-              {applications.length === 0 ? (
-                <p className="text-xs text-slate-400 italic py-2">No applications added yet. Click &quot;Add Application&quot; above.</p>
-              ) : (
-                <div className="space-y-2">
-                  {applications.map((app: string, ai: number) => (
-                    <div key={ai} className="flex items-center gap-2">
-                      <span className="text-xs text-slate-400 font-mono w-5 shrink-0">{ai + 1}.</span>
-                      <input
-                        type="text"
-                        className="flex-1 border border-slate-300 p-2 text-sm outline-none focus:border-primary"
-                        value={app}
-                        onChange={e => {
-                          const updated = [...applications];
-                          updated[ai] = e.target.value;
-                          updateList('applications', updated);
-                        }}
-                        placeholder="e.g. Corrugated packaging boxes, paper & board"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => updateList('applications', applications.filter((_: any, idx: number) => idx !== ai))}
-                        className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-                        title="Remove point"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        );
-      }
-
-      case 'TabbedContent': {
-        const rawTabs = data.tabs;
-        let tabs: any[] = [];
-        if (Array.isArray(rawTabs)) tabs = rawTabs;
-        else if (typeof rawTabs === 'string') {
-          try { const p = JSON.parse(rawTabs); if (Array.isArray(p)) tabs = p; } catch (e) {}
-        }
-        const setTabs = (updated: any[]) => setField('tabs', updated);
-
-        return (
-          <div className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Section Title</label>
-              <input
-                type="text"
-                className="w-full border border-gray-300 p-2 outline-none focus:border-primary text-sm"
-                value={data.title || ''}
-                onChange={e => setField('title', e.target.value)}
-                placeholder="e.g. Technical Details"
-              />
-            </div>
-
-            {/* Tabs List */}
-            <div className="space-y-3 pt-3 border-t border-gray-100">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="text-xs font-bold text-gray-700 uppercase">Tabs</label>
-                  <p className="text-xs text-gray-400">Add tabs with label and detailed content</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setTabs([...tabs, { label: '', content: '' }])}
-                  className="text-xs bg-primary text-white px-3 py-1.5 font-bold hover:bg-primary/90 flex items-center shadow-sm"
-                >
-                  <Plus className="w-3.5 h-3.5 mr-1" /> Add Tab
-                </button>
-              </div>
-
-              {tabs.length === 0 && (
-                <div className="text-xs text-gray-400 text-center py-6 border border-dashed border-gray-200 bg-gray-50/50">
-                  No tabs added yet. Click &quot;Add Tab&quot; to get started.
-                </div>
-              )}
-
-              <div className="space-y-3">
-                {tabs.map((tab: any, ti: number) => (
-                  <div key={ti} className="border border-gray-200 p-4 space-y-3 bg-white relative shadow-sm">
-                    <div className="flex items-center justify-between pb-2 border-b border-gray-100">
-                      <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 uppercase tracking-wide">
-                        Tab #{ti + 1}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setTabs(tabs.filter((_: any, idx: number) => idx !== ti))}
-                        className="text-gray-400 hover:text-red-500 transition-colors p-1"
-                        title="Delete tab"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Tab Label</label>
-                      <input
-                        type="text"
-                        className="w-full border border-gray-300 p-2 outline-none focus:border-primary text-sm font-semibold"
-                        value={tab.label || ''}
-                        onChange={e => setTabs(tabs.map((t: any, idx: number) => idx === ti ? { ...t, label: e.target.value } : t))}
-                        placeholder="e.g. Overview, Operation, Standards"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Tab Content</label>
-                      <textarea
-                        rows={3}
-                        className="w-full border border-gray-300 p-2 outline-none focus:border-primary text-sm"
-                        value={tab.content || ''}
-                        onChange={e => setTabs(tabs.map((t: any, idx: number) => idx === ti ? { ...t, content: e.target.value } : t))}
-                        placeholder="Write tab content here..."
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-      }
-
       case 'Downloads': {
         const rawFiles = data.files;
         let files: any[] = [];
         if (Array.isArray(rawFiles)) files = rawFiles;
         else if (typeof rawFiles === 'string') {
-          try { const p = JSON.parse(rawFiles); if (Array.isArray(p)) files = p; } catch (e) {}
+          try { const p = JSON.parse(rawFiles); if (Array.isArray(p)) files = p; } catch (e) { }
         }
         const setFiles = (updated: any[]) => setField('files', updated);
 
@@ -1337,7 +1139,7 @@ export default function CampaignForm() {
         let examples: any[] = [];
         if (Array.isArray(rawExamples)) examples = rawExamples;
         else if (typeof rawExamples === 'string') {
-          try { const p = JSON.parse(rawExamples); if (Array.isArray(p)) examples = p; } catch (e) {}
+          try { const p = JSON.parse(rawExamples); if (Array.isArray(p)) examples = p; } catch (e) { }
         }
         const setExamples = (updated: any[]) => setField('examples', updated);
 
@@ -1423,7 +1225,7 @@ export default function CampaignForm() {
         let products: any[] = [];
         if (Array.isArray(rawProducts)) products = rawProducts;
         else if (typeof rawProducts === 'string') {
-          try { const p = JSON.parse(rawProducts); if (Array.isArray(p)) products = p; } catch (e) {}
+          try { const p = JSON.parse(rawProducts); if (Array.isArray(p)) products = p; } catch (e) { }
         }
         const setProducts = (updated: any[]) => setField('products', updated);
 
@@ -1558,7 +1360,7 @@ export default function CampaignForm() {
               onChange={(e) => {
                 try {
                   setField('', JSON.parse(e.target.value));
-                } catch (err) {}
+                } catch (err) { }
               }}
             />
           </div>
@@ -1577,8 +1379,6 @@ export default function CampaignForm() {
       case 'CustomerFeedback': return <FeedbackSection key={section.id} data={section.data || {}} />;
       case 'ApplicationExamples': return <ApplicationsSection key={section.id} data={section.data || {}} />;
       case 'FAQs': return <FAQSection key={section.id} data={section.data || {}} />;
-      case 'TabbedContent': return <TabbedContentSection key={section.id} data={section.data || {}} />;
-      case 'ProductTabs': return <ProductTabsSection key={section.id} data={section.data || {}} />;
       case 'Downloads': return <DownloadsSection key={section.id} data={section.data || {}} />;
       case 'Contact': return <ContactSection key={section.id} data={section.data || {}} />;
       case 'RelatedProducts': return <RelatedProductsSection key={section.id} data={section.data || {}} />;
@@ -1590,7 +1390,7 @@ export default function CampaignForm() {
 
   return (
     <div className="flex flex-col md:flex-row h-full min-h-screen bg-gray-50 pb-24 font-sans">
-      
+
       {/* LEFT: FORM (Takes 1/2 if preview is open, else 100%) */}
       <div className={`transition-all duration-300 flex-1 ${showPreview ? 'md:w-1/2 border-r border-gray-300 max-h-screen overflow-y-auto overflow-x-hidden' : 'w-full'}`}>
         <div className="p-6 md:p-8 space-y-6 max-w-5xl mx-auto">
@@ -1605,153 +1405,153 @@ export default function CampaignForm() {
                 </h1>
               </div>
             </div>
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={() => setShowPreview(!showPreview)}
               className="hidden md:flex px-4 py-2 border-2 border-primary text-primary font-bold uppercase tracking-wide text-sm items-center hover:bg-primary hover:text-white transition-colors"
             >
-              {showPreview ? <><EyeOff className="w-4 h-4 mr-2"/> Hide Preview</> : <><Eye className="w-4 h-4 mr-2"/> Show Preview</>}
+              {showPreview ? <><EyeOff className="w-4 h-4 mr-2" /> Hide Preview</> : <><Eye className="w-4 h-4 mr-2" /> Show Preview</>}
             </button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8 bg-white border border-gray-200 p-8 shadow-sm rounded-none">
-        
-        {/* Basic Info */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-bold text-secondary border-b pb-2">Basic Details</h2>
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Campaign Title (Internal)</label>
-              <input 
-                type="text" 
-                required
-                className="w-full border border-gray-300 p-2 outline-none focus:border-primary"
-                value={formData.title} 
-                onChange={e => handleChange('title', e.target.value)} 
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">URL Slug</label>
-              <input 
-                type="text" 
-                required
-                placeholder="e.g. bursting-strength-tester"
-                className="w-full border border-gray-300 p-2 outline-none focus:border-primary font-mono text-sm"
-                value={formData.slug} 
-                onChange={e => handleChange('slug', e.target.value.toLowerCase().replace(/\s+/g, '-'))} 
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Status</label>
-            <select 
-              className="w-full md:w-1/3 border border-gray-300 p-2 outline-none focus:border-primary"
-              value={formData.status} 
-              onChange={e => handleChange('status', e.target.value)}
-            >
-              <option value="draft">Draft</option>
-              <option value="published">Published</option>
-            </select>
-          </div>
-        </div>
 
-        {/* Dynamic Sections Builder */}
-        <div className="space-y-6 pt-8 border-t border-gray-100">
-          <div className="flex items-center justify-between border-b pb-2">
-            <h2 className="text-lg font-bold text-secondary">Page Builder Sections</h2>
-            
-            <div className="relative group">
-              <button type="button" className="bg-secondary text-white px-4 py-2 text-sm font-bold flex items-center hover:bg-secondary/90 transition-colors">
-                <Plus className="w-4 h-4 mr-2" /> Add Section
-              </button>
-              <div className="absolute right-0 top-full mt-1 w-64 bg-white border border-gray-200 shadow-xl hidden group-hover:block z-10 max-h-96 overflow-y-auto">
-                {SECTION_TYPES.map(type => (
-                  <button
-                    key={type}
-                    type="button"
-                    onClick={() => addSection(type)}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors border-b border-gray-100 last:border-0"
-                  >
-                    + {type}
+            {/* Basic Info */}
+            <div className="space-y-4">
+              <h2 className="text-lg font-bold text-secondary border-b pb-2">Basic Details</h2>
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">Campaign Title (Internal)</label>
+                  <input
+                    type="text"
+                    required
+                    className="w-full border border-gray-300 p-2 outline-none focus:border-primary"
+                    value={formData.title}
+                    onChange={e => handleChange('title', e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">URL Slug</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. bursting-strength-tester"
+                    className="w-full border border-gray-300 p-2 outline-none focus:border-primary font-mono text-sm"
+                    value={formData.slug}
+                    onChange={e => handleChange('slug', e.target.value.toLowerCase().replace(/\s+/g, '-'))}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Status</label>
+                <select
+                  className="w-full md:w-1/3 border border-gray-300 p-2 outline-none focus:border-primary"
+                  value={formData.status}
+                  onChange={e => handleChange('status', e.target.value)}
+                >
+                  <option value="draft">Draft</option>
+                  <option value="published">Published</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Dynamic Sections Builder */}
+            <div className="space-y-6 pt-8 border-t border-gray-100">
+              <div className="flex items-center justify-between border-b pb-2">
+                <h2 className="text-lg font-bold text-secondary">Page Builder Sections</h2>
+
+                <div className="relative group">
+                  <button type="button" className="bg-secondary text-white px-4 py-2 text-sm font-bold flex items-center hover:bg-secondary/90 transition-colors">
+                    <Plus className="w-4 h-4 mr-2" /> Add Section
                   </button>
+                  <div className="absolute right-0 top-full mt-0 w-64 bg-white border border-gray-200 shadow-xl hidden group-hover:block z-10 max-h-96 overflow-y-auto">
+                    {SECTION_TYPES.map(type => (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() => addSection(type)}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors border-b border-gray-100 last:border-0"
+                      >
+                        + {type}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                {formData.sections.length === 0 && (
+                  <div className="text-center p-12 border-2 border-dashed border-gray-200 text-gray-400">
+                    No sections added yet. Click "Add Section" to start building your campaign page.
+                  </div>
+                )}
+
+                {formData.sections.map((section: any, index: number) => (
+                  <div key={section.id} className="border border-gray-200 shadow-sm bg-gray-50/30">
+                    {/* Section Header */}
+                    <div className="bg-gray-100 p-3 flex justify-between items-center border-b border-gray-200">
+                      <div className="flex items-center space-x-3">
+                        <GripVertical className="w-5 h-5 text-gray-400 cursor-move" />
+                        <span className="font-black text-secondary uppercase tracking-widest text-xs">
+                          {index + 1}. {section.type}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <button type="button" onClick={() => moveSection(index, 'up')} disabled={index === 0} className="p-1 text-gray-500 hover:text-primary disabled:opacity-30">
+                          <ChevronUp className="w-4 h-4" />
+                        </button>
+                        <button type="button" onClick={() => moveSection(index, 'down')} disabled={index === formData.sections.length - 1} className="p-1 text-gray-500 hover:text-primary disabled:opacity-30">
+                          <ChevronDown className="w-4 h-4" />
+                        </button>
+                        <button type="button" onClick={() => removeSection(index)} className="p-1 text-gray-500 hover:text-red-500 ml-2">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Section Editor */}
+                    <div className="p-6">
+                      {renderSectionEditor(section, index)}
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
-          </div>
 
-          <div className="space-y-6">
-            {formData.sections.length === 0 && (
-              <div className="text-center p-12 border-2 border-dashed border-gray-200 text-gray-400">
-                No sections added yet. Click "Add Section" to start building your campaign page.
+            {/* SEO */}
+            <div className="space-y-4 pt-8 border-t border-gray-100">
+              <h2 className="text-lg font-bold text-secondary border-b pb-2">SEO Meta Data</h2>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Meta Title</label>
+                <input
+                  type="text"
+                  className="w-full border border-gray-300 p-2 outline-none focus:border-primary"
+                  value={formData.seo?.metaTitle || ''}
+                  onChange={e => handleChange('metaTitle', e.target.value, 'seo')}
+                />
               </div>
-            )}
-
-            {formData.sections.map((section: any, index: number) => (
-              <div key={section.id} className="border border-gray-200 shadow-sm bg-gray-50/30">
-                {/* Section Header */}
-                <div className="bg-gray-100 p-3 flex justify-between items-center border-b border-gray-200">
-                  <div className="flex items-center space-x-3">
-                    <GripVertical className="w-5 h-5 text-gray-400 cursor-move" />
-                    <span className="font-black text-secondary uppercase tracking-widest text-xs">
-                      {index + 1}. {section.type}
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <button type="button" onClick={() => moveSection(index, 'up')} disabled={index === 0} className="p-1 text-gray-500 hover:text-primary disabled:opacity-30">
-                      <ChevronUp className="w-4 h-4" />
-                    </button>
-                    <button type="button" onClick={() => moveSection(index, 'down')} disabled={index === formData.sections.length - 1} className="p-1 text-gray-500 hover:text-primary disabled:opacity-30">
-                      <ChevronDown className="w-4 h-4" />
-                    </button>
-                    <button type="button" onClick={() => removeSection(index)} className="p-1 text-gray-500 hover:text-red-500 ml-2">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Section Editor */}
-                <div className="p-6">
-                  {renderSectionEditor(section, index)}
-                </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Meta Description</label>
+                <textarea
+                  rows={3}
+                  className="w-full border border-gray-300 p-2 outline-none focus:border-primary"
+                  value={formData.seo?.metaDescription || ''}
+                  onChange={e => handleChange('metaDescription', e.target.value, 'seo')}
+                />
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
 
-        {/* SEO */}
-        <div className="space-y-4 pt-8 border-t border-gray-100">
-          <h2 className="text-lg font-bold text-secondary border-b pb-2">SEO Meta Data</h2>
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Meta Title</label>
-            <input 
-              type="text" 
-              className="w-full border border-gray-300 p-2 outline-none focus:border-primary"
-              value={formData.seo?.metaTitle || ''} 
-              onChange={e => handleChange('metaTitle', e.target.value, 'seo')} 
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Meta Description</label>
-            <textarea 
-              rows={3}
-              className="w-full border border-gray-300 p-2 outline-none focus:border-primary"
-              value={formData.seo?.metaDescription || ''} 
-              onChange={e => handleChange('metaDescription', e.target.value, 'seo')} 
-            />
-          </div>
-        </div>
-
-        <div className="pt-6 border-t mt-8 bg-white md:bg-transparent">
-          <button 
-            type="submit" 
-            disabled={isSaving}
-            className="w-full md:w-auto bg-primary text-white px-8 py-3 font-bold flex items-center justify-center hover:bg-primary/90 transition-colors disabled:opacity-50 uppercase tracking-wider"
-          >
-            <Save className="w-5 h-5 mr-2" />
-            {isSaving ? 'Saving...' : 'Save Campaign Page'}
-          </button>
-        </div>
-      </form>
+            <div className="pt-6 border-t mt-8 bg-white md:bg-transparent">
+              <button
+                type="submit"
+                disabled={isSaving}
+                className="w-full md:w-auto bg-primary text-white px-8 py-3 font-bold flex items-center justify-center hover:bg-primary/90 transition-colors disabled:opacity-50 uppercase tracking-wider"
+              >
+                <Save className="w-5 h-5 mr-2" />
+                {isSaving ? 'Saving...' : 'Save Campaign Page'}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
 
@@ -1765,7 +1565,7 @@ export default function CampaignForm() {
           <div className="relative pointer-events-none pb-24">
             {/* Render all sections using the frontend components */}
             {formData.sections.map((section: any, index: number) => renderPreviewSection(section, index))}
-            
+
             {formData.sections.length === 0 && (
               <div className="h-full flex items-center justify-center p-12 text-gray-400 font-bold uppercase text-xl">
                 Add sections to see preview

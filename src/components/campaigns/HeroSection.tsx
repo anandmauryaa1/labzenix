@@ -6,7 +6,8 @@ import Link from 'next/link';
 import FadeIn from '@/components/ui/FadeIn';
 import { 
   Maximize, CheckCircle2, ShieldCheck, Download, Phone, 
-  ArrowRight, Sparkles, Award, Gauge, Cpu, Wrench, X, Play
+  ArrowRight, Sparkles, Award, Gauge, Cpu, Wrench, X, Play,
+  Settings, FileText, Factory, Check, Layers
 } from 'lucide-react';
 import { formatTitle } from './Typography';
 import { getOptimizedImageUrl } from '@/lib/image';
@@ -23,6 +24,7 @@ export default function HeroSection({ data, campaignTitle }: HeroSectionProps) {
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [activeHeroTab, setActiveHeroTab] = useState(0);
 
   const title = data?.title || campaignTitle || 'High-Precision Testing Equipment';
   const description = data?.description || `
@@ -36,6 +38,56 @@ export default function HeroSection({ data, campaignTitle }: HeroSectionProps) {
     'Auto Burst Detection',
     'Integrated Touchscreen HMI',
   ];
+
+  // Dynamic Tabs from admin (NO fallback dummy data)
+  const rawTabs = data?.tabs;
+  let tabs: Array<{ label: string; content: string }> = [];
+  if (Array.isArray(rawTabs)) {
+    tabs = rawTabs.filter((t: any) => t && (t.label || t.content));
+  } else if (typeof rawTabs === 'string') {
+    try {
+      const parsed = JSON.parse(rawTabs);
+      if (Array.isArray(parsed)) {
+        tabs = parsed.filter((t: any) => t && (t.label || t.content));
+      }
+    } catch (_) {}
+  }
+
+  const safeActiveIndex = activeHeroTab < tabs.length ? activeHeroTab : 0;
+  const currentTab = tabs[safeActiveIndex];
+
+  // Helper to render tab content (rich HTML or parsed bullet points)
+  const renderTabContent = (content: string) => {
+    if (!content || !content.trim()) {
+      return <p className="text-xs text-slate-400 italic text-center py-6">No content added for this tab yet.</p>;
+    }
+    const hasHtml = /<[a-z][\s\S]*>/i.test(content);
+    if (hasHtml) {
+      return (
+        <div 
+          className="prose prose-slate max-w-none text-slate-700 text-sm leading-relaxed prose-p:my-2 prose-ul:my-2 prose-ul:list-disc prose-ul:pl-5 prose-ol:list-decimal prose-ol:pl-5 prose-li:my-1 prose-headings:font-bold prose-headings:text-slate-900"
+          dangerouslySetInnerHTML={{ __html: content }}
+        />
+      );
+    }
+    // Plain text with line breaks
+    const lines = content.split('\n').map(l => l.trim()).filter(Boolean);
+    if (lines.length > 1) {
+      return (
+        <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-3.5">
+          {lines.map((line, idx) => (
+            <li key={idx} className="flex items-start gap-3 p-3 bg-slate-50/80 border border-slate-100 hover:border-primary/30 transition-colors">
+              <span className="mt-0.5 shrink-0 w-5 h-5 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
+                <Check className="w-3 h-3 text-primary" />
+              </span>
+              <span className="text-xs md:text-sm text-slate-700 font-medium leading-relaxed">{line.replace(/^[-•*]\s*/, '')}</span>
+            </li>
+          ))}
+        </ul>
+      );
+    }
+    return <p className="text-slate-700 text-sm leading-relaxed">{content}</p>;
+  };
 
   return (
     <section id="overview" className="pt-12 pb-16 bg-gradient-to-b from-slate-100 via-slate-50 to-white relative overflow-hidden font-display border-b border-slate-200">
@@ -221,6 +273,47 @@ export default function HeroSection({ data, campaignTitle }: HeroSectionProps) {
             </FadeIn>
           </div>
         </div>
+
+        {/* ─── Embedded TabbedContent Inside Hero (Rendered only when tabs exist) ─── */}
+        {tabs.length > 0 && (
+          <div className="mt-12 pt-8 border-t border-slate-200">
+            <div className="bg-white border border-slate-200 shadow-md">
+              
+              {/* Tab Navigation Bar - Non Scrollable Full Width Grid */}
+              <div className={`grid grid-cols-1 ${
+                tabs.length === 2 ? 'sm:grid-cols-2' :
+                tabs.length === 3 ? 'sm:grid-cols-3' :
+                tabs.length === 4 ? 'sm:grid-cols-4' :
+                tabs.length === 5 ? 'sm:grid-cols-5' :
+                tabs.length >= 6 ? 'sm:grid-cols-6' : 'sm:grid-cols-1'
+              } border-b-2 border-slate-200 bg-slate-50/80`}>
+                {tabs.map((tab: any, i: number) => {
+                  const isActive = safeActiveIndex === i;
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setActiveHeroTab(i)}
+                      className={`flex items-center justify-center gap-2 px-3 sm:px-6 py-3.5 sm:py-4 text-xs sm:text-sm font-black uppercase tracking-wider text-center transition-all border-b-2 sm:border-r border-slate-200 last:border-r-0 -mb-[2px] cursor-pointer ${
+                        isActive
+                          ? 'border-b-primary text-primary bg-white shadow-sm font-bold'
+                          : 'border-b-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-100/80'
+                      }`}
+                    >
+                      <Layers className={`w-4 h-4 shrink-0 ${isActive ? 'text-primary' : 'text-slate-400'}`} />
+                      <span className="truncate">{tab.label || `Tab #${i + 1}`}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Tab Content Box */}
+              <div className="p-6 md:p-8">
+                {renderTabContent(currentTab?.content)}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Bottom Trust Grid */}
         <div className="mt-10 pt-8 border-t border-slate-200/80 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 text-slate-700 font-display">

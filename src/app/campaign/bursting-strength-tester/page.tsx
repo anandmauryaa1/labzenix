@@ -6,7 +6,7 @@ import HeroSection from '@/components/campaigns/HeroSection';
 import VideoSection from '@/components/campaigns/VideoSection';
 import { 
   FeaturesSection, SpecificationsSection, ComparisonSection, 
-  FeedbackSection, ApplicationsSection, FAQSection, ProductTabsSection 
+  FeedbackSection, ApplicationsSection, FAQSection 
 } from '@/components/campaigns/Sections';
 import CampaignEnquiryForm from '@/components/campaigns/CampaignEnquiryForm';
 import { formatTitle, SectionHeader } from '@/components/campaigns/Typography';
@@ -39,6 +39,40 @@ const FALLBACK_HERO = {
     'ISO 13938-1 & ASTM D3786',
     'Auto Burst Point Detection',
     'Touchscreen HMI & Software Export'
+  ],
+  tabs: [
+    {
+      label: 'Key Features',
+      content: `High-precision servo hydraulic drive ensuring constant rate of pressure increase (0.1–100 kPa/s)
+Dual pneumatic clamping system with adjustable clamping pressure preventing sample slippage
+7-inch color PLC touchscreen interface with real-time pressure-displacement curve display
+Automatic specimen rupture detection with instant high-speed pressure relief
+Quick-change interchangeable test heads (7.3 cm², 10 cm², 50 cm², 100 cm²)
+Automatic diaphragm distension tare & zero-correction for high measurement repeatability
+Onboard micro-printer and USB/RS-232 export for LIMS & factory quality systems
+Transparent acrylic safety interlock shield protecting operators during high-pressure bursting`
+    },
+    {
+      label: 'Applicable Test Standards',
+      content: `ISO 13938-1: Textiles — Bursting properties of fabrics (Hydraulic method)
+ASTM D3786 / D3786M: Standard Test Method for Bursting Strength of Textile Fabrics
+ISO 2758: Paper — Determination of bursting strength (Low pressure method)
+ISO 2759: Board — Determination of bursting strength (High pressure method)
+GB/T 7742.1: Textiles — Bursting properties of fabrics (Hydraulic method)
+TAPPI T810: Bursting strength of corrugated and solid fiberboard
+EN 12332-2: Rubber or plastics coated fabrics — Determination of bursting strength
+JIS L1096: Testing methods for woven and knitted fabrics`
+    },
+    {
+      label: 'Applications',
+      content: `Corrugated boxes, packaging cartons & multi-wall shipping sacks
+Kraft paper, linerboard, greyboard, and specialty paper manufacturing
+Knitted, woven, and technical industrial textiles (apparel & outdoor wear)
+Medical non-wovens, surgical gowns, sterile packaging, and PPE barriers
+Geotextiles, filter cloths, and technical synthetic fabrics
+Automotive interior fabrics, airbags, and reinforced composites
+Third-party testing laboratories, universities & quality inspection centers`
+    }
   ]
 };
 
@@ -76,40 +110,6 @@ const FALLBACK_FAQS = [
 ];
 
 
-const FALLBACK_PRODUCT_TABS = {
-  title: 'Bursting Strength Testing Capabilities',
-  subtitle: 'Explore the key technical features, international testing standards, and industry applications.',
-  keyFeatures: [
-    'High-precision servo hydraulic drive ensuring constant rate of pressure increase (0.1–100 kPa/s)',
-    'Dual pneumatic clamping system with adjustable clamping pressure preventing sample slippage',
-    '7-inch color PLC touchscreen interface with real-time pressure-displacement curve display',
-    'Automatic specimen rupture detection with instant high-speed pressure relief',
-    'Quick-change interchangeable test heads (7.3 cm², 10 cm², 50 cm², 100 cm²)',
-    'Automatic diaphragm distension tare & zero-correction for high measurement repeatability',
-    'Onboard micro-printer and USB/RS-232 export for LIMS & factory quality systems',
-    'Transparent acrylic safety interlock shield protecting operators during high-pressure bursting'
-  ],
-  testStandards: [
-    'ISO 13938-1: Textiles — Bursting properties of fabrics (Hydraulic method)',
-    'ASTM D3786 / D3786M: Standard Test Method for Bursting Strength of Textile Fabrics',
-    'ISO 2758: Paper — Determination of bursting strength (Low pressure method)',
-    'ISO 2759: Board — Determination of bursting strength (High pressure method)',
-    'GB/T 7742.1: Textiles — Bursting properties of fabrics (Hydraulic method)',
-    'TAPPI T810: Bursting strength of corrugated and solid fiberboard',
-    'EN 12332-2: Rubber or plastics coated fabrics — Determination of bursting strength',
-    'JIS L1096: Testing methods for woven and knitted fabrics'
-  ],
-  applications: [
-    'Corrugated boxes, packaging cartons & multi-wall shipping sacks',
-    'Kraft paper, linerboard, greyboard, and specialty paper manufacturing',
-    'Knitted, woven, and technical industrial textiles (apparel & outdoor wear)',
-    'Medical non-wovens, surgical gowns, sterile packaging, and PPE barriers',
-    'Geotextiles, filter cloths, and technical synthetic fabrics',
-    'Automotive interior fabrics, airbags, and reinforced composites',
-    'Third-party testing laboratories, universities & quality inspection centers'
-  ]
-};
-
 export default async function BurstingStrengthTesterCampaign() {
   let sections: any[] = [];
   try {
@@ -124,11 +124,19 @@ export default async function BurstingStrengthTesterCampaign() {
     // Fall back to static data cleanly if DB disconnected
   }
 
-  const heroData = sections.find(s => s.type === 'Hero')?.data || FALLBACK_HERO;
+  const heroDataRaw = sections.find(s => s.type === 'Hero')?.data;
+  const heroData = heroDataRaw
+    ? {
+        ...FALLBACK_HERO,
+        ...heroDataRaw,
+        tabs: (Array.isArray(heroDataRaw.tabs) && heroDataRaw.tabs.length > 0)
+          ? heroDataRaw.tabs
+          : (heroDataRaw.tabs === undefined ? FALLBACK_HERO.tabs : heroDataRaw.tabs)
+      }
+    : FALLBACK_HERO;
   const featData = sections.find(s => s.type === 'FeaturesWithImage' || s.type === 'TextWithImage')?.data || { title: 'Uncompromising Engineering Precision', features: FALLBACK_FEATURES, image: FALLBACK_HERO.images[0] };
   const specsData = sections.find(s => s.type === 'Specifications')?.data || { title: 'Technical Specifications', specs: FALLBACK_SPECS };
   const compData = sections.find(s => s.type === 'ComparisonTable')?.data || { title: 'Why LabZenix Leads The Industry', rows: FALLBACK_COMPARISON };
-  const tabsData = sections.find(s => s.type === 'ProductTabs')?.data || FALLBACK_PRODUCT_TABS;
   const faqData = sections.find(s => s.type === 'FAQs')?.data || { title: 'Frequently Asked Questions', faqs: FALLBACK_FAQS };
 
   return (
@@ -137,9 +145,6 @@ export default async function BurstingStrengthTesterCampaign() {
 
       {/* Hero Section */}
       <HeroSection data={heroData} campaignTitle="Servo Hydraulic Bursting Strength Tester" />
-
-      {/* Technical Capabilities / Product Details Tabs (Key Features, Standards, Applications) */}
-      <ProductTabsSection data={tabsData} />
 
       {/* Key Advantages / Features */}
       <FeaturesSection data={featData} index={0} />

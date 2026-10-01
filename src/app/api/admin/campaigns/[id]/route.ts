@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import Campaign from '@/models/Campaign';
 import { isAdmin } from '@/lib/auth';
+import { delCache } from '@/lib/cache';
+import { revalidatePath } from 'next/cache';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -32,6 +34,18 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     if (!updatedCampaign) {
       return NextResponse.json({ error: 'Campaign not found' }, { status: 404 });
     }
+
+    // Invalidate campaign cache & trigger page revalidation
+    if (updatedCampaign.slug) {
+      await delCache(`campaign:${updatedCampaign.slug}`);
+      try {
+        revalidatePath(`/campaign/${updatedCampaign.slug}`);
+        if (updatedCampaign.slug === 'bursting-strength-tester') {
+          revalidatePath('/campaign/bursting-strength-tester');
+        }
+      } catch (_) {}
+    }
+
     return NextResponse.json(updatedCampaign, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });
@@ -49,8 +63,18 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     if (!deletedCampaign) {
       return NextResponse.json({ error: 'Campaign not found' }, { status: 404 });
     }
+
+    // Invalidate cache for deleted campaign
+    if (deletedCampaign.slug) {
+      await delCache(`campaign:${deletedCampaign.slug}`);
+      try {
+        revalidatePath(`/campaign/${deletedCampaign.slug}`);
+      } catch (_) {}
+    }
+
     return NextResponse.json({ message: 'Campaign deleted successfully' }, { status: 200 });
   } catch (error) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+

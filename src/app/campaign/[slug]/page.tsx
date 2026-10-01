@@ -7,8 +7,7 @@ import HeroSection from '@/components/campaigns/HeroSection';
 import VideoSection from '@/components/campaigns/VideoSection';
 import { 
   FeaturesSection, SpecificationsSection, ComparisonSection, 
-  FeedbackSection, ApplicationsSection, FAQSection, 
-  TabbedContentSection, ProductTabsSection, DownloadsSection, RelatedProductsSection 
+  FeedbackSection, ApplicationsSection, FAQSection, DownloadsSection, RelatedProductsSection 
 } from '@/components/campaigns/Sections';
 import CampaignEnquiryForm from '@/components/campaigns/CampaignEnquiryForm';
 import CampaignStickyNav from '@/components/campaigns/CampaignStickyNav';
@@ -72,12 +71,6 @@ export default async function DynamicCampaignPage({ params }: { params: Promise<
 
       case 'FAQs':
         return <FAQSection key={section.id} data={data} />;
-
-      case 'TabbedContent':
-        return <TabbedContentSection key={section.id} data={data} />;
-
-      case 'ProductTabs':
-        return <ProductTabsSection key={section.id} data={data} />;
 
       case 'Downloads':
         return <DownloadsSection key={section.id} data={data} />;

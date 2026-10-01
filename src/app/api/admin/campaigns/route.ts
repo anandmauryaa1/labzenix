@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import Campaign from '@/models/Campaign';
 import { isAdmin } from '@/lib/auth';
+import { delCache } from '@/lib/cache';
+import { revalidatePath } from 'next/cache';
 
 export async function GET(req: NextRequest) {
   try {
@@ -24,8 +26,17 @@ export async function POST(req: NextRequest) {
     await dbConnect();
     const body = await req.json();
     const newCampaign = await Campaign.create(body);
+
+    if (newCampaign.slug) {
+      await delCache(`campaign:${newCampaign.slug}`);
+      try {
+        revalidatePath(`/campaign/${newCampaign.slug}`);
+      } catch (_) {}
+    }
+
     return NextResponse.json(newCampaign, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 }
+
