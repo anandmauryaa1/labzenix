@@ -16,17 +16,25 @@ import * as motion from 'framer-motion/client';
 import CatalogButton from '@/components/products/CatalogButton';
 import PageBanner from '@/components/ui/PageBanner';
 import ProductRange from '@/components/home/ProductRange';
+import { cachedFetch } from '@/lib/cache';
 
-// Always fetch fresh ΓÇö reviews and FAQs must appear immediately after admin saves
+// Always fetch fresh — reviews and FAQs must appear immediately after admin saves
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-
-
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  await dbConnect();
-  const product = await Product.findOne({ slug }).lean() as IProduct | null;
+  const product: IProduct | null = await cachedFetch(
+    `product:meta:${slug}`,
+    async () => {
+      await dbConnect();
+      return (await Product.findOne({ slug })
+        .select('title metaTitle metaDescription focusKeyword category modelNumber ogTitle ogDescription images')
+        .lean()) as unknown as IProduct | null;
+    },
+    600
+  );
+
   if (!product) return { title: 'Not Found' };
   
   const title = product.metaTitle || product.title;
@@ -47,22 +55,47 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  await dbConnect();
-  const product = await Product.findOne({ slug }).lean() as IProduct | null;
+
+  const product: IProduct | null = await cachedFetch(
+    `product:${slug}`,
+    async () => {
+      await dbConnect();
+      return (await Product.findOne({ slug })
+        .select('title modelNumber slug description category usage images features featuresText specificationText specs youtubeUrl metaTitle metaDescription focusKeyword ogTitle ogDescription applications views createdAt')
+        .lean()) as unknown as IProduct | null;
+    },
+    300
+  );
+
   if (!product) notFound();
 
   // Fetch category for catalog
-  const category = await Category.findOne({ name: product.category }).lean() as ICategory | null;
+  const category: ICategory | null = await cachedFetch(
+    `category:name:${product.category}`,
+    async () => {
+      await dbConnect();
+      return (await Category.findOne({ name: product.category }).select('name catalogUrl').lean()) as unknown as ICategory | null;
+    },
+    600
+  );
   
   // Fetch social media settings
-  const settings = await Settings.findOne({ configKey: 'global' }).lean() as ISettings | null;
+  const settings: ISettings | null = await cachedFetch(
+    `settings:global`,
+    async () => {
+      await dbConnect();
+      return (await Settings.findOne({ configKey: 'global' }).select('social').lean()) as unknown as ISettings | null;
+    },
+    600
+  );
 
   // Explicitly fetch reviews and FAQs from new collections
-  const rawReviews = await Review.find({ product: product._id }).lean() as IReview[];
-  const rawFaqs    = await Faq.find({ product: product._id }).lean() as IFaq[];
+  await dbConnect();
+  const rawReviews = await Review.find({ product: product._id }).select('author rating comment date images').lean() as IReview[];
+  const rawFaqs    = await Faq.find({ product: product._id }).select('question answer').lean() as IFaq[];
 
   // Fetch linked applications
-  const linkedApplications = await Application.find({ _id: { $in: product.applications || [] } }).lean() as IApplication[];
+  const linkedApplications = await Application.find({ _id: { $in: product.applications || [] } }).select('_id name slug').lean() as IApplication[];
 
   /* ΓöÇΓöÇΓöÇ JSON-LD Structured Data ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
   const reviews: { author: string; rating: number; comment: string; date?: string; images?: string[] }[] = JSON.parse(JSON.stringify(rawReviews ?? []));

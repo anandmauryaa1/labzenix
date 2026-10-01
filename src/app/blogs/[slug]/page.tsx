@@ -8,16 +8,25 @@ import Image from 'next/image';
 import Button from '@/components/ui/Button';
 import SidebarContactForm from '@/components/blogs/SidebarContactForm';
 import PageBanner from '@/components/ui/PageBanner';
+import { cachedFetch } from '@/lib/cache';
+import { getOptimizedImageUrl } from '@/lib/image';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  await dbConnect();
-  const blog = await Blog.findOne({ 
-    $or: [
-      { slug: slug },
-      { slug: `/${slug}` }
-    ]
-  });
+  const blog: any = await cachedFetch(
+    `blog:meta:${slug}`,
+    async () => {
+      await dbConnect();
+      return Blog.findOne({ 
+        $or: [
+          { slug: slug },
+          { slug: `/${slug}` }
+        ]
+      }).select('title slug content image category metaTitle metaDescription focusKeyword ogTitle ogDescription tags').lean();
+    },
+    600
+  );
+
   if (!blog) return { title: 'Not Found' };
 
   const title = blog.metaTitle || blog.title;
@@ -30,7 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     openGraph: {
       title: blog.ogTitle ? `${blog.ogTitle} | LabZenix Knowledge Center` : `${title} | LabZenix Knowledge Center`,
       description: blog.ogDescription || description,
-      images: [blog.image],
+      images: [getOptimizedImageUrl(blog.image, { width: 1200, height: 630 })],
     },
   };
 }
@@ -40,7 +49,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
   await dbConnect();
 
   logger.info('Fetching blog details', { slug });
-  // Try matching slug exactly as passed or with a leading slash if stored that way
+  // Increment view counter and fetch blog document with author name
   const blog = await Blog.findOneAndUpdate(
     { 
       $or: [
@@ -50,39 +59,58 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
     },
     { $inc: { views: 1 } },
     { returnDocument: 'after' }
-  ).populate('author', 'name');
+  ).select('title slug content image category status tags author createdAt views').populate('author', 'name').lean();
 
   if (!blog || (blog.status === 'draft')) {
     notFound();
   }
 
-  // Fetch Sidebar Data
-  const recentBlogs = await Blog.find({ 
-    status: { $ne: 'draft' }, 
-    _id: { $ne: blog._id } 
-  })
-  .sort({ createdAt: -1 })
-  .limit(3)
-  .lean();
+  // Fetch Sidebar Data with projection & lean
+  const recentBlogs = await cachedFetch(
+    `blogs:recent:${blog._id}`,
+    async () => {
+      return Blog.find({ 
+        status: { $ne: 'draft' }, 
+        _id: { $ne: blog._id } 
+      })
+      .select('title slug image category createdAt')
+      .sort({ createdAt: -1 })
+      .limit(3)
+      .lean();
+    },
+    300
+  );
 
-  const popularBlogs = await Blog.find({ 
-    status: { $ne: 'draft' }, 
-    _id: { $ne: blog._id } 
-  })
-  .sort({ views: -1 })
-  .limit(3)
-  .lean();
+  const popularBlogs = await cachedFetch(
+    `blogs:popular:${blog._id}`,
+    async () => {
+      return Blog.find({ 
+        status: { $ne: 'draft' }, 
+        _id: { $ne: blog._id } 
+      })
+      .select('title slug image category views createdAt')
+      .sort({ views: -1 })
+      .limit(3)
+      .lean();
+    },
+    300
+  );
 
-  const relatedBlogs = await Blog.find({ 
-    status: 'published', 
-    category: blog.category,
-    _id: { $ne: blog._id } 
-  })
-  .sort({ createdAt: -1 })
-  .limit(3)
-  .lean();
-
-  const categories = await Blog.distinct('category', { status: 'published' });
+  const relatedBlogs = await cachedFetch(
+    `blogs:related:${blog.category}:${blog._id}`,
+    async () => {
+      return Blog.find({ 
+        status: 'published', 
+        category: blog.category,
+        _id: { $ne: blog._id } 
+      })
+      .select('title slug image category createdAt')
+      .sort({ createdAt: -1 })
+      .limit(3)
+      .lean();
+    },
+    300
+  );
 
   return (
     <div className="bg-white min-h-screen">

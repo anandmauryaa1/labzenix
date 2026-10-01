@@ -28,9 +28,9 @@ export interface IProduct extends Document {
 const ProductSchema = new mongoose.Schema<IProduct>({
   title:       { type: String, required: [true, 'Product title is required'],   trim: true },
   modelNumber: { type: String, required: [true, 'Model number is required'],    trim: true },
-  slug:        { type: String, required: true, unique: true, lowercase: true, trim: true },
+  slug:        { type: String, required: true, unique: true, lowercase: true, trim: true, index: true },
   description: { type: String, required: [true, 'Description is required'],    trim: true },
-  category:    { type: String, required: [true, 'Category is required'],        trim: true },
+  category:    { type: String, required: [true, 'Category is required'],        trim: true, index: true },
   usage: {
     type: String,
     required: [true, 'Usage type is required'],
@@ -74,10 +74,12 @@ const ProductSchema = new mongoose.Schema<IProduct>({
   createdAt: { type: Date, default: Date.now, index: true },
 });
 
-// Compound query index
-ProductSchema.index({ category: 1, usage: 1 });
-ProductSchema.index({ createdAt: -1 });
-ProductSchema.index({ slug: 1 });
+// ─── ESR Rule Compound Indexes ────────────────────────────────────────────────
+// Rule: Equality (category, usage) -> Sort (createdAt, views) -> Range
+ProductSchema.index({ category: 1, usage: 1, createdAt: -1 });  // E: category, E: usage, S: createdAt
+ProductSchema.index({ category: 1, views: -1 });              // E: category, S: views
+ProductSchema.index({ slug: 1 });                            // E: slug
+ProductSchema.index({ createdAt: -1 });                      // S: createdAt
 
 // Full-text search index — used by $text queries on the catalog
 ProductSchema.index(

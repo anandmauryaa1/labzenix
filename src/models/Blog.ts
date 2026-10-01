@@ -37,12 +37,12 @@ const BlogSchema = new Schema<IBlog>({
   timestamps: true
 });
 
-// Query indexes
+// Query indexes (ESR Rule: Equality -> Sort -> Range)
+BlogSchema.index({ status: 1, slug: 1 });
+BlogSchema.index({ status: 1, category: 1, createdAt: -1 });
 BlogSchema.index({ status: 1, createdAt: -1 });
-BlogSchema.index({ category: 1, status: 1 });
-BlogSchema.index({ slug: 1 });
-BlogSchema.index({ author: 1 });
-BlogSchema.index({ views: -1 });
+BlogSchema.index({ status: 1, views: -1 });
+BlogSchema.index({ author: 1, createdAt: -1 });
 
 // Full-text search index
 BlogSchema.index(

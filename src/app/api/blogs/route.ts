@@ -20,15 +20,28 @@ const blogSchema = z.object({
   metaDescription: z.string().min(1, 'Meta description is required').trim(),
 });
 
+import { cachedFetch } from '@/lib/cache';
+
 export async function GET() {
   try {
-    await dbConnect();
-    const blogs = await Blog.find({})
-      .populate({ path: 'author', model: User, select: 'name' })
-      .sort({ createdAt: -1 })
-      .lean()
-      .select('-__v');
-    return NextResponse.json(blogs);
+    const blogs = await cachedFetch(
+      'api:blogs:all',
+      async () => {
+        await dbConnect();
+        return Blog.find({ status: 'published' })
+          .select('title slug image category status tags author createdAt views')
+          .populate({ path: 'author', model: User, select: 'name' })
+          .sort({ createdAt: -1 })
+          .lean();
+      },
+      300 // 5 min cache
+    );
+
+    return NextResponse.json(blogs, {
+      headers: {
+        'Cache-Control': 'public, max-age=120, s-maxage=600, stale-while-revalidate=1200'
+      }
+    });
   } catch (error: any) {
     return handleProductionError(error);
   }

@@ -7,6 +7,7 @@ import User from '@/models/User';
 import { handleProductionError } from '@/lib/errorHandler';
 import { getAuthUser, hasPermission } from '@/lib/auth';
 import { invalidateProductCaches } from '@/lib/cacheRevalidation';
+import { cachedFetch } from '@/lib/cache';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
@@ -36,45 +37,52 @@ export async function GET(req: NextRequest) {
     const categoryParam = searchParams.get('category');
     const fieldsParam = searchParams.get('fields');
     
-    let query: Record<string, any> = {};
-    
-    if (applicationSlug) {
-      // Find the application ID from slug
-      const Application = (await import('@/models/Application')).default;
-      const app = await Application.findOne({ slug: applicationSlug }).lean();
-      if (app) {
-        query.applications = app._id;
-      }
-    }
+    const cacheKey = `api:products:${applicationSlug || 'all'}:${categoryParam || 'all'}:${fieldsParam || 'full'}`;
 
-    if (categoryParam) {
-      const decodedCat = decodeURIComponent(categoryParam).trim();
-      // Build flexible regex pattern matching & or and, hyphens or spaces
-      const escaped = decodedCat.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const regexPattern = escaped
-        .replace(/\\&/g, '(\\&|and)')
-        .replace(/[-\s]+/g, '[-\\s]+');
-      query.category = { $regex: new RegExp(`^${regexPattern}$`, 'i') };
-    }
+    const products = await cachedFetch(
+      cacheKey,
+      async () => {
+        await dbConnect();
+        let query: Record<string, any> = {};
+        
+        if (applicationSlug) {
+          const Application = (await import('@/models/Application')).default;
+          const app = await Application.findOne({ slug: applicationSlug }).select('_id').lean();
+          if (app) {
+            query.applications = app._id;
+          }
+        }
 
-    let selectFields = '-__v';
-    let shouldPopulate = true;
+        if (categoryParam) {
+          const decodedCat = decodeURIComponent(categoryParam).trim();
+          const escaped = decodedCat.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const regexPattern = escaped
+            .replace(/\\&/g, '(\\&|and)')
+            .replace(/[-\s]+/g, '[-\\s]+');
+          query.category = { $regex: new RegExp(`^${regexPattern}$`, 'i') };
+        }
 
-    if (fieldsParam === 'card') {
-      selectFields = '_id title modelNumber slug category images description';
-      shouldPopulate = false;
-    }
+        let selectFields = '_id title modelNumber slug description category usage images features specs createdAt';
+        let shouldPopulate = true;
 
-    let queryBuilder = Product.find(query)
-      .sort({ createdAt: 1 })
-      .lean()
-      .select(selectFields);
+        if (fieldsParam === 'card') {
+          selectFields = '_id title modelNumber slug category images description';
+          shouldPopulate = false;
+        }
 
-    if (shouldPopulate) {
-      queryBuilder = queryBuilder.populate({ path: 'author', model: User, select: 'name' });
-    }
+        let queryBuilder = Product.find(query)
+          .sort({ createdAt: -1 })
+          .select(selectFields)
+          .lean();
 
-    const products = await queryBuilder;
+        if (shouldPopulate) {
+          queryBuilder = queryBuilder.populate({ path: 'author', model: User, select: 'name' });
+        }
+
+        return queryBuilder;
+      },
+      120 // 2 min cache
+    );
     
     return NextResponse.json(JSON.parse(JSON.stringify(products)), {
       headers: {

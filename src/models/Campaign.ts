@@ -33,11 +33,13 @@ const CampaignSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
+    index: true,
   },
   status: {
     type: String,
     enum: ['draft', 'published'],
     default: 'published',
+    index: true,
   },
   seo: {
     metaTitle: String,
@@ -46,5 +48,9 @@ const CampaignSchema = new mongoose.Schema({
   sections: [SectionSchema],
 }, { timestamps: true });
 
-// Check if the model already exists to avoid hot-reloading errors in Next.js
+// ─── ESR Rule Compound Indexes ────────────────────────────────────────────────
+// Rule: Equality (status, slug) -> Sort (createdAt) -> Range
+CampaignSchema.index({ status: 1, slug: 1 });          // E: status, E: slug
+CampaignSchema.index({ status: 1, createdAt: -1 });     // E: status, S: createdAt (newest campaigns first)
+
 export default mongoose.models.Campaign || mongoose.model('Campaign', CampaignSchema);

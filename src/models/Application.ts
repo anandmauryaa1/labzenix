@@ -35,6 +35,11 @@ const ApplicationSchema = new mongoose.Schema<IApplication>({
   createdAt: { type: Date, default: Date.now },
 });
 
+// ESR Compound Indexes (Equality -> Sort -> Range)
+ApplicationSchema.index({ active: 1, slug: 1 });
+ApplicationSchema.index({ active: 1, category: 1, order: 1 });
+ApplicationSchema.index({ active: 1, order: 1, createdAt: -1 });
+
 // Handle model compilation error in development with hot-reloading
 if (process.env.NODE_ENV === 'development') {
   delete mongoose.models.Application;

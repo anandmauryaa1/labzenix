@@ -35,6 +35,10 @@ const CategorySchema = new mongoose.Schema<ICategory>({
   createdAt: { type: Date, default: Date.now },
 });
 
+// ESR Compound Indexes
+CategorySchema.index({ slug: 1 });
+CategorySchema.index({ order: 1, createdAt: -1 });
+
 // Handle model compilation error in development with hot-reloading
 if (process.env.NODE_ENV === 'development') {
   delete mongoose.models.Category;
