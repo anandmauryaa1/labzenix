@@ -8,7 +8,7 @@ import VideoSection from '@/components/campaigns/VideoSection';
 import { 
   FeaturesSection, SpecificationsSection, ComparisonSection, 
   FeedbackSection, ApplicationsSection, FAQSection, 
-  TabbedContentSection, DownloadsSection, RelatedProductsSection 
+  TabbedContentSection, ProductTabsSection, DownloadsSection, RelatedProductsSection 
 } from '@/components/campaigns/Sections';
 import CampaignEnquiryForm from '@/components/campaigns/CampaignEnquiryForm';
 import CampaignStickyNav from '@/components/campaigns/CampaignStickyNav';
@@ -75,6 +75,9 @@ export default async function DynamicCampaignPage({ params }: { params: Promise<
 
       case 'TabbedContent':
         return <TabbedContentSection key={section.id} data={data} />;
+
+      case 'ProductTabs':
+        return <ProductTabsSection key={section.id} data={data} />;
 
       case 'Downloads':
         return <DownloadsSection key={section.id} data={data} />;

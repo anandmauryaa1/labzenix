@@ -8,7 +8,7 @@ import HeroSection from '@/components/campaigns/HeroSection';
 import VideoSection from '@/components/campaigns/VideoSection';
 import { 
   FeaturesSection, SpecificationsSection, ComparisonSection, FeedbackSection, 
-  ApplicationsSection, FAQSection, TabbedContentSection, DownloadsSection, ContactSection, RelatedProductsSection 
+  ApplicationsSection, FAQSection, TabbedContentSection, ProductTabsSection, DownloadsSection, ContactSection, RelatedProductsSection 
 } from '@/components/campaigns/Sections';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
@@ -392,6 +392,7 @@ const SECTION_TYPES = [
   'CustomerFeedback',
   'Downloads',
   'TabbedContent',
+  'ProductTabs',
   'RelatedProducts',
   'Video'
 ];
@@ -985,6 +986,185 @@ export default function CampaignForm() {
         );
       }
 
+            case 'ProductTabs': {
+        const keyFeatures = Array.isArray(data.keyFeatures) ? data.keyFeatures : [];
+        const testStandards = Array.isArray(data.testStandards) ? data.testStandards : [];
+        const applications = Array.isArray(data.applications) ? data.applications : [];
+
+        const updateList = (field: string, list: string[]) => setField(field, list);
+
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Section Title</label>
+                <input
+                  type="text"
+                  className="w-full border border-gray-300 p-2 outline-none focus:border-primary text-sm"
+                  value={data.title || ''}
+                  onChange={e => setField('title', e.target.value)}
+                  placeholder="e.g. Comprehensive Specifications & Details"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Section Subtitle</label>
+                <input
+                  type="text"
+                  className="w-full border border-gray-300 p-2 outline-none focus:border-primary text-sm"
+                  value={data.subtitle || ''}
+                  onChange={e => setField('subtitle', e.target.value)}
+                  placeholder="e.g. Explore key engineering features, compliant test standards..."
+                />
+              </div>
+            </div>
+
+            {/* TAB 1: Key Features */}
+            <div className="border border-slate-200 p-4 bg-white space-y-3">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-black uppercase text-primary bg-primary/10 px-2 py-1">Tab 1</span>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">Key Features Points</h4>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => updateList('keyFeatures', [...keyFeatures, ''])}
+                  className="text-xs bg-primary text-white px-3 py-1 font-bold hover:bg-primary/90 flex items-center shadow-sm"
+                >
+                  <Plus className="w-3.5 h-3.5 mr-1" /> Add Feature Point
+                </button>
+              </div>
+
+              {keyFeatures.length === 0 ? (
+                <p className="text-xs text-slate-400 italic py-2">No key features added yet. Click &quot;Add Feature Point&quot; above.</p>
+              ) : (
+                <div className="space-y-2">
+                  {keyFeatures.map((feat: string, fi: number) => (
+                    <div key={fi} className="flex items-center gap-2">
+                      <span className="text-xs text-slate-400 font-mono w-5 shrink-0">{fi + 1}.</span>
+                      <input
+                        type="text"
+                        className="flex-1 border border-slate-300 p-2 text-sm outline-none focus:border-primary"
+                        value={feat}
+                        onChange={e => {
+                          const updated = [...keyFeatures];
+                          updated[fi] = e.target.value;
+                          updateList('keyFeatures', updated);
+                        }}
+                        placeholder="e.g. High-precision servo hydraulic pressure control system"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => updateList('keyFeatures', keyFeatures.filter((_: any, idx: number) => idx !== fi))}
+                        className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                        title="Remove point"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* TAB 2: Applicable Test Standards */}
+            <div className="border border-slate-200 p-4 bg-white space-y-3">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-black uppercase text-primary bg-primary/10 px-2 py-1">Tab 2</span>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">Applicable Test Standards</h4>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => updateList('testStandards', [...testStandards, ''])}
+                  className="text-xs bg-primary text-white px-3 py-1 font-bold hover:bg-primary/90 flex items-center shadow-sm"
+                >
+                  <Plus className="w-3.5 h-3.5 mr-1" /> Add Standard
+                </button>
+              </div>
+
+              {testStandards.length === 0 ? (
+                <p className="text-xs text-slate-400 italic py-2">No test standards added yet. Click &quot;Add Standard&quot; above.</p>
+              ) : (
+                <div className="space-y-2">
+                  {testStandards.map((std: string, si: number) => (
+                    <div key={si} className="flex items-center gap-2">
+                      <span className="text-xs text-slate-400 font-mono w-5 shrink-0">{si + 1}.</span>
+                      <input
+                        type="text"
+                        className="flex-1 border border-slate-300 p-2 text-sm outline-none focus:border-primary"
+                        value={std}
+                        onChange={e => {
+                          const updated = [...testStandards];
+                          updated[si] = e.target.value;
+                          updateList('testStandards', updated);
+                        }}
+                        placeholder="e.g. ISO 13938-1 (Hydraulic bursting strength of fabrics)"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => updateList('testStandards', testStandards.filter((_: any, idx: number) => idx !== si))}
+                        className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                        title="Remove point"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* TAB 3: Applications */}
+            <div className="border border-slate-200 p-4 bg-white space-y-3">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-black uppercase text-primary bg-primary/10 px-2 py-1">Tab 3</span>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">Applications</h4>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => updateList('applications', [...applications, ''])}
+                  className="text-xs bg-primary text-white px-3 py-1 font-bold hover:bg-primary/90 flex items-center shadow-sm"
+                >
+                  <Plus className="w-3.5 h-3.5 mr-1" /> Add Application
+                </button>
+              </div>
+
+              {applications.length === 0 ? (
+                <p className="text-xs text-slate-400 italic py-2">No applications added yet. Click &quot;Add Application&quot; above.</p>
+              ) : (
+                <div className="space-y-2">
+                  {applications.map((app: string, ai: number) => (
+                    <div key={ai} className="flex items-center gap-2">
+                      <span className="text-xs text-slate-400 font-mono w-5 shrink-0">{ai + 1}.</span>
+                      <input
+                        type="text"
+                        className="flex-1 border border-slate-300 p-2 text-sm outline-none focus:border-primary"
+                        value={app}
+                        onChange={e => {
+                          const updated = [...applications];
+                          updated[ai] = e.target.value;
+                          updateList('applications', updated);
+                        }}
+                        placeholder="e.g. Corrugated packaging boxes, paper & board"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => updateList('applications', applications.filter((_: any, idx: number) => idx !== ai))}
+                        className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                        title="Remove point"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
       case 'TabbedContent': {
         const rawTabs = data.tabs;
         let tabs: any[] = [];
@@ -1398,6 +1578,7 @@ export default function CampaignForm() {
       case 'ApplicationExamples': return <ApplicationsSection key={section.id} data={section.data || {}} />;
       case 'FAQs': return <FAQSection key={section.id} data={section.data || {}} />;
       case 'TabbedContent': return <TabbedContentSection key={section.id} data={section.data || {}} />;
+      case 'ProductTabs': return <ProductTabsSection key={section.id} data={section.data || {}} />;
       case 'Downloads': return <DownloadsSection key={section.id} data={section.data || {}} />;
       case 'Contact': return <ContactSection key={section.id} data={section.data || {}} />;
       case 'RelatedProducts': return <RelatedProductsSection key={section.id} data={section.data || {}} />;

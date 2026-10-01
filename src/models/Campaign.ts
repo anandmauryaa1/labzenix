@@ -16,6 +16,7 @@ const SectionSchema = new mongoose.Schema({
       'CustomerFeedback',
       'Downloads',
       'TabbedContent',
+      'ProductTabs',
       'RelatedProducts',
       'Video'
     ],

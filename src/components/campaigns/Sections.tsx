@@ -568,3 +568,96 @@ export const RelatedProductsSection = ({ data }: { data: any }) => {
     </section>
   );
 };
+
+// --- PRODUCT TABS SECTION (Key Features / Standards / Applications) ---
+export const ProductTabsSection = ({ data }: { data: any }) => {
+  const [activeTab, setActiveTab] = useState(0);
+
+  const tabs = [
+    { 
+      id: 'features', 
+      label: 'Key Features', 
+      Icon: Settings, 
+      points: data?.keyFeatures || [] 
+    },
+    { 
+      id: 'standards', 
+      label: 'Applicable Test Standards', 
+      Icon: FileText, 
+      points: data?.testStandards || [] 
+    },
+    { 
+      id: 'applications', 
+      label: 'Applications', 
+      Icon: Factory, 
+      points: data?.applications || [] 
+    },
+  ];
+
+  const active = tabs[activeTab];
+
+  return (
+    <section id="product-tabs" className="py-20 md:py-24 bg-slate-50 font-display border-t border-slate-200">
+      <div className="container mx-auto px-4 max-w-6xl">
+        <FadeIn>
+          <SectionHeader 
+            title={data?.title || 'Comprehensive Specifications & Details'} 
+            subtitle={data?.subtitle || 'Explore key engineering features, compliant international test standards, and industrial application sectors.'} 
+            topText="TECHNICAL CAPABILITIES" 
+          />
+
+          {/* Tabs Navigation */}
+          <div className="mt-10 flex border-b-2 border-slate-200 overflow-x-auto no-scrollbar">
+            {tabs.map((tab, i) => {
+              const TabIcon = tab.Icon;
+              const isActive = activeTab === i;
+              return (
+                <button 
+                  key={tab.id} 
+                  type="button" 
+                  onClick={() => setActiveTab(i)} 
+                  className={`flex items-center gap-2.5 px-6 md:px-8 py-4 text-xs md:text-sm font-black uppercase tracking-wider whitespace-nowrap transition-all border-b-2 -mb-[2px] ${
+                    isActive 
+                      ? 'border-primary text-primary bg-white shadow-sm' 
+                      : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'
+                  }`}
+                >
+                  <TabIcon className={`w-4 h-4 ${isActive ? 'text-primary' : 'text-slate-400'}`} />
+                  <span>{tab.label}</span>
+                  {tab.points && tab.points.length > 0 && (
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                      isActive ? 'bg-primary/10 text-primary' : 'bg-slate-200 text-slate-600'
+                    }`}>
+                      {tab.points.length}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Tab Content Box */}
+          <div className="bg-white border border-t-0 border-slate-200 p-6 md:p-10 shadow-sm">
+            {!active.points || active.points.length === 0 ? (
+              <div className="text-center py-12 text-slate-400">
+                <active.Icon className="w-10 h-10 mx-auto text-slate-300 mb-2 opacity-50" />
+                <p className="text-sm italic">No points specified for {active.label.toLowerCase()} yet.</p>
+              </div>
+            ) : (
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
+                {active.points.map((point: string, i: number) => (
+                  <li key={i} className="flex items-start gap-3 p-3 bg-slate-50/70 border border-slate-100 rounded-none hover:border-primary/30 transition-colors">
+                    <span className="mt-0.5 shrink-0 w-5 h-5 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
+                      <Check className="w-3 h-3 text-primary" />
+                    </span>
+                    <span className="text-sm text-slate-700 font-medium leading-relaxed">{point}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </FadeIn>
+      </div>
+    </section>
+  );
+};
