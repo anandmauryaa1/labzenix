@@ -555,9 +555,14 @@ export default function CampaignForm() {
                 value={data.title || ''} onChange={e => setField('title', e.target.value)} placeholder="Leave blank to use campaign title" />
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Description (HTML)</label>
-              <textarea rows={3} className="w-full border border-gray-300 p-2 outline-none focus:border-primary text-sm"
-                value={data.description || ''} onChange={e => setField('description', e.target.value)} />
+              <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Description</label>
+              <div className="mt-1">
+                <RichTextEditor
+                  value={data.description || ''}
+                  onChange={(val: string) => setField('description', val)}
+                  placeholder="Write campaign description, highlight key points, formatting..."
+                />
+              </div>
             </div>
             <MultiImageUploadField
               images={data.images || []}
@@ -781,7 +786,7 @@ export default function CampaignForm() {
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Content / Intro (Optional HTML)</label>
+              <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Content / Intro</label>
               <textarea
                 rows={2}
                 className="w-full border border-gray-300 p-2 outline-none focus:border-primary text-sm"

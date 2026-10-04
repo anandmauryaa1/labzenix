@@ -65,7 +65,7 @@ export const FeaturesSection = ({ data, index = 0 }: { data: any, index?: number
 
               {data?.description && (
                 <div 
-                  className="text-slate-600 mb-8 text-base leading-relaxed prose prose-slate"
+                  className="text-slate-600 mb-8 text-base leading-relaxed blog-content prose max-w-none"
                   dangerouslySetInnerHTML={{ __html: data.description }}
                 />
               )}
@@ -170,7 +170,7 @@ export const SpecificationsSection = ({ data }: { data: any }) => {
         <div className="bg-white shadow-xl border border-slate-200 overflow-hidden rounded-none">
           <FadeIn direction="up">
             {data?.content ? (
-              <div className="p-8 text-slate-700 prose max-w-none" dangerouslySetInnerHTML={{ __html: data.content }}></div>
+              <div className="p-8 text-slate-700 blog-content prose max-w-none" dangerouslySetInnerHTML={{ __html: data.content }}></div>
             ) : filteredSpecs.length > 0 ? (
               <table className="w-full text-left border-collapse">
                 <thead>

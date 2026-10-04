@@ -65,7 +65,7 @@ export default function HeroSection({ data, campaignTitle }: HeroSectionProps) {
     if (hasHtml) {
       return (
         <div 
-          className="prose prose-slate max-w-none text-slate-700 text-sm leading-relaxed prose-p:my-2 prose-ul:my-2 prose-ul:list-disc prose-ul:pl-5 prose-ol:list-decimal prose-ol:pl-5 prose-li:my-1 prose-headings:font-bold prose-headings:text-slate-900"
+          className="blog-content prose max-w-none text-slate-700 text-sm leading-relaxed"
           dangerouslySetInnerHTML={{ __html: content }}
         />
       );
@@ -232,7 +232,7 @@ export default function HeroSection({ data, campaignTitle }: HeroSectionProps) {
 
               {/* Description Content */}
               <div 
-                className="prose prose-slate max-w-none text-slate-600 text-sm leading-relaxed mb-8 space-y-3 font-normal"
+                className="blog-content prose max-w-none text-slate-600 text-sm leading-relaxed mb-8 font-normal"
                 dangerouslySetInnerHTML={{ __html: description }}
               />
 

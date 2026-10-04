@@ -143,25 +143,38 @@
 }
 
 .blog-content ul,
-.blog-content ol {
+.blog-content ol,
+.prose ul,
+.prose ol {
   @apply my-3 ml-6;
 }
 
-.blog-content li {
+.blog-content li,
+.prose li {
   @apply mb-1 text-gray-700 leading-relaxed;
+  display: list-item !important;
 }
 
-.blog-content li p {
+.blog-content li p,
+.prose li p {
   @apply mb-0 inline;
   margin-bottom: 0 !important;
 }
 
-.blog-content ul li {
+.blog-content ul li,
+.blog-content ul > li,
+.prose ul li,
+.prose ul > li {
   @apply list-disc list-outside;
+  list-style-type: disc !important;
 }
 
-.blog-content ol li {
+.blog-content ol li,
+.blog-content ol > li,
+.prose ol li,
+.prose ol > li {
   @apply list-decimal list-outside;
+  list-style-type: decimal !important;
 }
 
 .blog-content blockquote {
