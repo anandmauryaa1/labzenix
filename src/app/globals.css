@@ -21,14 +21,36 @@
     @apply border-gray-100;
   }
   body {
-    @apply bg-white text-gray-800 antialiased selection:bg-primary selection:text-white leading-relaxed;
+    @apply bg-white text-gray-700 antialiased selection:bg-primary selection:text-white leading-relaxed;
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-display text-secondary leading-tight;
     letter-spacing: 0.5px;
   }
+  h1 {
+    @apply text-3xl md:text-4xl font-bold mb-4 mt-6;
+  }
+  h2 {
+    @apply text-2xl md:text-3xl font-bold mb-3 mt-6;
+  }
+  h3 {
+    @apply text-xl md:text-2xl font-bold mb-3 mt-5;
+  }
+  h4 {
+    @apply text-lg font-bold mb-2 mt-4;
+  }
+  h5 {
+    @apply text-base font-bold mb-2 mt-3;
+  }
+  h6 {
+    @apply text-sm font-bold mb-2 mt-3;
+  }
   p {
-    @apply leading-relaxed mb-4;
+    @apply text-gray-700 leading-relaxed mb-3.5;
+  }
+  li p {
+    @apply mb-0 inline;
+    margin-bottom: 0 !important;
   }
 }
 
@@ -87,23 +109,23 @@
 
 /* Blog Content Styling */
 .blog-content h1 {
-  @apply text-4xl md:text-5xl font-bold text-secondary mb-6 mt-8 uppercase tracking-[0.5px] leading-tight;
+  @apply text-3xl md:text-4xl font-bold text-secondary mb-4 mt-6 tracking-[0.5px] leading-tight;
 }
 
 .blog-content h2 {
-  @apply text-3xl md:text-4xl font-bold text-secondary mb-4 mt-8 uppercase tracking-[0.5px] leading-tight;
+  @apply text-2xl md:text-3xl font-bold text-secondary mb-3 mt-6 tracking-[0.5px] leading-tight;
 }
 
 .blog-content h3 {
-  @apply text-2xl md:text-3xl font-semibold text-secondary mb-4 mt-6 uppercase tracking-[0.5px];
+  @apply text-xl md:text-2xl font-bold text-secondary mb-3 mt-5 tracking-[0.5px];
 }
 
 .blog-content h4 {
-  @apply text-xl font-semibold text-secondary mb-3 mt-5 uppercase tracking-[0.5px];
+  @apply text-lg font-bold text-secondary mb-2 mt-4 tracking-[0.5px];
 }
 
 .blog-content p {
-  @apply text-gray-700 leading-8 mb-6 text-base;
+  @apply text-gray-700 leading-relaxed mb-3.5 text-base;
 }
 
 .blog-content a {
@@ -122,11 +144,16 @@
 
 .blog-content ul,
 .blog-content ol {
-  @apply mb-6 ml-6;
+  @apply my-3 ml-6;
 }
 
 .blog-content li {
-  @apply mb-3 text-gray-700 leading-7;
+  @apply mb-1 text-gray-700 leading-relaxed;
+}
+
+.blog-content li p {
+  @apply mb-0 inline;
+  margin-bottom: 0 !important;
 }
 
 .blog-content ul li {

@@ -96,16 +96,16 @@ export default async function BlogPage({
                           <span className="flex items-center"><User className="w-3 h-3 mr-2 text-primary" /> {blog.author?.name || 'Editorial Team'}</span>
                         </div>
                         
-                        <h2 className="text-2xl font-bold text-secondary mb-4 leading-tight group-hover:text-primary transition-colors uppercase tracking-[0.5px]">
+                        <h2 className="text-xl font-bold text-secondary mb-3 leading-snug group-hover:text-primary transition-colors tracking-[0.5px]">
                           {blog.title}
                         </h2>
                         
-                        <p className="text-sm text-gray-500 font-medium leading-relaxed mb-8 flex-grow line-clamp-3">
+                        <p className="text-sm text-gray-600 leading-relaxed mb-6 flex-grow line-clamp-3">
                           {blog.metaDescription || blog.content.replace(/<[^>]*>/g, '').substring(0, 160) + '...'}
                         </p>
                         
-                        <Link href={`/blogs/${blog.slug}`} className="inline-flex items-center text-secondary font-black uppercase text-[10px] tracking-[0.3em] group-hover:text-primary transition-all">
-                          Read Story <span className="ml-3 text-sm">→</span>
+                        <Link href={`/blogs/${blog.slug}`} className="inline-flex items-center text-secondary font-bold uppercase text-[11px] tracking-wider group-hover:text-primary transition-all">
+                          Read Story <span className="ml-2 text-sm">→</span>
                         </Link>
                       </div>
                     </article>
