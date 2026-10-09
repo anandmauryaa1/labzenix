@@ -54,7 +54,7 @@ export default async function Home() {
     ] = await Promise.all([
       HeroSlide.find({}).sort({ order: 1 }).lean().exec(),
       ProductRangeModel.find({ active: true }).sort({ order: 1 }).lean().exec(),
-      Product.find({}).sort({ views: -1, createdAt: -1, _id: -1 }).limit(6).lean().exec(),
+      Product.find({}).sort({ views: -1, createdAt: 1, _id: 1 }).limit(6).lean().exec(),
       AboutContent.find({}).lean().exec(),
       CoreValue.find({}).sort({ order: 1 }).lean().exec(),
       Partner.find({ isActive: true }).sort({ order: 1 }).lean().exec(),

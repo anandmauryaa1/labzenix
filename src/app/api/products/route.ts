@@ -71,7 +71,7 @@ export async function GET(req: NextRequest) {
         }
 
         let queryBuilder = Product.find(query)
-          .sort({ createdAt: -1, _id: -1 })
+          .sort({ createdAt: 1, _id: 1 })
           .select(selectFields)
           .lean();
 
