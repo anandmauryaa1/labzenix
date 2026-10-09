@@ -91,9 +91,9 @@ export default function Partners({ initialPartners }: { initialPartners?: Partne
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                     className="object-contain p-2 transform group-hover:scale-105 transition-transform duration-300"
                   />
-                  <h1 className="absolute -bottom-10 left-1/2 -translate-x-1/2 text-sm sm:text-base font-semibold text-secondary uppercase tracking-tight">
+                  <p className="absolute -bottom-10 left-1/2 -translate-x-1/2 text-sm sm:text-base font-semibold text-secondary uppercase tracking-tight">
                     {partner.name}
-                  </h1>
+                  </p>
                 </a>
               ))}
               

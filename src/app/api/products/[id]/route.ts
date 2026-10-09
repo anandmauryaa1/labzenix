@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { revalidatePath, revalidateTag } from 'next/cache';
 import dbConnect from '@/lib/dbConnect';
 import Product from '@/models/Product';
 import Review from '@/models/Review';
 import Faq from '@/models/Faq';
 import { handleProductionError } from '@/lib/errorHandler';
+import { invalidateProductCaches } from '@/lib/cacheRevalidation';
 import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -78,11 +78,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     });
     
     // Revalidate cached pages
-    revalidatePath('/admin/products');
-    revalidatePath('/products');
-    revalidatePath(`/products/${product.slug}`);
-    revalidateTag('products', 'max');
-    revalidateTag('categories', 'max');
+    await invalidateProductCaches(product.slug);
     
     return NextResponse.json(JSON.parse(JSON.stringify(product)));
   } catch (error) {
@@ -116,11 +112,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     logger.info('[API] Delete successful', { id });
     
     // Revalidate cached pages
-    revalidatePath('/admin/products');
-    revalidatePath('/products');
-    revalidatePath(`/products/${product.slug}`);
-    revalidateTag('products', 'max');
-    revalidateTag('categories', 'max');
+    await invalidateProductCaches(product?.slug);
     
     return NextResponse.json({ success: true });
   } catch (error) {

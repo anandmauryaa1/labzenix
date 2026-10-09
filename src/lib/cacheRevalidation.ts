@@ -1,10 +1,13 @@
 import { revalidatePath, revalidateTag } from 'next/cache';
+import { delCacheByPrefix } from './cache';
 
 /**
  * Centralized cache invalidation logic
  * Call this whenever admin updates products, blogs, categories, or SEO
  */
 export async function invalidateAdminCaches() {
+  await delCacheByPrefix('api:products');
+  await delCacheByPrefix('api:blogs');
   // Admin pages
   revalidatePath('/admin/products');
   revalidatePath('/admin/blogs');
@@ -24,6 +27,7 @@ export async function invalidateAdminCaches() {
 }
 
 export async function invalidateProductCaches(slug?: string) {
+  await delCacheByPrefix('api:products');
   revalidatePath('/admin/products');
   revalidatePath('/products');
   if (slug) revalidatePath(`/products/${slug}`);

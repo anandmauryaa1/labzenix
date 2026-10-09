@@ -13,6 +13,7 @@ interface PageBannerProps {
   description?: string;
   showBackButton?: boolean;
   backUrl?: string;
+  as?: 'h1' | 'h2' | 'p' | 'span';
 }
 
 export default function PageBanner({ 
@@ -20,8 +21,10 @@ export default function PageBanner({
   breadcrumbs, 
   description, 
   showBackButton, 
-  backUrl = '/products' 
+  backUrl = '/products',
+  as = 'p'
 }: PageBannerProps) {
+  const HeadingTag = as;
   return (
     <section className="bg-primary py-4 md:py-8">
       <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row md:items-center justify-between gap-8">
@@ -35,9 +38,9 @@ export default function PageBanner({
             </Link>
           )}
           <div>
-            <h1 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter leading-tight">
+            <HeadingTag className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter leading-tight">
               {title}
-            </h1>
+            </HeadingTag>
             {/* {description && (
               <p className="mt-2 text-white/90 font-medium text-sm md:text-base max-w-2xl leading-relaxed">
                 {description}

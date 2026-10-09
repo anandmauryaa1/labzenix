@@ -58,6 +58,7 @@ function ApplicationsContent() {
         breadcrumbs={breadcrumbs}
         showBackButton={!!categoryFilter}
         backUrl="/applications"
+        as="h1"
       />
 
       <section className="py-24 px-4">

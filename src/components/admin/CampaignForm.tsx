@@ -1405,9 +1405,9 @@ export default function CampaignForm() {
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
               </Link>
               <div>
-                <h1 className="text-2xl font-black text-secondary tracking-tight uppercase">
+                <h2 className="text-2xl font-black text-secondary tracking-tight uppercase">
                   {isEditing ? 'Edit Campaign' : 'Create Campaign'}
-                </h1>
+                </h2>
               </div>
             </div>
             <button

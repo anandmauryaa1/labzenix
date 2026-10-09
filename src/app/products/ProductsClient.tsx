@@ -37,7 +37,6 @@ interface Application {
 }
 
 const ITEMS_PER_PAGE = 12;
-const productCacheMap = new Map<string, Product[]>();
 
 function ProductsContent() {
   const searchParams = useSearchParams();
@@ -133,13 +132,6 @@ function ProductsContent() {
   }
 
   async function fetchProducts() {
-    const cacheKey = `cat=${categoryParam || ''}&app=${applicationParam || ''}`;
-    if (productCacheMap.has(cacheKey)) {
-      setProducts(productCacheMap.get(cacheKey)!);
-      setLoading(false);
-      return;
-    }
-
     setLoading(true);
     try {
       let url = '/api/products?fields=card';
@@ -171,7 +163,6 @@ function ProductsContent() {
         }
       }
 
-      productCacheMap.set(cacheKey, data);
       setProducts(data);
     } catch (err) {
       console.error('Error fetching products:', err);
@@ -328,6 +319,7 @@ function ProductsContent() {
         breadcrumbs={breadcrumbs} 
         description={pageDescription} 
         showBackButton={!!(categoryParam || applicationParam || searchParam)}
+        as="h1"
       />
       
       <section className="py-24 px-4 bg-gradient-to-b from-gray-200 to-white-50">

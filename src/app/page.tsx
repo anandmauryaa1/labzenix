@@ -54,7 +54,7 @@ export default async function Home() {
     ] = await Promise.all([
       HeroSlide.find({}).sort({ order: 1 }).lean().exec(),
       ProductRangeModel.find({ active: true }).sort({ order: 1 }).lean().exec(),
-      Product.find({}).sort({ views: -1 }).limit(6).lean().exec(),
+      Product.find({}).sort({ views: -1, createdAt: -1, _id: -1 }).limit(6).lean().exec(),
       AboutContent.find({}).lean().exec(),
       CoreValue.find({}).sort({ order: 1 }).lean().exec(),
       Partner.find({ isActive: true }).sort({ order: 1 }).lean().exec(),
@@ -74,6 +74,7 @@ export default async function Home() {
 
   return (
     <main className="overflow-hidden">
+      <h1 className="sr-only">LabZenix - Precision Laboratory &amp; Industrial Testing Equipment</h1>
       <Hero initialSlides={serialize(heroSlides)} />
       <DynamicProductRange initialRanges={serialize(productRanges)} />
       <ProductCarousel initialProducts={serialize(topProducts)} />

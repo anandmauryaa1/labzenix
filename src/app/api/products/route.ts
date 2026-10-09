@@ -66,12 +66,12 @@ export async function GET(req: NextRequest) {
         let shouldPopulate = true;
 
         if (fieldsParam === 'card') {
-          selectFields = '_id title modelNumber slug category images description';
+          selectFields = '_id title modelNumber slug category images description createdAt';
           shouldPopulate = false;
         }
 
         let queryBuilder = Product.find(query)
-          .sort({ createdAt: -1 })
+          .sort({ createdAt: -1, _id: -1 })
           .select(selectFields)
           .lean();
 

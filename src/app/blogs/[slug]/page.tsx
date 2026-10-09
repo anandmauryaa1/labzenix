@@ -123,6 +123,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
         ]} 
         showBackButton={true}
         backUrl="/blogs"
+        as="h1"
       />
 
       {/* Main Content Area */}

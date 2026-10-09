@@ -3,6 +3,7 @@ import dbConnect from '@/lib/dbConnect';
 import Product from '@/models/Product';
 import Review from '@/models/Review';
 import Faq from '@/models/Faq';
+import { invalidateProductCaches } from '@/lib/cacheRevalidation';
 import { logger } from '@/lib/logger';
 
 export async function DELETE(req: NextRequest) {
@@ -23,6 +24,8 @@ export async function DELETE(req: NextRequest) {
     const result = await Product.deleteMany({ _id: { $in: ids } });
     
     logger.info('Bulk products deleted', { count: result.deletedCount, ids });
+
+    await invalidateProductCaches();
 
     return NextResponse.json({ 
       success: true, 

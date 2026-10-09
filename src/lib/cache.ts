@@ -94,6 +94,17 @@ export async function delCache(key: string): Promise<void> {
 }
 
 /**
+ * Invalidate all cache keys matching a prefix
+ */
+export async function delCacheByPrefix(prefix: string): Promise<void> {
+  for (const key of Array.from(memoryCache.keys())) {
+    if (key.startsWith(prefix)) {
+      memoryCache.delete(key);
+    }
+  }
+}
+
+/**
  * Higher-order function to wrap DB queries with Redis/In-Memory Cache
  */
 export async function cachedFetch<T>(
