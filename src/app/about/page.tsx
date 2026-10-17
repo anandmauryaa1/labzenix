@@ -40,8 +40,53 @@ export default async function AboutPage() {
     ];
   }
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://labzenix.com';
+
+  const aboutSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    name: 'About LabZenix',
+    url: `${siteUrl}/about`,
+    description: 'Learn about LabZenix - A pioneer in manufacturing high-precision laboratory testing instruments for paper, packaging, plastic, and coating industries.',
+    mainEntity: {
+      '@type': 'Organization',
+      name: 'LabZenix Industries Pvt. Ltd.',
+      url: siteUrl,
+      logo: `${siteUrl}/icon.png`,
+    },
+  };
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: siteUrl,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'About Us',
+        item: `${siteUrl}/about`,
+      },
+    ],
+  };
+
   return (
     <div className="bg-white scroll-smooth">
+      {/* ─── Structured Data (JSON-LD) ─────────────────────────── */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+
       <PageBanner 
         title="About Us" 
         breadcrumbs={[

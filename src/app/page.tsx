@@ -72,8 +72,90 @@ export default async function Home() {
   // Next.js Server Components require passing plain objects to Client Components
   const serialize = (obj: any) => JSON.parse(JSON.stringify(obj));
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://labzenix.com';
+
+  const organizationSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': `${siteUrl}/#organization`,
+    name: 'LabZenix Industries Pvt. Ltd.',
+    alternateName: 'LabZenix',
+    url: siteUrl,
+    logo: `${siteUrl}/icon.png`,
+    description: 'Manufacturer of high-precision laboratory testing instruments for Paper, Packaging, PET, Plastic, and Paint industries.',
+    contactPoint: [
+      {
+        '@type': 'ContactPoint',
+        telephone: '+91-9565453120',
+        contactType: 'customer service',
+        areaServed: 'IN',
+        availableLanguage: ['English', 'Hindi'],
+      },
+    ],
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: '3D/98, New Industrial Town',
+      addressLocality: 'Faridabad',
+      addressRegion: 'Haryana',
+      postalCode: '121001',
+      addressCountry: 'IN',
+    },
+  };
+
+  const websiteSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${siteUrl}/#website`,
+    url: siteUrl,
+    name: 'LabZenix',
+    publisher: {
+      '@id': `${siteUrl}/#organization`,
+    },
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${siteUrl}/products?search={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  };
+
+  const localBusinessSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    name: 'LabZenix Industries Pvt. Ltd.',
+    image: `${siteUrl}/icon.png`,
+    '@id': `${siteUrl}/#localbusiness`,
+    url: siteUrl,
+    telephone: '+91-9565453120',
+    priceRange: '₹₹₹',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: '3D/98, New Industrial Town',
+      addressLocality: 'Faridabad',
+      addressRegion: 'Haryana',
+      postalCode: '121001',
+      addressCountry: 'IN',
+    },
+  };
+
   return (
     <main className="overflow-hidden">
+      {/* ─── Structured Data (JSON-LD) ─────────────────────────── */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+      />
+
       <h1 className="sr-only">LabZenix - Precision Laboratory &amp; Industrial Testing Equipment</h1>
       <Hero initialSlides={serialize(heroSlides)} />
       <DynamicProductRange initialRanges={serialize(productRanges)} />

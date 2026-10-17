@@ -26,7 +26,7 @@ interface SiteSettings {
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   const [settings, setSettings] = useState<SiteSettings | null>(null);
-  const [categories, setCategories] = useState<{ _id: string; name: string }[]>([]);
+  const [categories, setCategories] = useState<{ _id: string; name: string; slug?: string }[]>([]);
 
   useEffect(() => {
     fetch('/api/settings').then(res => res.json()).then(data => setSettings(data)).catch(console.error);
@@ -92,7 +92,7 @@ export default function Footer() {
                 : categories.map((cat) => (
                     <li key={cat._id}>
                       <Link
-                        href={`/products?category=${encodeURIComponent(cat.name)}`}
+                        href={cat.slug ? `/category/${cat.slug}` : `/products?category=${encodeURIComponent(cat.name)}`}
                         className="text-gray-600 hover:text-primary transition-all flex items-center group font-normal text-sm uppercase tracking-wider"
                       >
                         <span className="w-0 group-hover:w-3 h-0.5 bg-primary mr-0 group-hover:mr-2 transition-all" />
@@ -179,7 +179,7 @@ export default function Footer() {
                   }
                 ].map((social) => {
                   const url = settings.social?.[social.key];
-                  if (!url) return null;
+                  if (!url || typeof url !== 'string' || !url.startsWith('http')) return null;
                   const Icon = social.icon;
                   return (
                     <a

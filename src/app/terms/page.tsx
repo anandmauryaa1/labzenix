@@ -6,6 +6,9 @@ import { ShieldAlert } from 'lucide-react';
 export const metadata = {
   title: 'Terms and Conditions | LabZenix',
   description: 'Terms and conditions for using LabZenix laboratory instruments and services.',
+  alternates: {
+    canonical: '/terms',
+  },
 };
 
 export const dynamic = 'force-dynamic';

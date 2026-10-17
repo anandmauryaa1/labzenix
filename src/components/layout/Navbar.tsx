@@ -50,7 +50,7 @@ export default function Navbar() {
         ...link,
         submenu: categories.map(cat => ({
           name: cat.name,
-          href: `/products?category=${encodeURIComponent(cat.name)}`
+          href: cat.slug ? `/category/${cat.slug}` : `/products?category=${encodeURIComponent(cat.name)}`
         }))
       };
     }

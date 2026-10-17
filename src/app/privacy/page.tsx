@@ -6,6 +6,9 @@ import { ShieldCheck } from 'lucide-react';
 export const metadata = {
   title: 'Privacy Policy | LabZenix',
   description: 'Privacy policy for LabZenix laboratory instruments and services.',
+  alternates: {
+    canonical: '/privacy',
+  },
 };
 
 export const dynamic = 'force-dynamic';

@@ -1,0 +1,47 @@
+import { NextResponse } from 'next/server';
+
+export const dynamic = 'force-static';
+
+const LLMS_TEXT = `# LabZenix Industries
+
+> LabZenix is a manufacturer of high-precision laboratory testing instruments and industrial quality control equipment based in Faridabad, Haryana, India.
+
+## About the Company
+LabZenix Industries Pvt. Ltd. designs, manufactures, and supplies material testing equipment and laboratory instruments for quality assurance, compliance testing, and research & development across India and international markets.
+
+- Headquarters: 3D/98, New Industrial Town, Faridabad, Haryana - 121001, India
+- Phone: +91 9565453120
+- Email: info@labzenix.com
+- Official Website: https://labzenix.com
+
+## Testing Equipment & Categories
+- **Paper & Packaging Testing Instruments**: Bursting Strength Testers, Box Compression Testers (BCT), Drop Testers, Cobb Sizing Testers, Dart Impact Testers, Tear Testers, Scuff Testers, Ring Crush Testers.
+- **Plastic & Polymer Testing Instruments**: Melt Flow Index Testers (MFI / MVR Method A & B), Universal Testing Machines (UTM) / Tensile Testers, Environmental Stress Crack Resistance (ESCR) Apparatus.
+- **PET Bottle & Preform Testing Instruments**: Polariscope / Preform Stress Viewers, Hot Wire Bottle Cutters, Perpendicularity Testers, Digital Torque Testers, Cap Pull-out Testers.
+- **Paint, Plating & Coating Testing Instruments**: Salt Spray Chambers / Corrosion Chambers, Scratch Hardness Testers, Cross Hatch Adhesion Cutters, Gloss Meters.
+- **Flexible Films & Laminates Testing Instruments**: Digital & Computerised Coefficient of Friction (COF) Testers, Heat Sealers, Vacuum Leak Testers.
+
+## International Standards & Compliance Supported
+- ASTM: ASTM D642, ASTM D3951, ASTM D1238, ASTM D638, ASTM D882, ASTM B117, ASTM D1709, ASTM D1424
+- ISO: ISO 2758, ISO 2759, ISO 1133, ISO 527, ISO 12048, ISO 9227
+- TAPPI: TAPPI T810, TAPPI T441, TAPPI T804
+- BIS / IS Indian Standards
+
+## Key Web Pages
+- Homepage: https://labzenix.com/
+- Product Catalog: https://labzenix.com/products
+- Industry Applications: https://labzenix.com/applications
+- Knowledge Center & Technical Blogs: https://labzenix.com/blogs
+- About Us: https://labzenix.com/about
+- Contact & Request a Quote: https://labzenix.com/contact
+`;
+
+export async function GET() {
+  return new NextResponse(LLMS_TEXT, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'public, max-age=86400, stale-while-revalidate=43200',
+    },
+  });
+}

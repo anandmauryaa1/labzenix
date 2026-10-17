@@ -38,16 +38,20 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!product) return { title: 'Not Found' };
   
   const title = product.metaTitle || product.title;
-  const stripHtml = (html: string) => (html || '').replace(/<[^>]*>?/gm, '').trim();
+  const stripHtml = (html: string) => (html || '').replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim();
   const description = product.metaDescription || stripHtml(product.description).substring(0, 160) || '';
 
   return { 
     title: `${title} | LabZenix`, 
     description: description,
     keywords: product.focusKeyword ? [product.focusKeyword, product.category, product.title, product.modelNumber] : [product.category, product.title, product.modelNumber],
+    alternates: {
+      canonical: `/products/${slug}`,
+    },
     openGraph: {
       title: product.ogTitle ? `${product.ogTitle} | LabZenix` : `${title} | LabZenix`,
       description: product.ogDescription || description,
+      url: `/products/${slug}`,
       images: [product.images?.[0] || '/og-image.png'],
     }
   };
@@ -97,44 +101,51 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   // Fetch linked applications
   const linkedApplications = await Application.find({ _id: { $in: product.applications || [] } }).select('_id name slug').lean() as IApplication[];
 
-  /* ΓöÇΓöÇΓöÇ JSON-LD Structured Data ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
+  /* ─── JSON-LD Structured Data ───────────────────────────── */
   const reviews: { author: string; rating: number; comment: string; date?: string; images?: string[] }[] = JSON.parse(JSON.stringify(rawReviews ?? []));
   const faqs:    { question: string; answer: string }[]                                 = JSON.parse(JSON.stringify(rawFaqs ?? []));
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://labzenix.com';
   const productUrl = `${siteUrl}/products/${product.slug}`;
 
-  // Product schema
+  const cleanDescription = (product.metaDescription && product.metaDescription.trim().length > 0)
+    ? product.metaDescription
+    : (product.description ? product.description.replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim().substring(0, 500) : `${product.title} by LabZenix`);
+
+  // Product schema — with sanitized plain-text description and valid offers
   const productSchema: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.title,
-    description: product.description,
-    sku: product.modelNumber,
+    description: cleanDescription,
+    sku: product.modelNumber || product.slug,
+    mpn: product.modelNumber || product.slug,
     brand: {
       '@type': 'Brand',
       name: 'LabZenix',
+    },
+    manufacturer: {
+      '@type': 'Organization',
+      name: 'LabZenix Industries Pvt. Ltd.',
+      url: siteUrl,
     },
     image: (product.images ?? []).map((img: string) =>
       img.startsWith('http') ? img : `${siteUrl}${img}`
     ),
     url: productUrl,
-    review: {
-      '@type': 'Review',
-      reviewRating: {
-        '@type': 'Rating',
-        ratingValue: 5,
-        bestRating: 5,
-        worstRating: 1
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: 'INR',
+      availability: 'https://schema.org/InStock',
+      url: productUrl,
+      seller: {
+        '@type': 'Organization',
+        name: 'LabZenix Industries Pvt. Ltd.',
       },
-      author: {
-        '@type': 'Person',
-        name: 'LabZenix Team'
-      }
-    }
+    },
   };
 
-  // AggregateRating ΓÇö only if there are reviews
+  // Real AggregateRating & Reviews — only added when authentic customer reviews exist
   if (reviews.length > 0) {
     const totalRating = reviews.reduce((sum, r) => sum + (r.rating ?? 0), 0);
     const avgRating   = totalRating / reviews.length;
@@ -159,7 +170,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     }));
   }
 
-  // FAQPage schema ΓÇö only if FAQs exist
+  // FAQPage schema — only if FAQs exist
   const faqSchema = faqs.length > 0
     ? {
         '@context': 'https://schema.org',
@@ -175,12 +186,42 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       }
     : null;
 
+  // BreadcrumbList schema for rich search results
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: siteUrl,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Products',
+        item: `${siteUrl}/products`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: product.title,
+        item: productUrl,
+      },
+    ],
+  };
+
   return (
     <div className="bg-white">
-      {/* ΓöÇΓöÇ JSON-LD Structured Data (in <head> via Next.js) ΓöÇΓöÇ */}
+      {/* ─── JSON-LD Structured Data ───────────────────────── */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
       {faqSchema && (
         <script
@@ -361,6 +402,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         <ProductTabs
           product={{
             _id: product._id.toString(),
+            slug: product.slug,
             title: product.title,
             description: product.description,
             specificationText: product.specificationText,
@@ -379,7 +421,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         <div className="max-w-7xl mx-auto px-4 py-16 border-t border-gray-200">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl font-black text-secondary uppercase tracking-tighter">Related Products</h2>
-            <Link href={`/products?category=${product.category.toLowerCase().replace(/\s+/g, '-')}`} className="flex items-center text-primary hover:text-secondary transition-colors font-bold uppercase text-sm">
+            <Link href={category?.slug ? `/category/${category.slug}` : `/products?category=${encodeURIComponent(product.category)}`} className="flex items-center text-primary hover:text-secondary transition-colors font-bold uppercase text-sm">
               View All <ChevronRight className="w-4 h-4 ml-2" />
             </Link>
           </div>

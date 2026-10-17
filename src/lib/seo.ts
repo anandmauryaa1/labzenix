@@ -5,6 +5,7 @@ import { Metadata } from 'next';
 export async function getPageMetadata(pageKey: string): Promise<Metadata> {
   const defaultTitle = pageKey.charAt(0).toUpperCase() + pageKey.slice(1);
   const brandSuffix = '| LabZenix';
+  const canonicalPath = pageKey === 'home' ? '/' : `/${pageKey}`;
 
   try {
     await dbConnect();
@@ -13,6 +14,9 @@ export async function getPageMetadata(pageKey: string): Promise<Metadata> {
     if (!meta) {
       return {
         title: `${defaultTitle} ${brandSuffix}`,
+        alternates: {
+          canonical: canonicalPath,
+        },
       };
     }
 
@@ -20,14 +24,21 @@ export async function getPageMetadata(pageKey: string): Promise<Metadata> {
       title: `${meta.metaTitle} ${brandSuffix}`,
       description: meta.metaDescription,
       keywords: meta.focusKeyword ? [meta.focusKeyword, ...meta.keywords] : meta.keywords,
+      alternates: {
+        canonical: canonicalPath,
+      },
       openGraph: {
         title: meta.ogTitle ? `${meta.ogTitle} ${brandSuffix}` : `${meta.metaTitle} ${brandSuffix}`,
         description: meta.ogDescription || meta.metaDescription,
+        url: canonicalPath,
       }
     };
-  } catch (error) {
+  } catch {
     return {
       title: `${defaultTitle} ${brandSuffix}`,
+      alternates: {
+        canonical: canonicalPath,
+      },
     };
   }
 }

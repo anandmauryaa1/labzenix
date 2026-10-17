@@ -273,7 +273,7 @@ function ProductsContent() {
                       variants={itemVariant}
                       className="flex flex-col border border-gray-100 bg-white group hover:shadow-2xl transition-all duration-500 overflow-hidden cursor-pointer"
                     >
-                      <Link href={`/products?category=${encodeURIComponent(cat.name)}`} className="flex flex-col h-full">
+                      <Link href={cat.slug ? `/category/${cat.slug}` : `/products?category=${encodeURIComponent(cat.name)}`} className="flex flex-col h-full">
                         <div className="w-full h-64 bg-gray-50 overflow-hidden flex items-center justify-center relative">
                           {cat.image ? (
                             <Image

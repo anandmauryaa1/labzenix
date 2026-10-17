@@ -76,7 +76,7 @@ export default function OurProductRange() {
 
                 {/* Content Container */}
                 <div className="p-8 flex flex-col flex-grow justify-between bg-white relative z-20">
-                  <Link href={`/products?category=${encodeURIComponent(cat.name)}`} className="absolute inset-0 z-30"><span className="sr-only">View {cat.name}</span></Link>
+                  <Link href={cat.slug ? `/category/${cat.slug}` : `/products?category=${encodeURIComponent(cat.name)}`} className="absolute inset-0 z-30"><span className="sr-only">View {cat.name}</span></Link>
                   <div className="mb-8">
                     <h3 className="text-xl font-black text-secondary group-hover:text-primary transition-colors leading-tight uppercase tracking-tight pr-8 line-clamp-2">
                       {cat.name}

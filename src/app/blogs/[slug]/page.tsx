@@ -10,6 +10,7 @@ import SidebarContactForm from '@/components/blogs/SidebarContactForm';
 import PageBanner from '@/components/ui/PageBanner';
 import { cachedFetch } from '@/lib/cache';
 import { getOptimizedImageUrl } from '@/lib/image';
+import { cleanSeoHtml, stripHtml } from '@/lib/seoContent';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -36,9 +37,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: `${title} | LabZenix Knowledge Center`,
     description: description,
     keywords: blog.focusKeyword ? [blog.focusKeyword, blog.category, blog.tags?.join(', ')].filter(Boolean) : [blog.category, blog.tags?.join(', ')].filter(Boolean),
+    alternates: {
+      canonical: `/blogs/${slug}`,
+    },
     openGraph: {
       title: blog.ogTitle ? `${blog.ogTitle} | LabZenix Knowledge Center` : `${title} | LabZenix Knowledge Center`,
       description: blog.ogDescription || description,
+      url: `/blogs/${slug}`,
       images: [getOptimizedImageUrl(blog.image, { width: 1200, height: 630 })],
     },
   };
@@ -112,8 +117,74 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
     300
   );
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://labzenix.com';
+  const blogUrl = `${siteUrl}/blogs/${blog.slug}`;
+  const cleanExcerpt = blog.metaDescription || stripHtml(blog.content || '').substring(0, 200);
+
+  const blogSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: blog.title,
+    description: cleanExcerpt,
+    image: [blog.image ? (blog.image.startsWith('http') ? blog.image : `${siteUrl}${blog.image}`) : `${siteUrl}/og-image.png`],
+    datePublished: new Date(blog.createdAt).toISOString(),
+    dateModified: new Date(blog.updatedAt || blog.createdAt).toISOString(),
+    author: {
+      '@type': 'Person',
+      name: blog.author?.name || 'LabZenix Editorial Team',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'LabZenix Industries Pvt. Ltd.',
+      url: siteUrl,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${siteUrl}/icon.png`,
+      },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': blogUrl,
+    },
+  };
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: siteUrl,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Blogs',
+        item: `${siteUrl}/blogs`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: blog.title,
+        item: blogUrl,
+      },
+    ],
+  };
+
   return (
     <div className="bg-white min-h-screen">
+      {/* ─── JSON-LD Structured Data ───────────────────────── */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+
       <PageBanner
         title={blog.title}
         breadcrumbs={[
@@ -160,7 +231,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
 
                 <div
                   className="blog-content"
-                  dangerouslySetInnerHTML={{ __html: blog.content }}
+                  dangerouslySetInnerHTML={{ __html: cleanSeoHtml(blog.content, `/blogs/${blog.slug}`) }}
                 />
 
                 <div className="mt-12 pt-12 border-t border-gray-200 space-y-8">
