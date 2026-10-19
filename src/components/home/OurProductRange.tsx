@@ -6,6 +6,7 @@ import { ArrowRight, Grid3X3 } from 'lucide-react';
 import FadeIn from '../ui/FadeIn';
 import Button from '../ui/Button';
 import { useState, useEffect } from 'react';
+import { getOptimizedImageUrl } from '@/lib/image';
 
 
 
@@ -52,15 +53,13 @@ export default function OurProductRange() {
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100 flex items-center justify-center border-b border-gray-100">
                   
                   {cat.image ? (
-                    <img 
-                      src={cat.image} 
+                    <Image 
+                      src={getOptimizedImageUrl(cat.image, { width: 600, height: 450, crop: 'fill' })} 
                       alt={cat.name} 
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 z-0"
-                      loading="eager"
-                      onError={(e) => {
-                        console.error('Image failed to load:', cat.image);
-                        e.currentTarget.style.display = 'none';
-                      }}
+                      fill
+                      loading="lazy"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover transition-transform duration-700 group-hover:scale-110 z-0"
                     />
                   ) : (
                     <div className="relative z-0 flex flex-col items-center justify-center p-8">

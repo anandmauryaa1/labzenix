@@ -1,18 +1,18 @@
-'use client';
 import Link from 'next/link';
 import Image from 'next/image';
-import Button from '../ui/Button';
 
 export default function CTABanner() {
   return (
     <section className="py-14 px-4">
       <div className="max-w-7xl mx-auto bg-black border border-white/10 p-16 text-center relative overflow-hidden group">
-        {/* Background Image with Parallax-like effect */}
+        {/* Background Image with subtle zoom effect */}
         <div className="absolute inset-0 z-0">
           <Image 
             src="https://images.pexels.com/photos/3825527/pexels-photo-3825527.jpeg" 
             alt="Laboratory background" 
             fill
+            loading="lazy"
+            sizes="(max-width: 1280px) 100vw, 1280px"
             className="object-cover opacity-80 group-hover:scale-105 transition-transform duration-700"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-black/80 z-10" />
@@ -28,10 +28,10 @@ export default function CTABanner() {
           <p className="text-lg md:text-xl text-gray-300 mb-12 max-w-2xl mx-auto font-medium leading-relaxed drop-shadow-lg">
             Our technical experts are standing by to provide you with the most advanced testing solutions for your specific industry requirements.
           </p>
-          <Link href="/contact">
-            <Button size="lg" className="px-12 py-5 !bg-white !text-black hover:!bg-primary hover:!text-white transition-all duration-300 font-black uppercase tracking-widest text-sm shadow-2xl">
+          <Link href="/contact" className="inline-block">
+            <span className="inline-block px-12 py-5 bg-white text-black hover:bg-primary hover:text-white transition-all duration-300 font-black uppercase tracking-widest text-sm shadow-2xl hover:scale-105 active:scale-95">
               Request a Custom Quote
-            </Button>
+            </span>
           </Link>
         </div>
       </div>

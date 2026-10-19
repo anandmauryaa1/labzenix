@@ -78,7 +78,7 @@ const ProductSchema = new mongoose.Schema<IProduct>({
 // Rule: Equality (category, usage) -> Sort (createdAt, views) -> Range
 ProductSchema.index({ category: 1, usage: 1, createdAt: -1 });  // E: category, E: usage, S: createdAt
 ProductSchema.index({ category: 1, views: -1 });              // E: category, S: views
-ProductSchema.index({ slug: 1 });                            // E: slug
+ProductSchema.index({ views: -1, createdAt: 1 });              // S: views, S: createdAt (Hot Selling)
 ProductSchema.index({ createdAt: -1 });                      // S: createdAt
 
 // Full-text search index — used by $text queries on the catalog

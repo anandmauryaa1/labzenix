@@ -1,11 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import Button from '../ui/Button';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { getOptimizedImageUrl } from '@/lib/image';
 
 export interface HeroSlide {
   _id?: string;
@@ -55,30 +54,21 @@ export default function Hero({ initialSlides }: { initialSlides?: HeroSlide[] })
   return (
     <section className="relative bg-white overflow-hidden">
       <div className="relative">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={current}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className="w-full"
-          >
-            <Link href={slides[current].link || '/'}>
-              <div className="relative w-full">
-                <Image 
-                  src={slides[current].image} 
-                  alt="Hero Banner"
-                  width={1920}
-                  height={800}
-                  sizes="100vw"
-                  className="w-full h-auto cursor-pointer"
-                  priority={current === 0}
-                />
-              </div>
-            </Link>
-          </motion.div>
-        </AnimatePresence>
+        <div className="w-full transition-opacity duration-500 ease-in-out">
+          <Link href={slides[current].link || '/'}>
+            <div className="relative w-full">
+              <Image 
+                src={getOptimizedImageUrl(slides[current].image, { width: 1920, quality: 'auto' })} 
+                alt={slides[current].title || 'LabZenix testing instruments'}
+                width={1920}
+                height={800}
+                sizes="100vw"
+                className="w-full h-auto cursor-pointer"
+                priority={current === 0}
+              />
+            </div>
+          </Link>
+        </div>
 
         {/* Controls - Positioned relative to the image container */}
         <div className="absolute bottom-4 md:bottom-8 left-0 w-full z-30 px-4 sm:px-6 lg:px-8 flex justify-between items-center pointer-events-none">
@@ -113,4 +103,3 @@ export default function Hero({ initialSlides }: { initialSlides?: HeroSlide[] })
     </section>
   );
 }
-

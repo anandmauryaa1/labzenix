@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   LayoutGrid,
@@ -92,25 +92,70 @@ export default function ProductTabs({ product }: ProductTabsProps) {
   const faqs    = product.faqs    ?? [];
   const currentProductPath = product.slug ? `/products/${product.slug}` : undefined;
 
+  // Sync tab with URL hash for Google sitelinks & deep-linked indexing (#specs, #faq, etc.)
+  useEffect(() => {
+    const handleHash = () => {
+      const rawHash = window.location.hash.replace('#', '').toLowerCase();
+      if (!rawHash) return;
+
+      const aliasMap: Record<string, TabId> = {
+        overview: 'overview',
+        specs: 'specs',
+        specifications: 'specs',
+        specification: 'specs',
+        features: 'features',
+        feature: 'features',
+        video: 'video',
+        videos: 'video',
+        reviews: 'reviews',
+        review: 'reviews',
+        faq: 'faq',
+        faqs: 'faq',
+        quote: 'quote',
+        inquiry: 'quote',
+      };
+
+      const matched = aliasMap[rawHash];
+      if (matched) {
+        setActiveTab(matched);
+      }
+    };
+
+    handleHash();
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
+
+  const handleTabClick = (e: React.MouseEvent<HTMLAnchorElement>, tabId: TabId) => {
+    e.preventDefault();
+    setActiveTab(tabId);
+    if (typeof window !== 'undefined' && window.history?.pushState) {
+      window.history.pushState(null, '', `#${tabId}`);
+    } else if (typeof window !== 'undefined') {
+      window.location.hash = `#${tabId}`;
+    }
+  };
+
   return (
     <div className="w-full">
-      {/* Tab Nav */}
+      {/* Tab Nav - Google-indexable crawlable links with role="tablist" */}
       <div className="overflow-x-auto sticky top-0 z-20 bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex min-w-max" role="tablist">
+          <nav className="flex min-w-max" role="tablist" aria-label="Product Sections">
             {TABS.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
               return (
-                <button
+                <a
                   key={tab.id}
                   id={`tab-btn-${tab.id}`}
+                  href={`#${tab.id}`}
                   role="tab"
                   aria-selected={isActive}
-                  aria-controls={`panel-${tab.id}`}
-                  onClick={() => setActiveTab(tab.id)}
+                  aria-controls={tab.id}
+                  onClick={(e) => handleTabClick(e, tab.id)}
                   className={[
-                    'flex items-center gap-2 px-5 py-4 text-xs font-black uppercase tracking-widest whitespace-nowrap',
+                    'flex items-center gap-2 px-5 py-4 text-xs font-black uppercase tracking-widest whitespace-nowrap cursor-pointer',
                     'transition-all duration-200 border-b-2 focus:outline-none',
                     isActive
                       ? tab.id === 'quote'
@@ -121,10 +166,10 @@ export default function ProductTabs({ product }: ProductTabsProps) {
                 >
                   <Icon className="w-3.5 h-3.5 flex-shrink-0" />
                   {tab.label}
-                </button>
+                </a>
               );
             })}
-          </div>
+          </nav>
         </div>
       </div>
 
@@ -321,10 +366,12 @@ export default function ProductTabs({ product }: ProductTabsProps) {
 function Panel({ id, active, children }: { id: string; active: boolean; children: React.ReactNode }) {
   return (
     <div
-      id={`panel-${id}`}
+      id={id}
+      data-panel-id={`panel-${id}`}
       role="tabpanel"
       aria-labelledby={`tab-btn-${id}`}
-      className={active ? 'block' : 'hidden'}
+      aria-hidden={!active}
+      className={active ? 'block scroll-mt-28' : 'hidden'}
     >
       <motion.div
         key={id}

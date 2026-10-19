@@ -82,8 +82,8 @@ export default async function RootLayout({
   return (
     <html lang="en" className="h-full scroll-smooth" suppressHydrationWarning>
       <head>
-        {/* Google Tag Manager — Loaded after interactive to protect Mobile Core Web Vitals (TBT/LCP) */}
-        <Script id="google-tag-manager" strategy="afterInteractive">
+        {/* Google Tag Manager — Loaded via lazyOnload to eliminate main thread Total Blocking Time (TBT) */}
+        <Script id="google-tag-manager" strategy="lazyOnload">
           {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
@@ -95,7 +95,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           <meta name="google-site-verification" content={gscVerification} />
         ) : null}
       </head>
-      <body className={`min-h-full flex flex-col font-display bg-white text-secondary ${inter.variable}`} suppressHydrationWarning>
+      <body className={`${inter.className} ${inter.variable} min-h-full flex flex-col font-display bg-white text-secondary`} suppressHydrationWarning>
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe
@@ -110,9 +110,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           <>
             <Script
               src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
-              strategy="afterInteractive"
+              strategy="lazyOnload"
             />
-            <Script id="google-analytics" strategy="afterInteractive">
+            <Script id="google-analytics" strategy="lazyOnload">
               {`
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){window.dataLayer.push(arguments);}
@@ -123,8 +123,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             </Script>
           </>
         ) : null}
-        {/* Tawk.to Live Chat Widget */}
-        <Script id="tawk-to" strategy="lazyOnload" src="https://embed.tawk.to/6a26f1606dd5c81c327338f4/1jqk1tov4" />
         <ConditionalWrapper>
           {children}
         </ConditionalWrapper>

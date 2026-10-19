@@ -1,4 +1,5 @@
 import { getPageMetadata } from '@/lib/seo';
+import dynamic from 'next/dynamic';
 import Hero from '@/components/home/Hero';
 import DynamicProductRange from '@/components/home/DynamicProductRange';
 import AboutSummary from '@/components/home/AboutSummary';
@@ -8,7 +9,9 @@ import ProductRange from '@/components/home/ProductRange';
 import Testimonials from '@/components/home/Testimonials';
 import CTABanner from '@/components/home/CTABanner';
 import Partners from '@/components/home/Partners';
-import FAQSection from '@/components/home/FAQSection';
+
+// Dynamically import non-critical below-the-fold FAQ accordion to minimize initial bundle
+const FAQSection = dynamic(() => import('@/components/home/FAQSection'));
 
 // MongoDB Models
 import dbConnect from '@/lib/dbConnect';
@@ -22,7 +25,8 @@ import CompleteProductRange from '@/models/CompleteProductRange';
 import Testimonial from '@/models/Testimonial';
 import SiteFaq from '@/models/SiteFaq';
 
-export const dynamic = 'force-dynamic';
+// Revalidate homepage every 60 seconds (ISR) for fast response times while preserving freshness
+export const revalidate = 60;
 
 export async function generateMetadata() {
   return await getPageMetadata('home');
@@ -54,8 +58,13 @@ export default async function Home() {
     ] = await Promise.all([
       HeroSlide.find({}).sort({ order: 1 }).lean().exec(),
       ProductRangeModel.find({ active: true }).sort({ order: 1 }).lean().exec(),
-      Product.find({}).sort({ views: -1, createdAt: 1, _id: 1 }).limit(6).lean().exec(),
-      AboutContent.find({}).lean().exec(),
+      Product.find({})
+        .select('title slug modelNumber images category description views createdAt')
+        .sort({ views: -1, createdAt: 1, _id: 1 })
+        .limit(6)
+        .lean()
+        .exec(),
+      AboutContent.find({}).limit(1).lean().exec(),
       CoreValue.find({}).sort({ order: 1 }).lean().exec(),
       Partner.find({ isActive: true }).sort({ order: 1 }).lean().exec(),
       CompleteProductRange.find({}).sort({ order: 1 }).lean().exec(),

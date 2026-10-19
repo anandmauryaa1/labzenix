@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import FadeIn from '../ui/FadeIn';
+import { getOptimizedImageUrl } from '@/lib/image';
 
 export interface Partner {
   _id: string;
@@ -35,16 +34,16 @@ export default function Partners({ initialPartners }: { initialPartners?: Partne
     <section className="py-14 bg-white border-t border-gray-100 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-center items-center mb-12 gap-6">
-          <FadeIn direction="up">
-            <div className="max-w-2xl text-center">
-              <span className="text-primary font-medium tracking-widest uppercase text-sm">Trusted By</span>
-              <h2 className="text-3xl md:text-4xl font-black text-secondary mt-2 mb-4 uppercase tracking-tighter">Our <span className="text-primary">Partners</span></h2>
-              <p className="text-gray-500 font-medium leading-relaxed">
-                A countless string of happy and satisfied customers vouch for our 
-                excellence and complete quality control support.
-              </p>
-            </div>
-          </FadeIn>
+          <div className="max-w-2xl text-center">
+            <span className="text-primary font-medium tracking-widest uppercase text-sm">Trusted By</span>
+            <h2 className="text-3xl md:text-4xl font-black text-secondary mt-2 mb-4 uppercase tracking-tighter">
+              Our <span className="text-primary">Partners</span>
+            </h2>
+            <p className="text-gray-500 font-medium leading-relaxed">
+              A countless string of happy and satisfied customers vouch for our 
+              excellence and complete quality control support.
+            </p>
+          </div>
 
           {totalPages > 1 && (
             <div className="flex space-x-3">
@@ -67,44 +66,36 @@ export default function Partners({ initialPartners }: { initialPartners?: Partne
         </div>
 
         <div className="relative min-h-[300px] md:min-h-[400px]">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentPage}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 md:gap-10"
-            >
-              {currentPartners.map((partner) => (
-                <a
-                  key={partner._id}
-                  href={partner.website || '#'}
-                  target={partner.website ? "_blank" : undefined}
-                  rel="noopener noreferrer"
-                  className="relative aspect-[5/2] flex flex-col mb-6 items-center justify-center transition-all duration-300 group bg-gray-50/50 hover:bg-white border border-transparent hover:border-gray-100 p-4"
-                >
-                  <Image
-                    src={partner.logo}
-                    alt={partner.name}
-                    fill
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                    className="object-contain p-2 transform group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <p className="absolute -bottom-10 left-1/2 -translate-x-1/2 text-sm sm:text-base font-semibold text-secondary uppercase tracking-tight">
-                    {partner.name}
-                  </p>
-                </a>
-              ))}
-              
-              {/* Fillers to maintain grid if fewer than 10 partners on last page */}
-              {currentPartners.length < partnersPerPage && totalPages > 1 && 
-                Array.from({ length: partnersPerPage - currentPartners.length }).map((_, i) => (
-                  <div key={`filler-${i}`} className="aspect-[5/2] hidden lg:block" />
-                ))
-              }
-            </motion.div>
-          </AnimatePresence>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 md:gap-10 transition-opacity duration-300">
+            {currentPartners.map((partner) => (
+              <a
+                key={partner._id}
+                href={partner.website || '#'}
+                target={partner.website ? "_blank" : undefined}
+                rel="noopener noreferrer"
+                className="relative aspect-[5/2] flex flex-col mb-6 items-center justify-center transition-all duration-300 group bg-gray-50/50 hover:bg-white border border-transparent hover:border-gray-100 p-4"
+              >
+                <Image
+                  src={getOptimizedImageUrl(partner.logo, { width: 300, height: 120, crop: 'fit' })}
+                  alt={partner.name}
+                  fill
+                  loading="lazy"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                  className="object-contain p-2 transform group-hover:scale-105 transition-transform duration-300"
+                />
+                <p className="absolute -bottom-10 left-1/2 -translate-x-1/2 text-sm sm:text-base font-semibold text-secondary uppercase tracking-tight">
+                  {partner.name}
+                </p>
+              </a>
+            ))}
+            
+            {/* Fillers to maintain grid if fewer than 10 partners on last page */}
+            {currentPartners.length < partnersPerPage && totalPages > 1 && 
+              Array.from({ length: partnersPerPage - currentPartners.length }).map((_, i) => (
+                <div key={`filler-${i}`} className="aspect-[5/2] hidden lg:block" />
+              ))
+            }
+          </div>
         </div>
         
         {totalPages > 1 && (

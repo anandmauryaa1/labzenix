@@ -7,9 +7,10 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import PageBanner from '@/components/ui/PageBanner';
-import { ChevronRight, Download, Package, ArrowRight, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { ChevronRight, Package } from 'lucide-react';
 import CatalogButton from '@/components/products/CatalogButton';
 import ProductRange from '@/components/home/ProductRange';
+import { getOptimizedImageUrl } from '@/lib/image';
 
 export const dynamic = 'force-dynamic';
 
@@ -60,21 +61,14 @@ export default async function CategoryDetailPage({ params }: PageProps) {
 
   if (!category) notFound();
 
-  // Fetch products in this category
+  // Fetch products in this category (older products first, recently added last)
   const products = (await Product.find({
     category: category.name
   })
     .select('title slug modelNumber images description features')
-    .sort({ views: -1, createdAt: -1 })
+    .sort({ createdAt: 1, _id: 1 })
     .lean()) as unknown as IProduct[];
 
-  // Fetch other categories for sidebar/navigation
-  const otherCategories = (await Category.find({
-    _id: { $ne: category._id }
-  })
-    .select('name slug')
-    .sort({ order: 1 })
-    .lean()) as unknown as ICategory[];
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://labzenix.com';
   const categoryUrl = `${siteUrl}/category/${category.slug}`;
@@ -178,52 +172,12 @@ export default async function CategoryDetailPage({ params }: PageProps) {
       {/* Product Grid & Navigation */}
       <section className="py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
-            
-            {/* Sidebar Navigation */}
-            <aside className="lg:col-span-1 space-y-8">
-              <div className="border border-gray-200 bg-white p-6 shadow-sm">
-                <h2 className="text-xs font-black uppercase tracking-[0.2em] text-secondary mb-4 pb-3 border-b border-gray-100">
-                  Testing Categories
-                </h2>
-                <ul className="space-y-2 text-sm font-medium">
-                  {otherCategories.map((cat) => (
-                    <li key={cat._id.toString()}>
-                      <Link
-                        href={`/category/${cat.slug}`}
-                        className="flex items-center justify-between py-2 px-3 text-gray-600 hover:text-primary hover:bg-primary/5 transition-all group"
-                      >
-                        <span className="truncate">{cat.name}</span>
-                        <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
-                      </Link>
-                    </li>
-                  ))}
-                  <li>
-                    <Link
-                      href="/products"
-                      className="flex items-center justify-between py-2 px-3 text-primary font-bold hover:bg-primary/5 transition-all mt-4 border-t border-gray-100"
-                    >
-                      <span>View All Products</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Quality Standards Badge */}
-              <div className="border border-primary/20 bg-primary/5 p-6 space-y-3">
-                <div className="flex items-center gap-2 text-primary font-black uppercase tracking-wider text-xs">
-                  <ShieldCheck className="w-4 h-4" />
-                  Standards Compliant
-                </div>
-                <p className="text-xs text-gray-600 font-medium leading-relaxed">
-                  All instruments in this category are designed to meet ASTM, ISO, TAPPI, and BIS testing standards.
-                </p>
-              </div>
-            </aside>
+          <div className="w-full">
+            {/* Sidebar Navigation - 'Testing Categories' & 'Standards Compliant' hidden per user request */}
+            <aside className="hidden" aria-hidden="true" />
 
             {/* Main Products Grid */}
-            <div className="lg:col-span-3">
+            <div>
               <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-100">
                 <p className="text-sm font-bold uppercase tracking-wider text-gray-500">
                   Showing <span className="text-secondary font-black">{products.length}</span> Instruments
@@ -251,7 +205,7 @@ export default async function CategoryDetailPage({ params }: PageProps) {
                   </Link>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {products.map((product) => {
                     const stripTags = (str?: string) => (str || '').replace(/<[^>]*>/g, '').trim();
                     const cleanDesc = stripTags(product.description).substring(0, 110);
@@ -265,10 +219,11 @@ export default async function CategoryDetailPage({ params }: PageProps) {
                         {/* Image */}
                         <div className="relative aspect-square w-full bg-gray-50 overflow-hidden border-b border-gray-100 p-6">
                           <Image
-                            src={imageSrc}
+                            src={getOptimizedImageUrl(imageSrc, { width: 400, height: 400, crop: 'fit' })}
                             alt={product.title}
                             fill
-                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            loading="lazy"
+                            sizes="(max-width: 768px) 50vw, 25vw"
                             className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                           />
                           {product.modelNumber && (

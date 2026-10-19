@@ -20,6 +20,26 @@
   * {
     @apply border-gray-100;
   }
+  a,
+  button,
+  [role="button"],
+  [role="tab"],
+  [role="menuitem"],
+  [role="option"],
+  [type="button"],
+  [type="submit"],
+  [type="reset"],
+  label[for],
+  select,
+  summary,
+  [onclick],
+  input[type="checkbox"],
+  input[type="radio"],
+  input[type="file"],
+  input[type="range"],
+  input[type="color"] {
+    cursor: pointer;
+  }
   body {
     @apply bg-white text-gray-700 antialiased selection:bg-primary selection:text-white leading-relaxed;
   }

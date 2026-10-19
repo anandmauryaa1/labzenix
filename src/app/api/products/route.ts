@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
     const categoryParam = searchParams.get('category');
     const fieldsParam = searchParams.get('fields');
     
-    const cacheKey = `api:products:${applicationSlug || 'all'}:${categoryParam || 'all'}:${fieldsParam || 'full'}`;
+    const cacheKey = `api:products:v2:${applicationSlug || 'all'}:${categoryParam || 'all'}:${fieldsParam || 'full'}`;
 
     const products = await cachedFetch(
       cacheKey,

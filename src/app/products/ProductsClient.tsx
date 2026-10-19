@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import FadeIn from '@/components/ui/FadeIn';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageBanner from '@/components/ui/PageBanner';
+import { getOptimizedImageUrl } from '@/lib/image';
 
 interface Product {
   _id: string;
@@ -360,12 +361,12 @@ function ProductsContent() {
                         <div className="w-full h-64 bg-gray-50 overflow-hidden flex items-center justify-center relative">
                           {product.images?.[0] ? (
                             <Image
-                              src={product.images[0]}
+                              src={getOptimizedImageUrl(product.images[0], { width: 400, height: 400, crop: 'fit' })}
                               alt={product.title}
                               fill
-                              priority={idx < 4}
-                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
-                              className="object-contain p-4 group-hover:scale-110 transition-transform duration-700"
+                              loading="lazy"
+                              sizes="(max-width: 768px) 50vw, 25vw"
+                              className="object-contain p-4 group-hover:scale-105 transition-transform duration-500"
                             />
                           ) : (
                             <Package className="w-16 h-16 text-gray-200" />

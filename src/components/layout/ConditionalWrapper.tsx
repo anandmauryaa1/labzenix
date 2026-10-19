@@ -1,11 +1,15 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import Navbar from './Navbar';
 import Footer from './Footer';
-import FloatingContact from './FloatingContact';
-import LeadCapturePopup from './LeadCapturePopup';
 import { Toaster } from 'react-hot-toast';
+
+// Dynamically load non-critical client widgets to reduce initial bundle and TBT
+const FloatingContact = dynamic(() => import('./FloatingContact'), { ssr: false });
+const LeadCapturePopup = dynamic(() => import('./LeadCapturePopup'), { ssr: false });
+const ChatWidget = dynamic(() => import('./ChatWidget'), { ssr: false });
 
 export default function ConditionalWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -25,6 +29,7 @@ export default function ConditionalWrapper({ children }: { children: React.React
       <Footer />
       <FloatingContact />
       <LeadCapturePopup />
+      <ChatWidget />
     </>
   );
 }

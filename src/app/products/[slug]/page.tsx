@@ -112,7 +112,33 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     ? product.metaDescription
     : (product.description ? product.description.replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim().substring(0, 500) : `${product.title} by LabZenix`);
 
-  // Product schema — with sanitized plain-text description and valid offers
+  // Helper to extract YouTube video ID for VideoObject schema & thumbnails
+  const getYouTubeId = (url?: string): string | null => {
+    if (!url) return null;
+    const trimmed = url.trim();
+    const match = trimmed.match(/(?:youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/|live\/)([a-zA-Z0-9_-]{11})/);
+    if (match && match[1]) return match[1];
+    if (trimmed.length === 11 && !trimmed.includes('/') && !trimmed.includes('.')) return trimmed;
+    return null;
+  };
+
+  const youtubeVideoId = getYouTubeId(product.youtubeUrl);
+
+  // Tab 2: Specifications -> Schema.org additionalProperty
+  const additionalProperty: { '@type': string; name: string; value: string }[] = [];
+  if (product.specs && typeof product.specs === 'object') {
+    for (const [key, val] of Object.entries(product.specs)) {
+      if (val !== undefined && val !== null && String(val).trim().length > 0) {
+        additionalProperty.push({
+          '@type': 'PropertyValue',
+          name: key.trim(),
+          value: String(val).trim(),
+        });
+      }
+    }
+  }
+
+  // Product schema — with sanitized plain-text description, specifications, and Google Merchant compliant offers
   const productSchema: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -133,17 +159,38 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       img.startsWith('http') ? img : `${siteUrl}${img}`
     ),
     url: productUrl,
+    // Google Merchant & Shopping 'Products' Tab compliance
     offers: {
       '@type': 'Offer',
       priceCurrency: 'INR',
+      price: '0',
+      priceValidUntil: '2028-12-31',
+      itemCondition: 'https://schema.org/NewCondition',
       availability: 'https://schema.org/InStock',
       url: productUrl,
       seller: {
         '@type': 'Organization',
         name: 'LabZenix Industries Pvt. Ltd.',
       },
+      hasMerchantReturnPolicy: {
+        '@type': 'MerchantReturnPolicy',
+        applicableCountry: 'IN',
+        returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+        merchantReturnDays: 15,
+        returnMethod: 'https://schema.org/ReturnByMail',
+        returnFees: 'https://schema.org/FreeReturn',
+      },
     },
+    ...(additionalProperty.length > 0 ? { additionalProperty } : {}),
   };
+
+  // Tab 3: Features in Product Schema
+  if (Array.isArray(product.features) && product.features.length > 0) {
+    const validFeatures = product.features.map(f => String(f).trim()).filter(Boolean);
+    if (validFeatures.length > 0) {
+      productSchema.disambiguatingDescription = validFeatures.slice(0, 8).join('. ');
+    }
+  }
 
   // Real AggregateRating & Reviews — only added when authentic customer reviews exist
   if (reviews.length > 0) {
@@ -170,7 +217,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     }));
   }
 
-  // FAQPage schema — only if FAQs exist
+  // FAQPage schema — for FAQ Tab
   const faqSchema = faqs.length > 0
     ? {
         '@context': 'https://schema.org',
@@ -185,6 +232,73 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         })),
       }
     : null;
+
+  // VideoObject schema — for Video Tab
+  const videoSchema = youtubeVideoId ? {
+    '@context': 'https://schema.org',
+    '@type': 'VideoObject',
+    name: `${product.title} - Operational & Demonstration Video`,
+    description: cleanDescription,
+    thumbnailUrl: [
+      `https://img.youtube.com/vi/${youtubeVideoId}/hqdefault.jpg`,
+      ...(product.images?.[0] ? [product.images[0].startsWith('http') ? product.images[0] : `${siteUrl}${product.images[0]}`] : [])
+    ],
+    uploadDate: product.createdAt ? new Date(product.createdAt).toISOString() : new Date().toISOString(),
+    embedUrl: `https://www.youtube.com/embed/${youtubeVideoId}`,
+    contentUrl: product.youtubeUrl,
+  } : null;
+
+  // Product Tabs Deep Navigation schema — for Google In-Page Sitelinks & Section Indexing
+  const tabsNavigationSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: `${product.title} - Product Details, Specs & Features`,
+    description: `Comprehensive technical details, specifications, features, demo video, customer reviews, and FAQs for ${product.title}.`,
+    itemListElement: [
+      {
+        '@type': 'SiteNavigationElement',
+        position: 1,
+        name: 'Product Overview',
+        url: `${productUrl}#overview`,
+      },
+      {
+        '@type': 'SiteNavigationElement',
+        position: 2,
+        name: 'Technical Specifications',
+        url: `${productUrl}#specs`,
+      },
+      {
+        '@type': 'SiteNavigationElement',
+        position: 3,
+        name: 'Features & Capabilities',
+        url: `${productUrl}#features`,
+      },
+      ...(youtubeVideoId ? [{
+        '@type': 'SiteNavigationElement',
+        position: 4,
+        name: 'Operational Video',
+        url: `${productUrl}#video`,
+      }] : []),
+      {
+        '@type': 'SiteNavigationElement',
+        position: 5,
+        name: 'Customer Reviews',
+        url: `${productUrl}#reviews`,
+      },
+      {
+        '@type': 'SiteNavigationElement',
+        position: 6,
+        name: 'Frequently Asked Questions',
+        url: `${productUrl}#faq`,
+      },
+      {
+        '@type': 'SiteNavigationElement',
+        position: 7,
+        name: 'Request a Quote',
+        url: `${productUrl}#quote`,
+      },
+    ],
+  };
 
   // BreadcrumbList schema for rich search results
   const breadcrumbSchema = {
@@ -223,6 +337,16 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(tabsNavigationSchema) }}
+      />
+      {videoSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(videoSchema) }}
+        />
+      )}
       {faqSchema && (
         <script
           type="application/ld+json"

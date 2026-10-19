@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { getOptimizedImageUrl } from '@/lib/image';
 
 interface ImageCarouselProps {
   images: string[];
@@ -42,9 +43,10 @@ export default function ImageCarousel({ images, alt }: ImageCarouselProps) {
       {/* Main Image Display */}
       <div className="relative h-96 bg-gray-50 border border-gray-200 flex items-center justify-center overflow-hidden group">
         <Image 
-          src={images[currentIndex]} 
+          src={getOptimizedImageUrl(images[currentIndex], { width: 800, height: 800, quality: 'auto' })} 
           alt={`${alt} - Image ${currentIndex + 1}`} 
           fill 
+          sizes="(max-width: 768px) 100vw, 50vw"
           className="object-contain p-8 transition-transform duration-300"
           priority
         />
@@ -91,9 +93,11 @@ export default function ImageCarousel({ images, alt }: ImageCarouselProps) {
               }`}
             >
               <Image 
-                src={img} 
+                src={getOptimizedImageUrl(img, { width: 100, height: 100, crop: 'fit' })} 
                 alt={`${alt} thumbnail ${index + 1}`} 
                 fill 
+                loading="lazy"
+                sizes="80px"
                 className="object-contain p-1"
               />
             </button>
