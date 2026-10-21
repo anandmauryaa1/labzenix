@@ -140,35 +140,6 @@ export default async function CategoryDetailPage({ params }: PageProps) {
         backUrl="/products"
       />
 
-      {/* Category Overview Section */}
-      <section className="bg-gray-50 border-b border-gray-100 py-12 md:py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
-            <div className="max-w-3xl space-y-4">
-              <span className="text-primary font-black uppercase tracking-[0.2em] text-[11px] bg-primary/10 px-3 py-1 inline-block">
-                Industrial Category
-              </span>
-              <h1 className="text-3xl md:text-5xl font-black text-secondary uppercase tracking-tight">
-                {category.name}
-              </h1>
-              <p className="text-gray-600 font-medium leading-relaxed text-base md:text-lg">
-                {category.description}
-              </p>
-            </div>
-
-            {category.catalogUrl && (
-              <div className="flex-shrink-0">
-                <CatalogButton
-                  productName={category.name}
-                  productId={category._id.toString()}
-                  catalogUrl={category.catalogUrl}
-                />
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
       {/* Product Grid & Navigation */}
       <section className="py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-4">
@@ -205,64 +176,59 @@ export default async function CategoryDetailPage({ params }: PageProps) {
                   </Link>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {products.map((product) => {
                     const stripTags = (str?: string) => (str || '').replace(/<[^>]*>/g, '').trim();
-                    const cleanDesc = stripTags(product.description).substring(0, 110);
+                    const cleanDesc = stripTags(product.description).substring(0, 90);
                     const imageSrc = product.images?.[0] || '/logo.webp';
 
                     return (
-                      <div
+                      <Link
                         key={product._id.toString()}
-                        className="group flex flex-col bg-white border border-gray-200 hover:border-primary hover:shadow-xl transition-all duration-300 relative"
+                        href={`/products/${product.slug}`}
+                        className="group flex flex-col bg-white border border-gray-200 shadow-sm hover:shadow-xl hover:border-primary hover:-translate-y-1 transition-all duration-300 relative cursor-pointer"
                       >
                         {/* Image */}
-                        <div className="relative aspect-square w-full bg-gray-50 overflow-hidden border-b border-gray-100 p-6">
+                        <div className="relative aspect-[4/3] w-full bg-gray-50 overflow-hidden border-b border-gray-100">
                           <Image
-                            src={getOptimizedImageUrl(imageSrc, { width: 400, height: 400, crop: 'fit' })}
+                            src={getOptimizedImageUrl(imageSrc, { width: 400, height: 300, crop: 'fit' })}
                             alt={product.title}
                             fill
                             loading="lazy"
                             sizes="(max-width: 768px) 50vw, 25vw"
-                            className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                            className="object-contain group-hover:scale-108 transition-transform duration-500 ease-out"
                           />
                           {product.modelNumber && (
-                            <span className="absolute top-3 right-3 text-[10px] font-black uppercase tracking-wider bg-secondary text-white px-2 py-0.5 shadow-sm">
+                            <span className="absolute top-1.5 right-1.5 text-[9px] font-black uppercase tracking-wider bg-secondary text-white px-1.5 py-0.5 shadow-sm">
                               {product.modelNumber}
                             </span>
                           )}
                         </div>
 
                         {/* Info */}
-                        <div className="flex-1 p-5 flex flex-col justify-between space-y-4">
+                        <div className="flex-1 px-2.5 py-2 flex flex-col justify-between gap-1.5">
                           <div>
-                            <h3 className="font-black text-secondary uppercase tracking-tight text-base group-hover:text-primary transition-colors line-clamp-2">
+                            <h3 className="font-bold text-secondary uppercase tracking-tight text-s line-clamp-2 leading-tight">
                               {product.title}
                             </h3>
                             {cleanDesc && (
-                              <p className="text-gray-500 font-medium text-xs mt-2 line-clamp-2 leading-relaxed">
+                              <p className="text-gray-500 font-medium text-s mt-0.5 line-clamp-2 leading-relaxed">
                                 {cleanDesc}...
                               </p>
                             )}
                           </div>
 
-                          <div className="pt-3 border-t border-gray-100 flex items-center justify-between">
-                            <Link
-                              href={`/products/${product.slug}`}
-                              className="text-xs font-black uppercase tracking-wider text-primary group-hover:text-secondary flex items-center gap-1.5 transition-colors"
-                            >
-                              Explore Details
-                              <ChevronRight className="w-3.5 h-3.5" />
-                            </Link>
-                            <Link
-                              href="/contact"
-                              className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-primary transition-colors"
-                            >
+                          <div className="pt-1.5 border-t border-gray-100 flex items-center justify-between">
+                            <span className="text-[11px] font-black uppercase tracking-wider text-primary flex items-center gap-1">
+                              Explore
+                              <ChevronRight className="w-3 h-3 transition-transform duration-300 group-hover:translate-x-1" />
+                            </span>
+                            <span className="text-[11px] font-bold uppercase tracking-widest text-gray-400">
                               Quote
-                            </Link>
+                            </span>
                           </div>
                         </div>
-                      </div>
+                      </Link>
                     );
                   })}
                 </div>

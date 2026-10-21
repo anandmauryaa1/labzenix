@@ -76,39 +76,42 @@ export default async function BlogPage({
             </div>
           ) : (
             <FadeIn stagger direction="none">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {blogs.map((blog: any) => (
                   <FadeIn key={blog._id} direction="up" delay={0.1}>
-                    <article className="bg-white border border-gray-100 flex flex-col group overflow-hidden hover:shadow-2xl transition-all duration-500 h-full">
-                      <Link href={`/blogs/${blog.slug}`} className="block overflow-hidden relative aspect-[16/10] bg-gray-50">
-                        <Image 
-                          src={blog.image || 'https://images.unsplash.com/photo-1579154341098-e4e158cc7f55?auto=format&fit=crop&q=80&w=800'} 
-                          alt={blog.title} 
-                          fill
-                          className="object-contain p-4 transition-transform duration-1000 group-hover:scale-110"
-                        />
-                        <div className="absolute inset-0 bg-secondary/0 group-hover:bg-secondary/10 transition-colors duration-500 z-10" />
-                      </Link>
-                      
-                      <div className="p-8 flex flex-col flex-grow">
-                        <div className="flex items-center space-x-6 text-[10px] text-gray-400 font-black uppercase tracking-widest mb-6 border-b border-gray-50 pb-4">
-                          <span className="flex items-center"><Calendar className="w-3 h-3 mr-2 text-primary" /> {new Date(blog.createdAt).toLocaleDateString()}</span>
-                          <span className="flex items-center"><User className="w-3 h-3 mr-2 text-primary" /> {blog.author?.name || 'Editorial Team'}</span>
+                    <Link href={`/blogs/${blog.slug}`} className="block h-full">
+                      <article className="bg-white border border-gray-100 shadow-sm flex flex-col group overflow-hidden hover:shadow-xl hover:-translate-y-1 hover:border-primary transition-all duration-300 h-full cursor-pointer">
+                        <div className="block overflow-hidden relative aspect-[16/9] bg-gray-50">
+                          <Image 
+                            src={blog.image || 'https://images.unsplash.com/photo-1579154341098-e4e158cc7f55?auto=format&fit=crop&q=80&w=800'} 
+                            alt={blog.title} 
+                            fill
+                            className="object-contain p-3 transition-transform duration-500 ease-out group-hover:scale-108"
+                          />
+                          <div className="absolute inset-0 bg-secondary/0 group-hover:bg-secondary/5 transition-colors duration-500 z-10" />
                         </div>
                         
-                        <h2 className="text-xl font-bold text-secondary mb-3 leading-snug group-hover:text-primary transition-colors tracking-[0.5px]">
-                          {blog.title}
-                        </h2>
-                        
-                        <p className="text-sm text-gray-600 leading-relaxed mb-6 flex-grow line-clamp-3">
-                          {blog.metaDescription || blog.content.replace(/<[^>]*>/g, '').substring(0, 160) + '...'}
-                        </p>
-                        
-                        <Link href={`/blogs/${blog.slug}`} className="inline-flex items-center text-secondary font-bold uppercase text-[11px] tracking-wider group-hover:text-primary transition-all">
-                          Read Story <span className="ml-2 text-sm">→</span>
-                        </Link>
-                      </div>
-                    </article>
+                        <div className="p-5 flex flex-col flex-grow">
+                          <div className="flex items-center space-x-4 text-[10px] text-gray-400 font-black uppercase tracking-widest mb-4 border-b border-gray-50 pb-3">
+                            <span className="flex items-center"><Calendar className="w-3 h-3 mr-1.5 text-primary" /> {new Date(blog.createdAt).toLocaleDateString()}</span>
+                            <span className="flex items-center"><User className="w-3 h-3 mr-1.5 text-primary" /> {blog.author?.name || 'Editorial Team'}</span>
+                          </div>
+                          
+                          <h2 className="text-base font-bold text-secondary mb-2 leading-snug tracking-[0.5px] line-clamp-2">
+                            {blog.title}
+                          </h2>
+                          
+                          <p className="text-xs text-gray-600 leading-relaxed mb-4 flex-grow line-clamp-2">
+                            {blog.metaDescription || blog.content.replace(/<[^>]*>/g, '').substring(0, 130) + '...'}
+                          </p>
+                          
+                          <span className="inline-flex items-center text-secondary font-bold uppercase text-[10px] tracking-wider">
+                            Read Story 
+                            <span className="ml-1.5 text-xs transition-transform duration-300 group-hover:translate-x-1">→</span>
+                          </span>
+                        </div>
+                      </article>
+                    </Link>
                   </FadeIn>
                 ))}
               </div>
