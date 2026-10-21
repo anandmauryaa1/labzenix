@@ -20,7 +20,7 @@ export default async function BlogPage({
 }) {
   const searchParamsObj = await searchParams;
   const currentPage = parseInt(searchParamsObj.page || '1');
-  const limit = 6;
+  const limit = 12;
   const skip = (currentPage - 1) * limit;
 
   let totalBlogs = 0;
@@ -42,15 +42,15 @@ export default async function BlogPage({
 
   return (
     <div className="bg-white overflow-hidden">
-      <PageBanner 
-        title="Our Blogs" 
+      <PageBanner
+        title="Our Blogs"
         breadcrumbs={[
           { label: 'Home', href: '/' },
           { label: 'Blogs' }
-        ]} 
+        ]}
       />
       {/* Blog Hero */}
-      <section className="bg-gray-50 py-24 border-b border-gray-100 flex justify-center">
+      {/* <section className="bg-gray-50 py-24 border-b border-gray-100 flex justify-center">
         <div className="max-w-7xl auto px-4 sm:px-6 lg:px-8 text-center">
           <FadeIn direction="up">
             <span className="text-primary font-black tracking-[0.3em] uppercase text-[10px] mb-4 block">
@@ -64,7 +64,7 @@ export default async function BlogPage({
             </p>
           </FadeIn>
         </div>
-      </section>
+      </section> */}
 
       {/* Blog Feed */}
       <section className="py-24 px-4 bg-white relative">
@@ -72,7 +72,7 @@ export default async function BlogPage({
         <div className="max-w-7xl mx-auto relative z-10">
           {blogs.length === 0 ? (
             <div className="text-center py-32">
-               <p className="text-gray-400 font-bold uppercase tracking-widest text-sm">The Knowledge Center is currently being updated.</p>
+              <p className="text-gray-400 font-bold uppercase tracking-widest text-sm">The Knowledge Center is currently being updated.</p>
             </div>
           ) : (
             <FadeIn stagger direction="none">
@@ -82,31 +82,31 @@ export default async function BlogPage({
                     <Link href={`/blogs/${blog.slug}`} className="block h-full">
                       <article className="bg-white border border-gray-100 shadow-sm flex flex-col group overflow-hidden hover:shadow-xl hover:-translate-y-1 hover:border-primary transition-all duration-300 h-full cursor-pointer">
                         <div className="block overflow-hidden relative aspect-[16/9] bg-gray-50">
-                          <Image 
-                            src={blog.image || 'https://images.unsplash.com/photo-1579154341098-e4e158cc7f55?auto=format&fit=crop&q=80&w=800'} 
-                            alt={blog.title} 
+                          <Image
+                            src={blog.image || 'https://images.unsplash.com/photo-1579154341098-e4e158cc7f55?auto=format&fit=crop&q=80&w=800'}
+                            alt={blog.title}
                             fill
                             className="object-contain p-3 transition-transform duration-500 ease-out group-hover:scale-108"
                           />
                           <div className="absolute inset-0 bg-secondary/0 group-hover:bg-secondary/5 transition-colors duration-500 z-10" />
                         </div>
-                        
+
                         <div className="p-5 flex flex-col flex-grow">
                           <div className="flex items-center space-x-4 text-[10px] text-gray-400 font-black uppercase tracking-widest mb-4 border-b border-gray-50 pb-3">
                             <span className="flex items-center"><Calendar className="w-3 h-3 mr-1.5 text-primary" /> {new Date(blog.createdAt).toLocaleDateString()}</span>
                             <span className="flex items-center"><User className="w-3 h-3 mr-1.5 text-primary" /> {blog.author?.name || 'Editorial Team'}</span>
                           </div>
-                          
-                          <h2 className="text-base font-bold text-secondary mb-2 leading-snug tracking-[0.5px] line-clamp-2">
+
+                          <h2 className="text-base font-bold text-[18px] mb-2 leading-snug tracking-[0.5px] line-clamp-2">
                             {blog.title}
                           </h2>
-                          
-                          <p className="text-xs text-gray-600 leading-relaxed mb-4 flex-grow line-clamp-2">
+
+                          <p className="text-s text-gray-600 leading-relaxed mb-4 flex-grow line-clamp-2">
                             {blog.metaDescription || blog.content.replace(/<[^>]*>/g, '').substring(0, 130) + '...'}
                           </p>
-                          
+
                           <span className="inline-flex items-center text-secondary font-bold uppercase text-[10px] tracking-wider">
-                            Read Story 
+                            Read Story
                             <span className="ml-1.5 text-xs transition-transform duration-300 group-hover:translate-x-1">→</span>
                           </span>
                         </div>
@@ -163,9 +163,9 @@ export default async function BlogPage({
           <h2 className="text-3xl md:text-5xl font-black text-white mb-6 uppercase tracking-tighter leading-none">Subscribe to Scientific Insights</h2>
           <p className="text-lg text-gray-400 mb-12 font-medium">Get the latest technical articles and standards delivered to your inbox.</p>
           <div className="flex flex-col sm:flex-row gap-4 max-w-2xl mx-auto bg-white/5 p-2 backdrop-blur-sm border border-white/10">
-            <input 
-              type="email" 
-              placeholder="Enter your business email" 
+            <input
+              type="email"
+              placeholder="Enter your business email"
               className="flex-grow px-8 py-5 bg-transparent text-white outline-none font-bold uppercase tracking-widest text-xs placeholder:text-gray-600"
             />
             <button className="px-10 py-5 bg-primary text-white font-black uppercase tracking-[0.2em] text-[10px] hover:bg-white hover:text-secondary transition-all">
