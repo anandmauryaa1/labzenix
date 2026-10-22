@@ -26,48 +26,45 @@ export default function PageBanner({
 }: PageBannerProps) {
   const HeadingTag = as;
   return (
-    <section className="bg-primary py-4 md:py-8">
-      <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row md:items-center justify-between gap-8">
-        {/* Title & Description */}
-        <div className="flex-1 flex items-center gap-6">
+    <section className="bg-primary py-3 sm:py-4 md:py-6">
+      <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4 flex flex-col md:flex-row md:items-center justify-between gap-2.5 sm:gap-4 md:gap-6">
+        {/* Title & Back Button */}
+        <div className="flex-1 flex items-center gap-2.5 sm:gap-3.5 md:gap-4 min-w-0">
           {showBackButton && (
-            <Link href={backUrl}>
-              <button className="p-3 bg-white/10 hover:bg-white/20 text-white transition-all rounded-none border border-white/20">
-                <ArrowLeft className="w-5 h-5" />
+            <Link href={backUrl} className="shrink-0" aria-label="Go back">
+              <button className="p-2 sm:p-2.5 bg-white/10 hover:bg-white/20 text-white transition-all rounded-none border border-white/20 flex items-center justify-center cursor-pointer">
+                <ArrowLeft className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5 shrink-0" />
               </button>
             </Link>
           )}
-          <div>
-            <HeadingTag className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter leading-tight">
+          <div className="min-w-0">
+            <HeadingTag className="text-base sm:text-lg md:text-2xl font-black text-white uppercase tracking-tight leading-snug sm:leading-tight m-0 p-0 break-words">
               {title}
             </HeadingTag>
-            {/* {description && (
-              <p className="mt-2 text-white/90 font-medium text-sm md:text-base max-w-2xl leading-relaxed">
-                {description}
-              </p>
-            )} */}
           </div>
         </div>
 
         {/* Breadcrumb */}
-        <nav className="text-white/80 font-medium text-sm">
-          <ul className="flex items-center space-x-2">
+        <nav aria-label="Breadcrumb" className="text-white/80 font-medium text-[11px] sm:text-xs md:text-sm">
+          <ol className="flex flex-wrap items-center gap-x-1.5 sm:gap-x-2 gap-y-0.5">
             {breadcrumbs.map((item, index) => {
               const isLast = index === breadcrumbs.length - 1;
               return (
-                <li key={index} className="flex items-center space-x-2">
+                <li key={index} className="inline-flex items-center gap-x-1.5 sm:gap-x-2">
                   {item.href ? (
-                    <Link href={item.href} className="hover:text-white transition-colors">
+                    <Link href={item.href} className="hover:text-white transition-colors capitalize shrink-0">
                       {item.label}
                     </Link>
                   ) : (
-                    <span className={isLast ? 'text-white font-bold' : ''}>{item.label}</span>
+                    <span className={`${isLast ? 'text-white font-bold' : ''} capitalize line-clamp-1`}>
+                      {item.label}
+                    </span>
                   )}
-                  {!isLast && <span className="text-white/50">/</span>}
+                  {!isLast && <span className="text-white/40 select-none">/</span>}
                 </li>
               );
             })}
-          </ul>
+          </ol>
         </nav>
       </div>
     </section>

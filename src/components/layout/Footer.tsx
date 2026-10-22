@@ -35,7 +35,7 @@ export default function Footer() {
 
   return (
     <footer className="bg-white border-t border-gray-100 pt-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+      <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4 pb-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Company Info */}
           <div className="space-y-6">
@@ -203,7 +203,7 @@ export default function Footer() {
 
       {/* Copyright Bar */}
       <div className="bg-secondary py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center text-gray-400 text-xs font-normal uppercase tracking-[0.15em]">
+        <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4 flex flex-col md:flex-row justify-between items-center text-gray-400 text-xs font-normal uppercase tracking-[0.15em]">
           <p>© {currentYear} LabZenix Instruments Private Limited.</p>
           <div className="flex space-x-8 mt-6 md:mt-0">
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>

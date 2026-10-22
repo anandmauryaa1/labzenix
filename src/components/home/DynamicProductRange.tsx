@@ -17,23 +17,23 @@ export default function DynamicProductRange({ initialRanges }: { initialRanges?:
   if (ranges.length === 0) return null;
 
   return (
-    <section aria-labelledby="dynamic-ranges-heading" className="py-14 px-4 bg-gray-50 overflow-hidden">
-      <div className="max-w-7xl mx-auto">
-        <header className="text-center mb-16">
-          <span className="text-primary font-medium tracking-[0.3em] uppercase text-sm mb-4 block">Our Series</span>
-          <h2 id="dynamic-ranges-heading" className="text-4xl md:text-5xl font-black text-secondary uppercase tracking-tighter leading-none mb-6">
+    <section aria-labelledby="dynamic-ranges-heading" className="py-10 sm:py-14 px-[5px] sm:px-4 bg-gray-50 overflow-hidden">
+      <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4">
+        <header className="text-center mb-8 sm:mb-16">
+          <span className="text-primary font-medium tracking-[0.3em] uppercase text-xs sm:text-sm mb-2 sm:mb-4 block">Our Series</span>
+          <h2 id="dynamic-ranges-heading" className="text-2xl sm:text-3xl md:text-5xl font-black text-secondary uppercase tracking-tight sm:tracking-tighter leading-tight sm:leading-none mb-3 sm:mb-6">
             Our <span className="text-primary">Product</span> Ranges
           </h2>
-          <p className="text-gray-500 font-medium max-w-2xl mx-auto">
+          <p className="text-xs sm:text-sm md:text-base text-gray-500 font-medium max-w-2xl mx-auto leading-relaxed">
             Explore our specialized instrument series tailored for diverse industrial testing requirements.
           </p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" role="list">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10 lg:gap-12" role="list">
           {ranges.map((range) => (
             <article key={range._id} role="listitem" className="h-full">
               <Link href={`/products?range=${range.slug}`} className="block h-full">
-                <div className="group bg-white border border-gray-100 hover:border-primary hover:shadow-2xl transition-all duration-300 overflow-hidden h-full flex flex-col cursor-pointer">
+                <div className="group bg-white border border-gray-100 shadow-xl hover:border-primary hover:shadow-2xl transition-all duration-300 overflow-hidden h-full flex flex-col cursor-pointer">
                   <div className="relative aspect-video overflow-hidden">
                     <Image 
                       src={getOptimizedImageUrl(range.image, { width: 640, height: 360, crop: 'fill' })} 

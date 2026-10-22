@@ -6,8 +6,9 @@
 export interface ImageOptimizationOptions {
   width?: number;
   height?: number;
-  quality?: 'auto' | 'auto:good' | 'auto:best' | 'auto:eco';
-  crop?: 'fill' | 'scale' | 'fit' | 'thumb';
+  quality?: 'auto' | 'auto:good' | 'auto:best' | 'auto:eco' | number | string;
+  crop?: 'fill' | 'scale' | 'fit' | 'thumb' | 'limit';
+  dpr?: number | string;
 }
 
 export function getOptimizedImageUrl(
@@ -18,12 +19,13 @@ export function getOptimizedImageUrl(
     return '/api/placeholder/600/450';
   }
 
-  const { width, height, quality = 'auto', crop } = options;
+  const { width, height, quality = 'auto', crop, dpr } = options;
 
   // Cloudinary image optimization injection
   if (url.includes('res.cloudinary.com') && url.includes('/upload/')) {
     const transformParts: string[] = ['f_auto', `q_${quality}`];
 
+    if (dpr) transformParts.push(`dpr_${dpr}`);
     if (width) transformParts.push(`w_${width}`);
     if (height) transformParts.push(`h_${height}`);
     if (crop) transformParts.push(`c_${crop}`);
@@ -31,7 +33,7 @@ export function getOptimizedImageUrl(
     const transformString = transformParts.join(',');
 
     // Avoid double transformation injection
-    if (url.includes('/f_auto,q_auto') || url.includes('/q_auto')) {
+    if (url.includes('/f_auto,') || url.includes('/q_auto')) {
       return url;
     }
 

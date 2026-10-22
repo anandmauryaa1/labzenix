@@ -23,7 +23,7 @@ export default function ConditionalWrapper({ children }: { children: React.React
     <>
       <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
       <Navbar />
-      <main className="flex-grow pt-[101px] md:pt-[117px]">
+      <main className="flex-grow pt-[94px] sm:pt-[104px] md:pt-[124px] lg:pt-[136px] xl:pt-[148px]">
         {children}
       </main>
       <Footer />

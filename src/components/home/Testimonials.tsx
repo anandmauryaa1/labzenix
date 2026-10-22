@@ -33,11 +33,11 @@ export default function Testimonials({ initialTestimonials }: { initialTestimoni
   const testimonials = initialTestimonials && initialTestimonials.length > 0 ? initialTestimonials : fallbackTestimonials;
 
   return (
-    <section className="py-14 px-4 bg-white relative overflow-hidden">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <span className="text-primary font-bold tracking-widest uppercase text-sm">Customer Stories</span>
-          <h2 className="text-4xl md:text-5xl font-black text-secondary mt-2 uppercase tracking-tighter italic">
+    <section className="py-10 sm:py-14 px-[5px] sm:px-4 bg-white relative overflow-hidden">
+      <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4">
+        <div className="text-center mb-8 sm:mb-16">
+          <span className="text-primary font-bold tracking-widest uppercase text-xs sm:text-sm">Customer Stories</span>
+          <h2 className="text-2xl sm:text-3xl md:text-5xl font-black text-secondary mt-1.5 sm:mt-2 uppercase tracking-tight sm:tracking-tighter italic">
             <span className="text-primary">Trusted </span> Globally
           </h2>
         </div>

@@ -18,28 +18,28 @@ export default function ProductCategories() {
   };
 
   return (
-    <section className="py-14 px-4 bg-white border-y border-gray-100 overflow-hidden">
-      <div className="max-w-7xl mx-auto">
+    <section className="py-10 sm:py-14 md:py-18 px-[5px] sm:px-4 bg-white border-y border-gray-100 overflow-hidden">
+      <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4">
         <FadeIn direction="up">
-          <span className="block text-primary font-bold tracking-[0.3em] uppercase text-xs text-center mb-4">Our Expertise</span>
-          <h2 className="text-4xl md:text-5xl font-black mb-16 text-center text-secondary uppercase tracking-tighter">Product Categories</h2>
+          <span className="block text-primary font-bold tracking-[0.3em] uppercase text-[10px] sm:text-xs text-center mb-2 sm:mb-4">Our Expertise</span>
+          <h2 className="text-2xl sm:text-3xl md:text-5xl font-black mb-6 sm:mb-12 text-center text-secondary uppercase tracking-tight">Product Categories</h2>
         </FadeIn>
         
         <FadeIn stagger direction="none">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
             {categories.map((cat) => (
               <motion.div 
                 key={cat.name} 
                 variants={item}
-                className="text-center p-10 rounded-none bg-gray-50 border border-transparent hover:border-primary hover:bg-white hover:shadow-2xl transition-all duration-300 group cursor-pointer relative overflow-hidden"
+                className="text-center p-6 sm:p-8 rounded-none bg-gray-50 border border-transparent hover:border-primary hover:bg-white shadow-xl hover:shadow-2xl transition-all duration-300 group cursor-pointer relative overflow-hidden"
               >
                 <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-transform duration-500" />
                 <div className="relative z-10">
-                  <div className="w-16 h-16 bg-white shadow-lg mx-auto flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
-                    <cat.icon className="w-8 h-8" />
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white shadow-lg mx-auto flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
+                    <cat.icon className="w-6 h-6 sm:w-8 sm:h-8" />
                   </div>
-                  <h3 className="text-lg font-black mb-3 text-secondary uppercase tracking-tight">{cat.name}</h3>
-                  <p className="text-sm text-gray-500 font-medium leading-relaxed">{cat.desc}</p>
+                  <h3 className="text-base sm:text-lg font-black mb-1.5 sm:mb-2 text-secondary uppercase tracking-tight m-0 p-0">{cat.name}</h3>
+                  <p className="text-xs sm:text-sm text-gray-500 font-medium leading-relaxed m-0 p-0 mt-1">{cat.desc}</p>
                 </div>
               </motion.div>
             ))}

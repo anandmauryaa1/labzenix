@@ -224,17 +224,17 @@ function ProductsContent() {
         />
         
         {/* Hero */}
-        <section className="bg-gray-50 py-24 border-b border-gray-100 bg-gradient-to-b from-gray-200 to-white-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-12">
+        <section className="bg-gray-50 py-10 sm:py-16 md:py-24 border-b border-gray-100 bg-gradient-to-b from-gray-200 to-white-50">
+          <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-8 md:gap-12">
               <FadeIn direction="right" className="max-w-2xl">
-                <span className="text-primary font-black tracking-[0.3em] uppercase text-[10px] mb-4 block">
+                <span className="text-primary font-black tracking-[0.3em] uppercase text-[10px] mb-3 sm:mb-4 block">
                   Industrial Catalog
                 </span>
-                <h1 className="text-4xl md:text-7xl font-black text-secondary uppercase tracking-tighter leading-none mb-6">
+                <h1 className="text-3xl sm:text-5xl md:text-7xl font-black text-secondary uppercase tracking-tighter leading-none mb-4 sm:mb-6">
                   Precision <span className="text-primary">Testing</span> Mastery
                 </h1>
-                <p className="text-xl text-gray-700 leading-relaxed font-medium mb-8">
+                <p className="text-base sm:text-lg md:text-xl text-gray-700 leading-relaxed font-medium mb-6 sm:mb-8">
                   Explore our range of ISO certified, technologically advanced laboratory instruments
                   designed for reliability, reproducibility, and precision.
                 </p>
@@ -258,24 +258,24 @@ function ProductsContent() {
         </section>
 
         {/* Categories from DB */}
-        <section className="py-24 px-4">
-          <div className="max-w-7xl mx-auto">
+        <section className="py-10 sm:py-16 md:py-24 px-[5px] sm:px-4">
+          <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4">
             {categories.length === 0 ? (
-              <div className="text-center py-16">
-                <Grid3X3 className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                <p className="text-gray-400 font-medium">No categories available yet.</p>
+              <div className="text-center py-12 sm:py-16">
+                <Grid3X3 className="w-10 h-10 sm:w-12 sm:h-12 text-gray-200 mx-auto mb-3" />
+                <p className="text-gray-400 font-medium text-sm sm:text-base">No categories available yet.</p>
               </div>
             ) : (
               <FadeIn stagger direction="none">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
                   {categories.map(cat => (
                     <motion.div
                       key={cat._id}
                       variants={itemVariant}
-                      className="flex flex-col border border-gray-100 bg-white group hover:shadow-2xl transition-all duration-500 overflow-hidden cursor-pointer"
+                      className="flex flex-col border border-gray-100 bg-white group shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden cursor-pointer"
                     >
                       <Link href={cat.slug ? `/category/${cat.slug}` : `/products?category=${encodeURIComponent(cat.name)}`} className="flex flex-col h-full">
-                        <div className="w-full h-64 bg-gray-50 overflow-hidden flex items-center justify-center relative">
+                        <div className="w-full h-48 sm:h-64 bg-gray-50 overflow-hidden flex items-center justify-center relative">
                           {cat.image ? (
                             <Image
                               src={cat.image}
@@ -284,21 +284,21 @@ function ProductsContent() {
                               className="object-cover group-hover:scale-110 transition-transform duration-700"
                             />
                           ) : (
-                            <Grid3X3 className="w-16 h-16 text-gray-200" />
+                            <Grid3X3 className="w-12 h-12 sm:w-16 sm:h-16 text-gray-200" />
                           )}
                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500 z-10" />
                         </div>
-                        <div className="p-8 pb-4">
-                          <h2 className="text-4xl font-black text-secondary uppercase mb-4 tracking-tighter group-hover:text-primary transition-colors leading-none">
+                        <div className="p-5 sm:p-8 pb-3 sm:pb-4">
+                          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-secondary uppercase mb-2 sm:mb-4 tracking-tighter group-hover:text-primary transition-colors leading-none">
                             {cat.name}
                           </h2>
-                          <p className="text-gray-500 font-medium text-sm leading-relaxed mb-8">{cat.description}</p>
+                          <p className="text-gray-500 font-medium text-xs sm:text-sm leading-relaxed mb-4 sm:mb-8">{cat.description}</p>
                         </div>
                         <div
-                          className="bg-gray-50 py-5 px-8 border-t border-gray-100 flex justify-between items-center group-hover:bg-secondary group-hover:text-white transition-all font-black uppercase text-[10px] tracking-[0.2em] text-secondary mt-auto"
+                          className="bg-gray-50 py-3.5 sm:py-5 px-5 sm:px-8 border-t border-gray-100 flex justify-between items-center group-hover:bg-secondary group-hover:text-white transition-all font-black uppercase text-[10px] tracking-[0.2em] text-secondary mt-auto"
                         >
                           View Full Category
-                          <ChevronRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-2 transition-transform" />
                         </div>
                       </Link>
                     </motion.div>
@@ -323,23 +323,23 @@ function ProductsContent() {
         as="h1"
       />
       
-      <section className="py-24 px-4 bg-gradient-to-b from-gray-200 to-white-50">
-        <div className="max-w-7xl mx-auto">
+      <section className="py-8 sm:py-14 md:py-20 px-[5px] sm:px-4 bg-gradient-to-b from-gray-200 to-white-50">
+        <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4">
           {/* Products grid */}
           {loading ? (
-            <div className="flex justify-center py-32">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary" />
+            <div className="flex justify-center py-20 sm:py-32">
+              <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-b-2 border-primary" />
             </div>
           ) : filteredProducts.length === 0 ? (
-            <div className="text-center py-32">
-              <Package className="w-16 h-16 text-gray-200 mx-auto mb-6" />
-              <p className="text-xl text-gray-500 font-black uppercase tracking-widest">
+            <div className="text-center py-20 sm:py-32">
+              <Package className="w-12 h-12 sm:w-16 sm:h-16 text-gray-200 mx-auto mb-4 sm:mb-6" />
+              <p className="text-base sm:text-xl text-gray-500 font-black uppercase tracking-widest">
                 No products found{searchTerm ? ' for your search' : ' in this category'}.
               </p>
               {searchTerm && (
                 <button
                   onClick={() => { if (searchParam) window.location.href = '/products'; }}
-                  className="mt-6 text-primary font-black uppercase tracking-[0.2em] text-xs underline hover:no-underline cursor-pointer"
+                  className="mt-4 sm:mt-6 text-primary font-black uppercase tracking-[0.2em] text-xs underline hover:no-underline cursor-pointer"
                 >
                   Clear search
                 </button>
@@ -347,7 +347,7 @@ function ProductsContent() {
             </div>
           ) : (
             <div>
-              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
                 {displayedProducts.map((product, idx) => (
                   <motion.div
                     key={product._id}
@@ -355,10 +355,20 @@ function ProductsContent() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.35, delay: (idx % ITEMS_PER_PAGE) * 0.04 }}
                   >
-                    <Link href={`/products/${product.slug}`}>
-                      <div className="flex flex-col border border-gray-100 bg-white group hover:shadow-2xl transition-all duration-500 overflow-hidden h-full cursor-pointer relative">
+                    <Link href={`/products/${product.slug}`} className="group block h-full cursor-pointer" style={{ perspective: '1000px' }}>
+                      <div
+                        style={{
+                          borderRadius: '4px',
+                          transition: 'transform 0.35s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.35s ease',
+                          transformStyle: 'preserve-3d',
+                          boxShadow: '0 20px 25px -5px rgba(0, 74, 173, 0.12), 0 8px 10px -6px rgba(0, 74, 173, 0.08)',
+                        }}
+                        className="flex flex-col border border-gray-200 bg-white shadow-xl hover:shadow-2xl group-hover:[transform:translateY(-6px)_rotateX(2deg)] group-hover:[box-shadow:0_25px_50px_rgba(0,74,173,0.22),0_12px_24px_rgba(0,74,173,0.12),0_0_0_1px_rgba(0,74,173,0.16)] transition-all overflow-hidden h-full relative"
+                      >
+                        {/* Top gradient accent line */}
+                        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-primary via-secondary to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
                         {/* Image */}
-                        <div className="w-full h-64 bg-gray-50 overflow-hidden flex items-center justify-center relative">
+                        <div className="w-full h-48 sm:h-64 bg-gray-50 overflow-hidden flex items-center justify-center relative">
                           {product.images?.[0] ? (
                             <Image
                               src={getOptimizedImageUrl(product.images[0], { width: 400, height: 400, crop: 'fit' })}
@@ -366,29 +376,29 @@ function ProductsContent() {
                               fill
                               loading="lazy"
                               sizes="(max-width: 768px) 50vw, 25vw"
-                              className="object-contain p-4 group-hover:scale-105 transition-transform duration-500"
+                              className="object-contain p-3 sm:p-4 group-hover:scale-105 transition-transform duration-500"
                             />
                           ) : (
-                            <Package className="w-16 h-16 text-gray-200" />
+                            <Package className="w-12 h-12 sm:w-16 sm:h-16 text-gray-200" />
                           )}
                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500 z-10" />
                         </div>
 
                         {/* Info */}
-                        <div className="p-8 flex flex-col flex-grow">
+                        <div className="p-4 sm:p-6 flex flex-col flex-grow">
                           {product.modelNumber && (
-                            <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-3">
+                            <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-2 sm:mb-3">
                               REF: {product.modelNumber}
                             </p>
                           )}
-                          <h3 className="text-lg font-bold text-secondary uppercase tracking-tighter mb-8 group-hover:text-primary transition-colors line-clamp-2 leading-none flex-grow">
+                          <h3 className="text-sm sm:text-base font-bold text-secondary uppercase tracking-tight mb-4 sm:mb-6 group-hover:text-primary transition-colors line-clamp-2 leading-snug flex-grow">
                             {product.title}
                           </h3>
-                          <div className="flex items-center justify-between pt-6 border-t border-gray-100">
+                          <div className="flex items-center justify-between pt-3 sm:pt-4 border-t border-gray-100 mt-auto">
                             <span className="text-[10px] font-black uppercase tracking-widest text-secondary group-hover:text-primary transition-colors">
                               Explore Specs
                             </span>
-                            <ChevronRight className="w-6 h-6 text-primary group-hover:translate-x-2 transition-transform duration-300" />
+                            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-primary group-hover:translate-x-1.5 transition-transform duration-300" />
                           </div>
                         </div>
                       </div>

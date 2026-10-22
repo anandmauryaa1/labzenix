@@ -61,23 +61,23 @@ function ApplicationsContent() {
         as="h1"
       />
 
-      <section className="py-24 px-4">
-        <div className="max-w-7xl mx-auto">
+      <section className="py-8 sm:py-14 md:py-20 px-[5px] sm:px-4">
+        <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4">
           {loading ? (
-            <div className="text-center py-20">
-              <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4" />
+            <div className="text-center py-16 sm:py-20">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-3 sm:mb-4" />
               <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Loading Applications...</p>
             </div>
           ) : applications.length === 0 ? (
-            <div className="text-center py-20 bg-gray-50 border border-dashed border-gray-200">
-              <Microscope className="w-12 h-12 text-gray-200 mx-auto mb-4" />
+            <div className="text-center py-16 sm:py-20 bg-gray-50 border border-dashed border-gray-200">
+              <Microscope className="w-10 h-10 sm:w-12 sm:h-12 text-gray-200 mx-auto mb-3 sm:mb-4" />
               <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">No applications configured yet.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
               {applications.map((app, idx) => (
                 <FadeIn key={app._id} direction="up" delay={idx * 0.1}>
-                  <div className="group bg-white flex flex-col h-full border border-gray-100 hover:shadow-2xl transition-all duration-500 overflow-hidden relative">
+                  <div className="group bg-white flex flex-col h-full border border-gray-100 shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden relative">
                     <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
                       <Image 
                         src={app.image} 
@@ -88,15 +88,15 @@ function ApplicationsContent() {
                       <div className="absolute inset-0 bg-secondary/0 group-hover:bg-secondary/10 transition-colors duration-500" />
                     </div>
                     
-                    <div className="p-10 flex flex-col flex-1">
-                      <h3 className="text-2xl font-black text-secondary uppercase tracking-tighter mb-4 group-hover:text-primary transition-colors leading-tight">
+                    <div className="p-5 sm:p-8 flex flex-col flex-1">
+                      <h3 className="text-xl sm:text-2xl font-black text-secondary uppercase tracking-tight mb-2 sm:mb-4 group-hover:text-primary transition-colors leading-tight">
                         {app.name}
                       </h3>
-                      <p className="text-gray-500 font-medium text-sm leading-relaxed mb-8 line-clamp-3">
+                      <p className="text-gray-500 font-medium text-xs sm:text-sm leading-relaxed mb-4 sm:mb-6 line-clamp-3">
                         {app.description || 'Advanced testing solutions designed to meet the rigorous standards of this specialized industrial application.'}
                       </p>
                       
-                      <div className="mt-auto pt-6 border-t border-gray-50 flex items-center justify-between">
+                      <div className="mt-auto pt-4 sm:pt-6 border-t border-gray-50 flex items-center justify-between">
                         <Link 
                           href={`/products?application=${app.slug}`}
                           className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center group/link"

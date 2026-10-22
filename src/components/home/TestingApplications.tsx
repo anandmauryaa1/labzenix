@@ -32,20 +32,20 @@ export default function TestingApplications() {
   if (loading || applications.length === 0) return null;
 
   return (
-    <section className="py-14 px-4 bg-white overflow-hidden">
-      <div className="max-w-7xl mx-auto">
+    <section className="py-10 sm:py-14 px-[5px] sm:px-4 bg-white overflow-hidden">
+      <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4">
         <FadeIn direction="up">
-          <div className="text-center mb-16">
-            <span className="inline-block px-4 py-1.5 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] rounded-full mb-4">
+          <div className="text-center mb-8 sm:mb-16">
+            <span className="inline-block px-3 sm:px-4 py-1 sm:py-1.5 bg-blue-50 text-blue-600 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] rounded-full mb-3 sm:mb-4">
               Testing Applications
             </span>
-            <div className="flex items-center justify-center space-x-3 mb-6">
-              <div className="w-1.5 h-10 bg-primary" />
-              <h2 className="text-4xl md:text-5xl font-black text-secondary uppercase tracking-tighter">
+            <div className="flex items-center justify-center space-x-2.5 sm:space-x-3 mb-3 sm:mb-6">
+              <div className="w-1.5 h-6 sm:h-10 bg-primary" />
+              <h2 className="text-2xl sm:text-3xl md:text-5xl font-black text-secondary uppercase tracking-tight sm:tracking-tighter">
                 Complete Product Range
               </h2>
             </div>
-            <p className="max-w-3xl mx-auto text-gray-500 font-medium leading-relaxed">
+            <p className="text-xs sm:text-sm md:text-base max-w-3xl mx-auto text-gray-500 font-medium leading-relaxed">
               Our Testing Instruments are in Strict Compliance to International Application that Makes Them Applicable in the International Markets As Well.
             </p>
           </div>

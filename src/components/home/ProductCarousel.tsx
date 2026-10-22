@@ -42,30 +42,30 @@ export default function ProductCarousel({ initialProducts }: { initialProducts?:
   const canScrollNext = currentIndex + itemsPerSlide < products.length;
 
   return (
-    <section className="py-14 px-4 bg-gradient-to-b from-gray-50 to-white border-b border-gray-100 overflow-hidden">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <span className="block text-primary font-medium tracking-[0.3em] uppercase text-sm mb-4">
+    <section className="py-10 sm:py-14 px-[5px] sm:px-4 bg-gradient-to-b from-gray-50 to-white border-b border-gray-100 overflow-hidden">
+      <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4">
+        <div className="text-center mb-8 sm:mb-16">
+          <span className="block text-primary font-medium tracking-[0.3em] uppercase text-xs sm:text-sm mb-2 sm:mb-4">
             Featured Products
           </span>
-          <h2 className="text-4xl md:text-5xl font-black mb-4 text-secondary uppercase tracking-tighter">
+          <h2 className="text-2xl sm:text-3xl md:text-5xl font-black mb-3 sm:mb-4 text-secondary uppercase tracking-tight sm:tracking-tighter">
             Hot <span className="text-primary"> Selling </span> Product
           </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto font-medium">
+          <p className="text-xs sm:text-sm md:text-base text-gray-600 max-w-2xl mx-auto font-medium leading-relaxed">
             Explore our collection of cutting-edge laboratory and production equipment designed for precision testing.
           </p>
         </div>
 
         <div className="relative">
           {/* Product Grid - Pure CSS transitions for fast rendering without Framer Motion main-thread overhead */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
             {visibleProducts.map((product) => (
               <div
                 key={product._id}
                 className="h-full transition-all duration-300 hover:-translate-y-1"
               >
                 <Link href={`/products/${product.slug}`} className="block h-full">
-                  <div className="h-full bg-white border border-gray-200 hover:border-primary hover:shadow-2xl transition-all duration-300 group cursor-pointer overflow-hidden flex flex-col">
+                  <div className="h-full bg-white border border-gray-200 shadow-xl hover:border-primary hover:shadow-2xl transition-all duration-300 group cursor-pointer overflow-hidden flex flex-col">
                     {/* Image Container */}
                     <div className="relative w-full h-52 bg-gray-100 overflow-hidden flex items-center justify-center">
                       {product.images && product.images.length > 0 ? (

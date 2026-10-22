@@ -18,11 +18,11 @@ export default function FAQSection({ initialFaqs }: { initialFaqs?: FAQ[] }) {
   if (faqs.length === 0) return null;
 
   return (
-    <section className="py-14 px-4 bg-gray-50 border-t border-gray-100">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-16">
-          <span className="text-primary font-bold tracking-widest uppercase text-sm">Support</span>
-          <h2 className="text-3xl md:text-4xl font-black text-secondary mt-2 uppercase tracking-tighter">
+    <section className="py-10 sm:py-14 px-[5px] sm:px-4 bg-gray-50 border-t border-gray-100">
+      <div className="w-full sm:max-w-4xl mx-auto px-[5px] sm:px-4">
+        <div className="text-center mb-8 sm:mb-16">
+          <span className="text-primary font-bold tracking-widest uppercase text-xs sm:text-sm">Support</span>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-secondary mt-1.5 sm:mt-2 uppercase tracking-tight sm:tracking-tighter">
             Frequently Asked <span className="text-primary"> Questions </span>
           </h2>
         </div>

@@ -31,15 +31,15 @@ export default function Partners({ initialPartners }: { initialPartners?: Partne
   );
 
   return (
-    <section className="py-14 bg-white border-t border-gray-100 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex flex-col md:flex-row justify-center items-center mb-12 gap-6">
+    <section className="py-10 sm:py-14 bg-white border-t border-gray-100 overflow-hidden px-[5px] sm:px-4">
+      <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4">
+        <div className="flex flex-col md:flex-row justify-center items-center mb-6 sm:mb-12 gap-4 sm:gap-6">
           <div className="max-w-2xl text-center">
-            <span className="text-primary font-medium tracking-widest uppercase text-sm">Trusted By</span>
-            <h2 className="text-3xl md:text-4xl font-black text-secondary mt-2 mb-4 uppercase tracking-tighter">
+            <span className="text-primary font-medium tracking-widest uppercase text-xs sm:text-sm">Trusted By</span>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-secondary mt-1 sm:mt-2 mb-2 sm:mb-4 uppercase tracking-tight sm:tracking-tighter">
               Our <span className="text-primary">Partners</span>
             </h2>
-            <p className="text-gray-500 font-medium leading-relaxed">
+            <p className="text-xs sm:text-sm md:text-base text-gray-500 font-medium leading-relaxed">
               A countless string of happy and satisfied customers vouch for our 
               excellence and complete quality control support.
             </p>

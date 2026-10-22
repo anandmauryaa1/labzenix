@@ -17,12 +17,12 @@ export default function ProductRange({ initialRanges }: { initialRanges?: Produc
   if (ranges.length === 0) return null;
 
   return (
-    <section aria-labelledby="complete-ranges-heading" id="productrange" className="py-8 md:py-14 bg-white overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 md:mb-20">
+    <section aria-labelledby="complete-ranges-heading" id="productrange" className="py-8 md:py-14 bg-white overflow-hidden px-[5px] sm:px-4">
+      <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4">
+        <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 mb-8 sm:mb-16 md:mb-20">
           <div>
-            <span className="text-primary font-black tracking-widest uppercase text-[14px]">Our Expertise</span>
-            <h2 id="complete-ranges-heading" className="text-3xl md:text-6xl font-black text-secondary mt-2 leading-tight uppercase tracking-tighter">
+            <span className="text-primary font-black tracking-widest uppercase text-xs sm:text-[14px]">Our Expertise</span>
+            <h2 id="complete-ranges-heading" className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black text-secondary mt-1.5 sm:mt-2 leading-tight uppercase tracking-tight sm:tracking-tighter">
               Complete <span className="text-primary">Product</span> Range
             </h2>
           </div>

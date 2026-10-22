@@ -55,12 +55,12 @@ export default function WhyChooseUs({ initialReasons }: { initialReasons?: CoreV
   if (reasons.length === 0) return null;
 
   return (
-    <section className="py-14 px-4 bg-gray-50 border-y border-gray-100 relative overflow-hidden">
+    <section className="py-10 sm:py-14 px-[5px] sm:px-4 bg-gray-50 border-y border-gray-100 relative overflow-hidden">
       <div className="absolute inset-0 bg-primary/5 pattern-grid opacity-10 pointer-events-none" />
-      <div className="max-w-7xl mx-auto relative z-10">
-        <div className="text-center mb-16">
-          <span className="block text-primary font-medium tracking-[0.3em] uppercase text-sm mb-4">Core Values</span>
-          <h2 className="text-4xl md:text-5xl font-black text-secondary uppercase tracking-tighter">
+      <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4 relative z-10">
+        <div className="text-center mb-8 sm:mb-16">
+          <span className="block text-primary font-medium tracking-[0.3em] uppercase text-xs sm:text-sm mb-2 sm:mb-4">Core Values</span>
+          <h2 className="text-2xl sm:text-3xl md:text-5xl font-black text-secondary uppercase tracking-tight sm:tracking-tighter">
             Why <span className="text-primary">LabZenix?</span>
           </h2>
         </div>

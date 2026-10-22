@@ -36,13 +36,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   );
 
   if (!product) return { title: 'Not Found' };
-  
+
   const title = product.metaTitle || product.title;
   const stripHtml = (html: string) => (html || '').replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim();
   const description = product.metaDescription || stripHtml(product.description).substring(0, 160) || '';
 
-  return { 
-    title: `${title} | LabZenix`, 
+  return {
+    title: `${title} | LabZenix`,
     description: description,
     keywords: product.focusKeyword ? [product.focusKeyword, product.category, product.title, product.modelNumber] : [product.category, product.title, product.modelNumber],
     alternates: {
@@ -82,7 +82,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     },
     600
   );
-  
+
   // Fetch social media settings
   const settings: ISettings | null = await cachedFetch(
     `settings:global`,
@@ -96,14 +96,14 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   // Explicitly fetch reviews and FAQs from new collections
   await dbConnect();
   const rawReviews = await Review.find({ product: product._id }).select('author rating comment date images').lean() as IReview[];
-  const rawFaqs    = await Faq.find({ product: product._id }).select('question answer').lean() as IFaq[];
+  const rawFaqs = await Faq.find({ product: product._id }).select('question answer').lean() as IFaq[];
 
   // Fetch linked applications
   const linkedApplications = await Application.find({ _id: { $in: product.applications || [] } }).select('_id name slug').lean() as IApplication[];
 
   /* ─── JSON-LD Structured Data ───────────────────────────── */
   const reviews: { author: string; rating: number; comment: string; date?: string; images?: string[] }[] = JSON.parse(JSON.stringify(rawReviews ?? []));
-  const faqs:    { question: string; answer: string }[]                                 = JSON.parse(JSON.stringify(rawFaqs ?? []));
+  const faqs: { question: string; answer: string }[] = JSON.parse(JSON.stringify(rawFaqs ?? []));
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://labzenix.com';
   const productUrl = `${siteUrl}/products/${product.slug}`;
@@ -195,7 +195,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   // Real AggregateRating & Reviews — only added when authentic customer reviews exist
   if (reviews.length > 0) {
     const totalRating = reviews.reduce((sum, r) => sum + (r.rating ?? 0), 0);
-    const avgRating   = totalRating / reviews.length;
+    const avgRating = totalRating / reviews.length;
     productSchema.aggregateRating = {
       '@type': 'AggregateRating',
       ratingValue: parseFloat(avgRating.toFixed(1)),
@@ -220,17 +220,17 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   // FAQPage schema — for FAQ Tab
   const faqSchema = faqs.length > 0
     ? {
-        '@context': 'https://schema.org',
-        '@type': 'FAQPage',
-        mainEntity: faqs.map((f) => ({
-          '@type': 'Question',
-          name: f.question,
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: f.answer,
-          },
-        })),
-      }
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqs.map((f) => ({
+        '@type': 'Question',
+        name: f.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: f.answer,
+        },
+      })),
+    }
     : null;
 
   // VideoObject schema — for Video Tab
@@ -355,167 +355,169 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       )}
 
       {/* Breadcrumb */}
-      <PageBanner 
-        title={product.title} 
+      <PageBanner
+        title={product.title}
         breadcrumbs={[
           { label: 'Home', href: '/' },
           { label: 'Products', href: '/products' },
           { label: product.title }
-        ]} 
+        ]}
         showBackButton={true}
       />
 
       {/* Product Detail Section */}
-      <div className="max-w-7xl mx-auto px-4 py-16">
-        <div className="grid lg:grid-cols-2 gap-16">
-          {/* Left Column - Image Carousel */}
-          <div>
-            <ImageCarousel images={product.images || []} alt={product.title} />
-          </div>
-
-          {/* Right Column - Product Info */}
-          <div className="space-y-8">
-            {/* Category Badge */}
+      <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4 py-6 sm:py-10 lg:py-16">
+        {/* Card wrapper with gradient top border */}
+        <div
+          style={{
+            borderRadius: '5px',
+            background: 'white',
+            boxShadow: '0 4px 24px 0 rgba(0,74,173,0.08)',
+            border: '1px solid #e5e7eb',
+            borderTop: '4px solid transparent',
+            backgroundImage: 'linear-gradient(white, white), linear-gradient(90deg, #004aad 0%, #8b5cf6 100%)',
+            backgroundOrigin: 'border-box',
+            backgroundClip: 'padding-box, border-box',
+          }}
+          className="p-2 sm:p-8 lg:p-12"
+        >
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16">
+            {/* Left Column - Image Carousel */}
             <div>
-              {/* <span className="inline-block px-4 py-1.5 bg-primary/5 text-primary text-[10px] font-black uppercase tracking-[0.2em] border border-primary/20 rounded-none mb-6 shadow-sm">
-                Category: {product.category}
-              </span> */}
-              {linkedApplications.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {linkedApplications.map((app) => (
-                    <Link 
-                      key={app._id.toString()} 
-                      href={`/applications?category=${app.slug}`}
-                      className="text-[9px] font-bold text-gray-500 uppercase tracking-widest px-3 py-1 bg-gray-50 border border-gray-100 hover:border-primary hover:text-primary transition-all"
-                    >
-                      {app.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
+              <ImageCarousel images={product.images || []} alt={product.title} />
             </div>
 
-            {/* Title (Commented out as moved to Banner) */}
-            <div>
-              <h1 className="text-4xl font-black text-secondary uppercase tracking-tighter leading-tight mb-2">
-                {product.title}
-              </h1>
-              {/* {product.modelNumber && (
-                <p className="text-gray-500 font-medium">{product.modelNumber}</p>
-              )} */}
-            </div>
-
-             {/* Product Overview & Applications ΓÇö description content */}
-            {product.description && (
+            {/* Right Column - Product Info */}
+            <div className="space-y-5 sm:space-y-8">
+              {/* Category Badge */}
               <div>
-                <p className="text-gray-600 leading-relaxed font-medium text-md border-primary/30 pl-4">
-                  {(() => {
-                    const stripHtml = (html: string) => (html || '').replace(/<[^>]*>?/gm, '').trim();
-                    const plainDesc = stripHtml(product.description);
-                    return plainDesc.length > 200 ? `${plainDesc.substring(0, 200)}...` : plainDesc;
-                  })()}
-                </p>
-              </div>
-            )}
-
-            {/* Key Information Grid */}
-            <div className="grid grid-cols-2 gap-8 py-8 border-y border-gray-100">
-              {product.modelNumber && (
-                <div className="space-y-1">
-                  <p className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em] flex items-center gap-2">
-                    <Hash className="w-3 h-3 text-primary" />
-                    Model
-                  </p>
-                  <p className="text-xl font-black text-secondary tracking-tighter">{product.modelNumber}</p>
-                </div>
-              )}
-              {/* <div className="space-y-1">
-                  <p className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em] flex items-center gap-2">
-                    <ShieldCheck className="w-3 h-3 text-primary" />
-                    Status
-                  </p>
-                  <p className="text-xl font-black text-secondary tracking-tighter uppercase transition-colors hover:text-primary">In Regular Stock</p>
-              </div> */}
-            </div>
-
-            {/* Social Media Links */}
-            {settings && settings.social && (
-              <div className="flex flex-col sm:flex-row sm:items-center gap-6 py-6 border-b border-gray-100">
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Follow our updates:</p>
-                <div className="flex items-center gap-6">
-                  {[
-                    { 
-                      key: 'facebook', 
-                      icon: (props: React.SVGProps<SVGSVGElement>) => (
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-                          <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
-                        </svg>
-                      ), 
-                      hover: 'hover:bg-[#1877F2]' 
-                    },
-                    { 
-                      key: 'linkedin', 
-                      icon: (props: React.SVGProps<SVGSVGElement>) => (
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-                          <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/>
-                        </svg>
-                      ), 
-                      hover: 'hover:bg-[#0A66C2]' 
-                    },
-                    { 
-                      key: 'instagram', 
-                      icon: (props: React.SVGProps<SVGSVGElement>) => (
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-                          <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
-                        </svg>
-                      ), 
-                      hover: 'hover:bg-gradient-to-tr hover:from-[#f09433] hover:via-[#dc2743] hover:to-[#bc1888]' 
-                    },
-                    { 
-                      key: 'twitter', 
-                      icon: (props: React.SVGProps<SVGSVGElement>) => (
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-                          <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/>
-                        </svg>
-                      ), 
-                      hover: 'hover:bg-[#1DA1F2]' 
-                    }
-                  ].map((social) => {
-                    if (!settings) return null;
-                    const url = (settings.social as any)[social.key];
-                    if (!url) return null;
-                    const Icon = social.icon;
-                    return (
-                      <motion.a
-                        key={social.key}
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        whileHover={{ scale: 1.1, y: -2 }}
-                        whileTap={{ scale: 0.95 }}
-                        className={`flex items-center justify-center w-10 h-10 border border-gray-100 text-gray-400 transition-all duration-300 hover:text-white hover:border-transparent ${social.hover} shadow-sm bg-white hover:shadow-xl`}
-                        title={social.key.charAt(0).toUpperCase() + social.key.slice(1)}
+                {linkedApplications.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-4 sm:mb-6">
+                    {linkedApplications.map((app) => (
+                      <Link
+                        key={app._id.toString()}
+                        href={`/applications?category=${app.slug}`}
+                        className="text-[9px] font-bold text-gray-500 uppercase tracking-widest px-3 py-1 bg-gray-50 border border-gray-100 hover:border-primary hover:text-primary transition-all"
                       >
-                        <Icon className="w-5 h-5" />
-                      </motion.a>
-                    );
-                  })}
-                </div>
+                        {app.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/contact" className="flex items-center justify-center px-8 py-4 bg-primary text-white font-black uppercase tracking-widest text-sm hover:bg-secondary transition-all shadow-lg active:scale-95 flex-1">
-                Contact Now
-              </Link>
-              {category && category.catalogUrl && (
-                <CatalogButton 
-                  productName={product.title}
-                  productId={product._id.toString()}
-                  catalogUrl={category.catalogUrl}
-                />
+              {/* Title */}
+              <div>
+                <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-secondary uppercase tracking-tight leading-snug break-words mb-2">
+                  {product.title}
+                </h1>
+              </div>
+
+              {/* Product Overview & Applications — description content */}
+              {product.description && (
+                <div className="py-1">
+                  <p className="text-gray-600 leading-relaxed font-medium text-sm sm:text-base">
+                    {(() => {
+                      const stripHtml = (html: string) => (html || '').replace(/<[^>]*>?/gm, '').trim();
+                      const plainDesc = stripHtml(product.description);
+                      return plainDesc.length > 200 ? `${plainDesc.substring(0, 200)}...` : plainDesc;
+                    })()}
+                  </p>
+                </div>
               )}
+
+              {/* Key Information Grid */}
+              <div className="grid grid-cols-2 gap-4 sm:gap-8 py-4 sm:py-6 border-y border-gray-100">
+                {product.modelNumber && (
+                  <div className="space-y-1">
+                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em] flex items-center gap-2">
+                      <Hash className="w-3 h-3 text-primary" />
+                      Model
+                    </p>
+                    <p className="text-base sm:text-xl font-black text-secondary tracking-tight break-all">{product.modelNumber}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Social Media Links */}
+              {settings && settings.social && (
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 py-4 sm:py-6 border-b border-gray-100">
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Follow our updates:</p>
+                  <div className="flex items-center gap-3 sm:gap-6">
+                    {[
+                      {
+                        key: 'facebook',
+                        icon: (props: React.SVGProps<SVGSVGElement>) => (
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+                            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                          </svg>
+                        ),
+                        hover: 'hover:bg-[#1877F2]'
+                      },
+                      {
+                        key: 'linkedin',
+                        icon: (props: React.SVGProps<SVGSVGElement>) => (
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+                            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" /><rect width="4" height="12" x="2" y="9" /><circle cx="4" cy="4" r="2" />
+                          </svg>
+                        ),
+                        hover: 'hover:bg-[#0A66C2]'
+                      },
+                      {
+                        key: 'instagram',
+                        icon: (props: React.SVGProps<SVGSVGElement>) => (
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+                            <rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+                          </svg>
+                        ),
+                        hover: 'hover:bg-gradient-to-tr hover:from-[#f09433] hover:via-[#dc2743] hover:to-[#bc1888]'
+                      },
+                      {
+                        key: 'twitter',
+                        icon: (props: React.SVGProps<SVGSVGElement>) => (
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+                            <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
+                          </svg>
+                        ),
+                        hover: 'hover:bg-[#1DA1F2]'
+                      }
+                    ].map((social) => {
+                      if (!settings) return null;
+                      const url = (settings.social as any)[social.key];
+                      if (!url) return null;
+                      const Icon = social.icon;
+                      return (
+                        <motion.a
+                          key={social.key}
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          whileHover={{ scale: 1.1, y: -2 }}
+                          whileTap={{ scale: 0.95 }}
+                          className={`flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 border border-gray-100 text-gray-400 transition-all duration-300 hover:text-white hover:border-transparent ${social.hover} shadow-sm bg-white hover:shadow-xl`}
+                          title={social.key.charAt(0).toUpperCase() + social.key.slice(1)}
+                        >
+                          <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                        </motion.a>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                <Link href="/contact" className="flex items-center justify-center px-6 py-3.5 sm:px-8 sm:py-4 bg-primary text-white font-black uppercase tracking-widest text-xs sm:text-sm hover:bg-secondary transition-all shadow-lg active:scale-95 flex-1 text-center">
+                  Contact Now
+                </Link>
+                {category && category.catalogUrl && (
+                  <CatalogButton
+                    productName={product.title}
+                    productId={product._id.toString()}
+                    catalogUrl={category.catalogUrl}
+                  />
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -542,7 +544,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
 
       {/* Related Products */}
       {product.category && (
-        <div className="max-w-7xl mx-auto px-4 py-16 border-t border-gray-200">
+        <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4 py-10 sm:py-16 border-t border-gray-200">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl font-black text-secondary uppercase tracking-tighter">Related Products</h2>
             <Link href={category?.slug ? `/category/${category.slug}` : `/products?category=${encodeURIComponent(product.category)}`} className="flex items-center text-primary hover:text-secondary transition-colors font-bold uppercase text-sm">

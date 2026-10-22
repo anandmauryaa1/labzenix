@@ -76,79 +76,79 @@ export default function ContactForm() {
   return (
     <div className="bg-white">
       {/* Header */}
-      <section className="bg-secondary py-24 text-white relative overflow-hidden">
+      <section className="bg-secondary py-10 sm:py-16 md:py-20 text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-primary/5 pattern-grid opacity-20" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <span className="text-primary font-bold tracking-[0.3em] uppercase text-xs mb-4 block">Availability</span>
-          <h1 className="text-4xl md:text-6xl font-black text-white mb-6 uppercase tracking-tighter leading-none">Connect With Us</h1>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto font-medium">
+        <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4 text-center relative z-10">
+          <span className="text-primary font-bold tracking-[0.3em] uppercase text-xs mb-3 sm:mb-4 block">Availability</span>
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-white mb-3 sm:mb-5 uppercase tracking-tighter leading-none">Connect With Us</h1>
+          <p className="text-sm sm:text-base md:text-lg text-gray-400 max-w-2xl mx-auto font-medium">
             Have questions about our laboratory instruments or need a custom quote? Our technical experts are here to assist you.
           </p>
         </div>
       </section>
 
-      <section className="py-24 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
+      <section className="py-8 sm:py-14 md:py-20 px-[5px] sm:px-4">
+        <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 sm:gap-12 lg:gap-16">
             {/* Contact Info */}
-            <div className="space-y-12">
+            <div className="space-y-8 sm:space-y-10">
               <div>
-                <h3 className="text-xl font-bold text-secondary mb-8 uppercase tracking-tighter border-b border-primary inline-block pb-2">Technical Sales</h3>
-                <div className="space-y-6">
+                <h3 className="text-lg sm:text-xl font-bold text-secondary mb-4 sm:mb-6 uppercase tracking-tight border-b border-primary inline-block pb-1.5 sm:pb-2">Technical Sales</h3>
+                <div className="space-y-4 sm:space-y-6">
                   <div className="flex items-start">
-                    <div className="w-12 h-12 bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary">
-                      <Phone className="w-6 h-6" />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary">
+                      <Phone className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
-                    <div className="ml-6">
-                      <p className="text-sm font-bold text-secondary uppercase tracking-widest mb-1">Sales Hotline</p>
-                      <a href={`tel:${settings?.communication?.salesPhone || '+919876500002'}`} className="text-lg text-gray-600 hover:text-primary transition-colors font-semibold">{settings?.communication?.salesPhone || '+91-98765-00002'}</a>
+                    <div className="ml-3.5 sm:ml-6 min-w-0">
+                      <p className="text-xs sm:text-sm font-bold text-secondary uppercase tracking-widest mb-0.5 sm:mb-1">Sales Hotline</p>
+                      <a href={`tel:${settings?.communication?.salesPhone || '+919876500002'}`} className="text-base sm:text-lg text-gray-600 hover:text-primary transition-colors font-semibold break-all">{settings?.communication?.salesPhone || '+91-98765-00002'}</a>
                     </div>
                   </div>
                   <div className="flex items-start">
-                    <div className="w-12 h-12 bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary">
-                      <Mail className="w-6 h-6" />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary">
+                      <Mail className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
-                    <div className="ml-6">
-                      <p className="text-sm font-bold text-secondary uppercase tracking-widest mb-1">Sales Email</p>
-                      <a href={`mailto:${settings?.communication?.salesEmail || 'sales@labzenix.com'}`} className="text-lg text-gray-600 hover:text-primary transition-colors font-semibold">{settings?.communication?.salesEmail || 'sales@labzenix.com'}</a>
+                    <div className="ml-3.5 sm:ml-6 min-w-0">
+                      <p className="text-xs sm:text-sm font-bold text-secondary uppercase tracking-widest mb-0.5 sm:mb-1">Sales Email</p>
+                      <a href={`mailto:${settings?.communication?.salesEmail || 'sales@labzenix.com'}`} className="text-base sm:text-lg text-gray-600 hover:text-primary transition-colors font-semibold break-all">{settings?.communication?.salesEmail || 'sales@labzenix.com'}</a>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div>
-                <h3 className="text-xl font-bold text-secondary mb-8 uppercase tracking-tighter border-b border-primary inline-block pb-2">Customer Support</h3>
-                <div className="space-y-6">
+                <h3 className="text-lg sm:text-xl font-bold text-secondary mb-4 sm:mb-6 uppercase tracking-tight border-b border-primary inline-block pb-1.5 sm:pb-2">Customer Support</h3>
+                <div className="space-y-4 sm:space-y-6">
                   <div className="flex items-start">
-                    <div className="w-12 h-12 bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary">
-                      <Phone className="w-6 h-6" />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary">
+                      <Phone className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
-                    <div className="ml-6">
-                      <p className="text-sm font-bold text-secondary uppercase tracking-widest mb-1">Support Phone</p>
-                      <a href={`tel:${settings?.communication?.supportPhone || '+919565453120'}`} className="text-lg text-gray-600 hover:text-primary transition-colors font-semibold">{settings?.communication?.supportPhone || '+91-9565453120'}</a>
+                    <div className="ml-3.5 sm:ml-6 min-w-0">
+                      <p className="text-xs sm:text-sm font-bold text-secondary uppercase tracking-widest mb-0.5 sm:mb-1">Support Phone</p>
+                      <a href={`tel:${settings?.communication?.supportPhone || '+919565453120'}`} className="text-base sm:text-lg text-gray-600 hover:text-primary transition-colors font-semibold break-all">{settings?.communication?.supportPhone || '+91-9565453120'}</a>
                     </div>
                   </div>
                   <div className="flex items-start">
-                    <div className="w-12 h-12 bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary">
-                      <Mail className="w-6 h-6" />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary">
+                      <Mail className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
-                    <div className="ml-6">
-                      <p className="text-sm font-bold text-secondary uppercase tracking-widest mb-1">Support Email</p>
-                      <a href={`mailto:${settings?.communication?.supportEmail || 'info@labzenix.com'}`} className="text-lg text-gray-600 hover:text-primary transition-colors font-semibold">{settings?.communication?.supportEmail || 'info@labzenix.com'}</a>
+                    <div className="ml-3.5 sm:ml-6 min-w-0">
+                      <p className="text-xs sm:text-sm font-bold text-secondary uppercase tracking-widest mb-0.5 sm:mb-1">Support Email</p>
+                      <a href={`mailto:${settings?.communication?.supportEmail || 'info@labzenix.com'}`} className="text-base sm:text-lg text-gray-600 hover:text-primary transition-colors font-semibold break-all">{settings?.communication?.supportEmail || 'info@labzenix.com'}</a>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div>
-                <h3 className="text-xl font-bold text-secondary mb-8 uppercase tracking-tighter border-b border-primary inline-block pb-2">Our Office</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-secondary mb-4 sm:mb-6 uppercase tracking-tight border-b border-primary inline-block pb-1.5 sm:pb-2">Our Office</h3>
                 <div className="flex items-start">
-                  <div className="w-12 h-12 bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary">
-                    <MapPin className="w-6 h-6" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary">
+                    <MapPin className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
-                  <div className="ml-6">
-                    <p className="text-sm font-bold text-secondary uppercase tracking-widest mb-1">Location</p>
-                    <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                  <div className="ml-3.5 sm:ml-6 min-w-0">
+                    <p className="text-xs sm:text-sm font-bold text-secondary uppercase tracking-widest mb-0.5 sm:mb-1">Location</p>
+                    <p className="text-gray-600 leading-relaxed whitespace-pre-line text-sm sm:text-base">
                       {settings?.communication?.address || '123, Instrument Square,\nIndustrial Area Phase II, Mohali,\nPunjab - 160062, India'}
                     </p>
                   </div>
@@ -156,25 +156,25 @@ export default function ContactForm() {
               </div>
 
               <div>
-                <h3 className="text-xl font-bold text-secondary mb-8 uppercase tracking-tighter border-b border-primary inline-block pb-2">Hours</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-secondary mb-4 sm:mb-6 uppercase tracking-tight border-b border-primary inline-block pb-1.5 sm:pb-2">Hours</h3>
                 <div className="flex items-start">
-                  <div className="w-12 h-12 bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary">
-                    <Clock className="w-6 h-6" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary">
+                    <Clock className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
-                  <div className="ml-6">
-                    <p className="text-sm font-bold text-secondary uppercase tracking-widest mb-1">Working Hours</p>
-                    <p className="text-gray-600">Monday - Saturday: 9:00 AM - 6:00 PM</p>
-                    <p className="text-gray-600">Sunday: Closed</p>
+                  <div className="ml-3.5 sm:ml-6 min-w-0">
+                    <p className="text-xs sm:text-sm font-bold text-secondary uppercase tracking-widest mb-0.5 sm:mb-1">Working Hours</p>
+                    <p className="text-gray-600 text-sm sm:text-base">Monday - Saturday: 9:00 AM - 6:00 PM</p>
+                    <p className="text-gray-600 text-sm sm:text-base">Sunday: Closed</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Form */}
-            <div className="lg:col-span-2 bg-gray-50 p-8 md:p-12 border border-gray-100 shadow-sm relative">
+            <div className="lg:col-span-2 bg-gray-50 p-5 sm:p-8 md:p-12 border border-gray-100 shadow-sm relative">
               <div className="absolute top-0 right-0 w-2 h-full bg-primary" />
-              <h3 className="text-2xl font-bold text-secondary mb-8 uppercase tracking-wider">Inquiry Form</h3>
-              <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <h3 className="text-xl sm:text-2xl font-bold text-secondary mb-5 sm:mb-8 uppercase tracking-wider">Inquiry Form</h3>
+              <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 <Input 
                   label="Your Name *" 
                   placeholder="Enter your full name" 

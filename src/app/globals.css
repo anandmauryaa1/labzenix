@@ -20,6 +20,7 @@
   * {
     @apply border-gray-100;
   }
+
   a,
   button,
   [role="button"],
@@ -40,34 +41,50 @@
   input[type="color"] {
     cursor: pointer;
   }
+
   body {
-    @apply bg-white text-gray-700 antialiased selection:bg-primary selection:text-white leading-relaxed;
+    @apply text-gray-700 antialiased selection:bg-primary selection:text-white leading-relaxed;
+    background-color: #f7f8fa;
   }
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-display text-secondary leading-tight;
     letter-spacing: 0.5px;
   }
+
   h1 {
     @apply text-3xl md:text-4xl font-bold mb-4 mt-6;
   }
+
   h2 {
     @apply text-2xl md:text-3xl font-bold mb-3 mt-6;
   }
+
   h3 {
     @apply text-xl md:text-2xl font-bold mb-3 mt-5;
   }
+
   h4 {
     @apply text-lg font-bold mb-2 mt-4;
   }
+
   h5 {
     @apply text-base font-bold mb-2 mt-3;
   }
+
   h6 {
     @apply text-sm font-bold mb-2 mt-3;
   }
+
   p {
     @apply text-gray-700 leading-relaxed mb-3.5;
   }
+
   li p {
     @apply mb-0 inline;
     margin-bottom: 0 !important;
@@ -78,50 +95,52 @@
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-[#004aad] to-[#000000];
   }
+
   .glass {
     @apply bg-white/90 backdrop-blur-sm border-b border-gray-100;
   }
+
   .section-padding {
     @apply py-16 md:py-24;
   }
-  
+
   /* Professional LabZenix Design System */
   .professional-border {
     @apply border border-gray-200 transition-all duration-300 hover:border-primary/50;
   }
-  
+
   .professional-card {
     @apply bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 hover:border-primary/50;
   }
-  
+
   .accent-line {
     @apply w-1 h-full bg-gradient-to-b from-primary via-primary/60 to-transparent;
   }
-  
+
   .accent-line-h {
     @apply h-1 w-full bg-gradient-to-r from-primary via-primary/60 to-transparent;
   }
-  
+
   .section-title {
     @apply text-3xl md:text-4xl font-black text-secondary tracking-tighter uppercase;
   }
-  
+
   .section-subtitle {
     @apply text-gray-500 font-medium text-sm md:text-base leading-relaxed;
   }
-  
+
   .btn-primary {
     @apply px-6 md:px-8 py-3 md:py-4 bg-primary text-white font-black uppercase tracking-widest text-xs md:text-sm hover:bg-secondary transition-all duration-300 shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105;
   }
-  
+
   .btn-secondary {
     @apply px-6 md:px-8 py-3 md:py-4 bg-secondary text-white font-black uppercase tracking-widest text-xs md:text-sm hover:bg-primary transition-all duration-300;
   }
-  
+
   .input-professional {
     @apply w-full px-4 py-3 bg-white border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-all duration-300 text-secondary font-medium;
   }
-  
+
   .badge-professional {
     @apply inline-block px-3 py-1 bg-primary/10 text-primary border border-primary/20 text-xs font-black uppercase tracking-widest rounded-none;
   }
@@ -182,17 +201,17 @@
 }
 
 .blog-content ul li,
-.blog-content ul > li,
+.blog-content ul>li,
 .prose ul li,
-.prose ul > li {
+.prose ul>li {
   @apply list-disc list-outside;
   list-style-type: disc !important;
 }
 
 .blog-content ol li,
-.blog-content ol > li,
+.blog-content ol>li,
 .prose ol li,
-.prose ol > li {
+.prose ol>li {
   @apply list-decimal list-outside;
   list-style-type: decimal !important;
 }
@@ -235,11 +254,28 @@
 
 
 @keyframes scan {
-  0% { top: 0; opacity: 0; }
-  5% { opacity: 0.5; }
-  50% { top: 100%; opacity: 0.5; }
-  95% { opacity: 0.5; }
-  100% { top: 100%; opacity: 0; }
+  0% {
+    top: 0;
+    opacity: 0;
+  }
+
+  5% {
+    opacity: 0.5;
+  }
+
+  50% {
+    top: 100%;
+    opacity: 0.5;
+  }
+
+  95% {
+    opacity: 0.5;
+  }
+
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
 }
 
 .animate-scan {
@@ -250,13 +286,16 @@
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #e5e7eb;
   border-radius: 10px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #d1d5db;
 }

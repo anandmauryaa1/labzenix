@@ -23,16 +23,16 @@ export default function OurProductRange() {
   }, []);
 
   return (
-    <section className="py-14 px-4 bg-gradient-to-b from-white to-gray-50 overflow-hidden border-b border-gray-100">
-      <div className="max-w-7xl mx-auto">
+    <section className="py-10 sm:py-14 px-[5px] sm:px-4 bg-gradient-to-b from-white to-gray-50 overflow-hidden border-b border-gray-100">
+      <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4">
         <FadeIn direction="up">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-16 gap-4 sm:gap-6">
             <div className="max-w-2xl">
-              <span className="block text-primary font-bold tracking-[0.3em] uppercase text-xs mb-4">Discover Categories</span>
-              <h2 className="text-4xl md:text-5xl font-black text-secondary uppercase tracking-tighter leading-tight">
+              <span className="block text-primary font-bold tracking-[0.3em] uppercase text-[10px] sm:text-xs mb-2 sm:mb-4">Discover Categories</span>
+              <h2 className="text-2xl sm:text-3xl md:text-5xl font-black text-secondary uppercase tracking-tight sm:tracking-tighter leading-tight">
                 Our Product Range
               </h2>
-              <p className="text-gray-600 mt-6 font-medium leading-relaxed">
+              <p className="text-xs sm:text-sm md:text-base text-gray-600 mt-3 sm:mt-6 font-medium leading-relaxed">
                 Our testing instruments help you examine constraints and are available in the following specialized ranges to ensure global quality standards.
               </p>
             </div>
@@ -44,13 +44,24 @@ export default function OurProductRange() {
           </div>
         </FadeIn>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10 lg:gap-12">
           {categories.slice(0, 12).map((cat, index) => (
             <FadeIn key={cat._id} direction="up" delay={index * 0.1}>
-              <div className="bg-white group overflow-hidden border border-gray-200 hover:border-primary hover:shadow-2xl transition-all duration-500 flex flex-col h-full rounded-none cursor-pointer relative">
-                
-                {/* Image/Icon Container */}
-                <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100 flex items-center justify-center border-b border-gray-100">
+              <div className="group h-full cursor-pointer" style={{ perspective: '1000px' }}>
+                <div
+                  style={{
+                    borderRadius: '4px',
+                    transition: 'transform 0.35s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.35s ease',
+                    transformStyle: 'preserve-3d',
+                    boxShadow: '0 20px 25px -5px rgba(0, 74, 173, 0.12), 0 8px 10px -6px rgba(0, 74, 173, 0.08)',
+                  }}
+                  className="bg-white overflow-hidden border border-gray-200 shadow-xl hover:shadow-2xl group-hover:[transform:translateY(-6px)_rotateX(2deg)] group-hover:[box-shadow:0_25px_50px_rgba(0,74,173,0.22),0_12px_24px_rgba(0,74,173,0.12),0_0_0_1px_rgba(0,74,173,0.16)] transition-all flex flex-col h-full relative"
+                >
+                  {/* Top gradient accent line */}
+                  <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-primary via-secondary to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30" />
+                  
+                  {/* Image/Icon Container */}
+                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100 flex items-center justify-center border-b border-gray-100">
                   
                   {cat.image ? (
                     <Image 
@@ -93,9 +104,9 @@ export default function OurProductRange() {
                     </div>
                   </div>
                 </div>
-
               </div>
-            </FadeIn>
+            </div>
+          </FadeIn>
           ))}
         </div>
       </div>
