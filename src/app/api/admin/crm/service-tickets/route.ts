@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
     }
 
     const tickets = await ServiceTicket.find(query)
-      .populate('company', 'name website address')
+      .populate('company', 'name company email phone address')
       .populate('assignedEngineer', 'name email')
       .sort({ createdAt: -1 });
 

@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { getPageMetadata } from '@/lib/seo';
 import FadeIn from '@/components/ui/FadeIn';
 import PageBanner from '@/components/ui/PageBanner';
+import BlogNewsletter from '@/components/blogs/BlogNewsletter';
 
 export async function generateMetadata() {
   return await getPageMetadata('blogs');
@@ -167,24 +168,7 @@ export default async function BlogPage({
       </section>
 
       {/* Newsletter */}
-      <section className="bg-secondary py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-primary/5 pattern-grid opacity-10" />
-        <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
-          <span className="text-primary font-black tracking-[0.3em] uppercase text-[10px] mb-4 block">Newsletter</span>
-          <h2 className="text-3xl md:text-5xl font-black text-white mb-6 uppercase tracking-tighter leading-none">Subscribe to Scientific Insights</h2>
-          <p className="text-lg text-gray-400 mb-12 font-medium">Get the latest technical articles and standards delivered to your inbox.</p>
-          <div className="flex flex-col sm:flex-row gap-4 max-w-2xl mx-auto bg-white/5 p-2 backdrop-blur-sm border border-white/10">
-            <input
-              type="email"
-              placeholder="Enter your business email"
-              className="flex-grow px-8 py-5 bg-transparent text-white outline-none font-bold uppercase tracking-widest text-xs placeholder:text-gray-600"
-            />
-            <button className="px-10 py-5 bg-primary text-white font-black uppercase tracking-[0.2em] text-[10px] hover:bg-white hover:text-secondary transition-all">
-              Subscribe
-            </button>
-          </div>
-        </div>
-      </section>
+      <BlogNewsletter />
     </div>
   );
 }

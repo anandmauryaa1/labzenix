@@ -36,8 +36,8 @@ export async function GET(req: NextRequest) {
     if (status) query.status = status;
 
     const quotations = await Quotation.find(query)
-      .populate('company', 'name industry website address')
-      .populate('contact', 'name email phone')
+      .populate('company', 'name company email phone address')
+      .populate('contact', 'name company email phone')
       .populate('items.product', 'name modelNumber')
       .sort({ createdAt: -1 });
 

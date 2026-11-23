@@ -82,7 +82,13 @@ export default function QuotationsManager() {
 
       if (companiesRes.ok) {
         const data = await companiesRes.json();
-        setCompanies(data.companies || []);
+        const contactList = Array.isArray(data) ? data : (data.contacts || []);
+        setCompanies(contactList);
+        setContactsList(contactList);
+        if (contactList.length > 0 && !companyId) {
+          setCompanyId(contactList[0]._id);
+          setContactId(contactList[0]._id);
+        }
       }
 
       if (productsRes.ok) {

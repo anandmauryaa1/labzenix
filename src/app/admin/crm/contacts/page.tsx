@@ -1,762 +1,1733 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, Fragment, useRef } from 'react';
 import { 
   Search, 
-  Filter, 
+  Plus, 
+  Filter as FilterIcon, 
+  ChevronDown, 
+  ChevronUp, 
+  Upload, 
+  Download, 
+  UserPlus, 
+  Trash2, 
+  Mail, 
+  FileText, 
+  MessageSquare, 
+  MoreVertical, 
+  Star, 
+  Edit, 
+  Send, 
+  Layers, 
+  Bell, 
+  X, 
   ChevronLeft, 
   ChevronRight, 
-  Plus, 
-  X, 
-  Phone, 
-  Mail, 
-  Clock, 
-  FileText,
-  User, 
-  Building2, 
-  Tag, 
-  Trash2,
-  Calendar,
-  Sparkles,
-  PhoneCall,
-  Activity
+  ChevronsLeft, 
+  ChevronsRight,
+  Phone,
+  Check,
+  Tag,
+  Clock,
+  CheckCircle2,
+  Bookmark
 } from 'lucide-react';
+import Link from 'next/link';
 import toast from 'react-hot-toast';
 
-export default function ContactsManagement() {
-  // Contacts list states
-  const [contacts, setContacts] = useState<any[]>([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
-  const [limit] = useState(20);
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+export default function ActiveCustomerPage() {
+  const [customers, setCustomers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'active' | 'deactive' | 'favorite' | 'duplicate'>('active');
+  const [tabCounts, setTabCounts] = useState({ active: 0, deactive: 0, favorite: 0, duplicate: 0 });
 
-  // Selected contact details panel
-  const [selectedContact, setSelectedContact] = useState<any>(null);
-  const [activities, setActivities] = useState<any[]>([]);
-  const [activitiesLoading, setActivitiesLoading] = useState(false);
+  // Search & Pagination
+  const [search, setSearch] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [total, setTotal] = useState(0);
 
-  // Create Contact states
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [newName, setNewName] = useState('');
-  const [newEmail, setNewEmail] = useState('');
-  const [newPhone, setNewPhone] = useState('');
-  const [newCompany, setNewCompany] = useState('');
-  const [newJobTitle, setNewJobTitle] = useState('');
-  const [newStatus, setNewStatus] = useState<'Lead' | 'Opportunity' | 'Customer' | 'Inactive'>('Lead');
-  const [newNotes, setNewNotes] = useState('');
+  // Expanded row IDs
+  const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
+  const [selectedCustomerIds, setSelectedCustomerIds] = useState<string[]>([]);
+  const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
 
-  // Call Dialer Widget states
-  const [isDialing, setIsDialing] = useState(false);
-  const [callTimer, setCallTimer] = useState(0);
-  const [callNotes, setCallNotes] = useState('');
-  const [callOutcome, setCallOutcome] = useState('Completed');
-  const callIntervalRef = useRef<any>(null);
+  // Modals state
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isAssignOpen, setIsAssignOpen] = useState(false);
+  const [isTagOpen, setIsTagOpen] = useState(false);
+  const [isReminderOpen, setIsReminderOpen] = useState(false);
+  const [isEmailOpen, setIsEmailOpen] = useState(false);
+  const [isNoteOpen, setIsNoteOpen] = useState(false);
+  const [isSendOpen, setIsSendOpen] = useState(false);
 
-  // Email Composer states
+  // Selected item for modals
+  const [currentCustomer, setCurrentCustomer] = useState<any>(null);
+
+  // Form states
+  const [formData, setFormData] = useState({
+    name: '',
+    company: '',
+    email: '',
+    phone: '',
+    gstNo: '',
+    address: '',
+    dob: '',
+    anniversaryDate: '',
+    convertedBy: 'Pooja Sharma',
+    rating: 0,
+    status: 'Active' as 'Active' | 'Deactive',
+    isFavorite: false
+  });
+
+  const [assigneeName, setAssigneeName] = useState('Pooja Sharma');
+  const [tagInput, setTagInput] = useState('');
+  const [reminderTitle, setReminderTitle] = useState('');
+  const [reminderDate, setReminderDate] = useState(new Date().toISOString().split('T')[0]);
+  const [reminderPriority, setReminderPriority] = useState('High');
+  const [noteContent, setNoteContent] = useState('');
   const [emailSubject, setEmailSubject] = useState('');
   const [emailBody, setEmailBody] = useState('');
-  const [isComposingEmail, setIsComposingEmail] = useState(false);
+  const [proposalType, setProposalType] = useState('Standard Product Quotation');
 
-  // Note composer states
-  const [noteContent, setNoteContent] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  // Debounce search
   useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      setPage(1);
-      fetchContacts();
-    }, 400);
+    fetchCustomers();
+  }, [activeTab, page, limit]);
 
-    return () => clearTimeout(delayDebounce);
-  }, [search, statusFilter]);
-
-  // Refetch when page changes
-  useEffect(() => {
-    fetchContacts();
-  }, [page]);
-
-  // Fetch activities when selected contact changes
-  useEffect(() => {
-    if (selectedContact) {
-      fetchActivities(selectedContact._id);
-    }
-  }, [selectedContact]);
-
-  async function fetchContacts() {
+  async function fetchCustomers() {
     setLoading(true);
     try {
-      const queryParams = new URLSearchParams({
+      const query = new URLSearchParams({
+        tab: activeTab,
         page: page.toString(),
         limit: limit.toString(),
-        search,
-        status: statusFilter,
-        sortBy: 'createdAt',
-        sortOrder: 'desc'
+        search
       });
-      const res = await fetch(`/api/admin/crm/contacts?${queryParams}`);
+      const res = await fetch(`/api/admin/crm/contacts?${query.toString()}`);
       if (res.ok) {
-        const payload = await res.json();
-        setContacts(payload.contacts);
-        setTotal(payload.total);
+        const data = await res.json();
+        setCustomers(data.contacts || []);
+        setTotal(data.pagination?.total || 0);
+        if (data.tabCounts) {
+          setTabCounts(data.tabCounts);
+        }
+        // Auto-expand first row if only 1 item like in screenshot
+        if (data.contacts?.length === 1) {
+          setExpandedRows({ [data.contacts[0]._id]: true });
+        }
       } else {
-        toast.error('Failed to load contacts');
+        toast.error('Failed to load customers');
       }
     } catch (err) {
-      toast.error('Error fetching contacts');
+      toast.error('Network error loading customers');
     } finally {
       setLoading(false);
     }
   }
 
-  async function fetchActivities(contactId: string) {
-    setActivitiesLoading(true);
-    try {
-      const res = await fetch(`/api/admin/crm/activities?contactId=${contactId}`);
-      if (res.ok) {
-        const data = await res.json();
-        setActivities(data);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setActivitiesLoading(false);
+  // Toggle single row accordion
+  function toggleRow(id: string) {
+    setExpandedRows(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  }
+
+  // Toggle select all
+  function toggleSelectAll() {
+    if (selectedCustomerIds.length === customers.length) {
+      setSelectedCustomerIds([]);
+    } else {
+      setSelectedCustomerIds(customers.map(c => c._id));
     }
   }
 
-  // Create CRM Contact
-  async function handleCreateContact(e: React.FormEvent) {
+  // Toggle select single
+  function toggleSelectCustomer(id: string) {
+    setSelectedCustomerIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  }
+
+  // Open Edit Modal
+  function handleOpenEdit(customer: any) {
+    setCurrentCustomer(customer);
+    setFormData({
+      name: customer.name || '',
+      company: customer.company || '',
+      email: customer.email || '',
+      phone: customer.phone || '',
+      gstNo: customer.gstNo || '',
+      address: customer.address || '',
+      dob: customer.dob || '',
+      anniversaryDate: customer.anniversaryDate || '',
+      convertedBy: customer.convertedBy || 'Pooja Sharma',
+      rating: customer.rating || 0,
+      status: customer.status === 'Deactive' ? 'Deactive' : 'Active',
+      isFavorite: !!customer.isFavorite
+    });
+    setIsEditOpen(true);
+    setActiveMenuId(null);
+  }
+
+  // Submit Edit
+  async function handleSaveEdit(e: React.FormEvent) {
     e.preventDefault();
+    if (!currentCustomer) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/admin/crm/contacts', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: currentCustomer._id,
+          ...formData
+        })
+      });
+      if (res.ok) {
+        toast.success('Customer updated successfully');
+        setIsEditOpen(false);
+        fetchCustomers();
+      } else {
+        const err = await res.json();
+        toast.error(err.error || 'Failed to update customer');
+      }
+    } catch (err) {
+      toast.error('Error saving customer');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  // Add customer handler
+  async function handleAddCustomer(e: React.FormEvent) {
+    e.preventDefault();
+    setSubmitting(true);
     try {
       const res = await fetch('/api/admin/crm/contacts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: newName,
-          email: newEmail,
-          phone: newPhone,
-          company: newCompany,
-          jobTitle: newJobTitle,
-          status: newStatus,
-          notes: newNotes,
-        })
+        body: JSON.stringify(formData)
       });
-
       if (res.ok) {
-        toast.success('Contact registered successfully');
-        setIsCreateOpen(false);
-        // Clear fields
-        setNewName('');
-        setNewEmail('');
-        setNewPhone('');
-        setNewCompany('');
-        setNewJobTitle('');
-        setNewNotes('');
-        fetchContacts();
+        toast.success('Customer added successfully!');
+        setIsAddOpen(false);
+        setFormData({
+          name: '',
+          company: '',
+          email: '',
+          phone: '',
+          gstNo: '',
+          address: '',
+          dob: '',
+          anniversaryDate: '',
+          convertedBy: 'Pooja Sharma',
+          rating: 0,
+          status: 'Active',
+          isFavorite: false
+        });
+        fetchCustomers();
       } else {
-        const errData = await res.json();
-        toast.error(errData.error || 'Failed to create contact');
+        const err = await res.json();
+        toast.error(err.error || 'Failed to add customer');
       }
     } catch (err) {
-      toast.error('Request failed');
+      toast.error('Error submitting customer form');
+    } finally {
+      setSubmitting(false);
     }
   }
 
-  // Call Dialer Actions
-  function startCall() {
-    setIsDialing(true);
-    setCallTimer(0);
-    setCallNotes('');
-    toast.success('Simulated call dialer connected');
-    callIntervalRef.current = setInterval(() => {
-      setCallTimer(prev => prev + 1);
-    }, 1000);
-  }
-
-  async function hangUpAndLog() {
-    if (callIntervalRef.current) {
-      clearInterval(callIntervalRef.current);
-    }
-    setIsDialing(false);
-
-    try {
-      const res = await fetch('/api/admin/crm/activities', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contact: selectedContact._id,
-          type: 'Call',
-          subject: 'Call Log',
-          description: `Logged call. Outcome: ${callOutcome}. Notes: ${callNotes || 'No notes entered.'}`,
-          duration: callTimer,
-          status: 'Completed'
-        })
-      });
-
-      if (res.ok) {
-        toast.success('Call logged to timeline');
-        fetchActivities(selectedContact._id);
-      } else {
-        toast.error('Failed to log call activity');
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  // Send Email simulated
-  async function sendEmailAndLog(e: React.FormEvent) {
+  // Assign Executive Submit
+  async function handleAssignExecutive(e: React.FormEvent) {
     e.preventDefault();
-    if (!emailSubject || !emailBody) {
-      toast.error('Email subject and body are required');
+    setSubmitting(true);
+    const targetIds = currentCustomer ? [currentCustomer._id] : selectedCustomerIds;
+    if (targetIds.length === 0) {
+      toast.error('No customer selected');
+      setSubmitting(false);
       return;
     }
 
     try {
-      const res = await fetch('/api/admin/crm/activities', {
-        method: 'POST',
+      const res = await fetch('/api/admin/crm/contacts', {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contact: selectedContact._id,
-          type: 'Email',
-          subject: emailSubject,
-          description: emailBody,
-          status: 'Sent'
+          ids: targetIds,
+          convertedBy: assigneeName
         })
       });
-
       if (res.ok) {
-        toast.success(`Email simulated & sent to ${selectedContact.email}`);
-        setIsComposingEmail(false);
-        setEmailSubject('');
-        setEmailBody('');
-        fetchActivities(selectedContact._id);
+        toast.success(`Assigned to ${assigneeName}`);
+        setIsAssignOpen(false);
+        fetchCustomers();
       } else {
-        toast.error('Failed to log email');
+        toast.error('Failed to assign');
       }
     } catch (err) {
-      console.error(err);
+      toast.error('Error saving assignment');
+    } finally {
+      setSubmitting(false);
     }
   }
 
-  // Log Note
-  async function logNote(e: React.FormEvent) {
+  // Add Tag Submit
+  async function handleSaveTag(e: React.FormEvent) {
     e.preventDefault();
-    if (!noteContent) return;
+    if (!currentCustomer || !tagInput.trim()) return;
+    setSubmitting(true);
+    try {
+      const existingTags = currentCustomer.tags || [];
+      const updatedTags = Array.from(new Set([...existingTags, tagInput.trim()]));
+      const res = await fetch('/api/admin/crm/contacts', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: currentCustomer._id,
+          tags: updatedTags
+        })
+      });
+      if (res.ok) {
+        toast.success(`Tag "${tagInput}" added`);
+        setTagInput('');
+        setIsTagOpen(false);
+        fetchCustomers();
+      } else {
+        toast.error('Failed to add tag');
+      }
+    } catch (err) {
+      toast.error('Error adding tag');
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
+  // Set Reminder Submit (Creates a CRM Task linked to this customer)
+  async function handleSetReminder(e: React.FormEvent) {
+    e.preventDefault();
+    if (!currentCustomer) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/admin/crm/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: reminderTitle || `Followup with ${currentCustomer.name}`,
+          description: `Reminder for customer ${currentCustomer.name} (${currentCustomer.company || ''})`,
+          dueDate: new Date(reminderDate).toISOString(),
+          priority: reminderPriority,
+          status: 'New',
+          contact: currentCustomer._id
+        })
+      });
+      if (res.ok) {
+        toast.success('Reminder task scheduled!');
+        setIsReminderOpen(false);
+        setReminderTitle('');
+      } else {
+        toast.error('Failed to schedule reminder');
+      }
+    } catch (err) {
+      toast.error('Error creating reminder task');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  // Add Note Submit (Creates an activity)
+  async function handleAddNote(e: React.FormEvent) {
+    e.preventDefault();
+    if (!currentCustomer || !noteContent.trim()) return;
+    setSubmitting(true);
     try {
       const res = await fetch('/api/admin/crm/activities', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contact: selectedContact._id,
+          contact: currentCustomer._id,
           type: 'Note',
-          subject: 'Internal Note Added',
-          description: noteContent,
+          subject: 'Customer Note',
+          description: noteContent.trim()
         })
       });
-
       if (res.ok) {
-        toast.success('Internal note saved');
+        toast.success('Note logged for customer');
         setNoteContent('');
-        fetchActivities(selectedContact._id);
+        setIsNoteOpen(false);
       } else {
         toast.error('Failed to save note');
       }
     } catch (err) {
-      console.error(err);
+      toast.error('Error saving note');
+    } finally {
+      setSubmitting(false);
     }
   }
 
-  // Apply templates to email body
-  function applyEmailTemplate(templateName: string) {
-    if (templateName === 'intro') {
-      setEmailSubject('Introduction: LabZenix Premium Equipment solutions');
-      setEmailBody(`Hi ${selectedContact.name},\n\nI am reaching out from LabZenix to follow up on your operations. We offer leading clinical lab instruments engineered for optimal precision.\n\nLet me know if we can set up a 10-minute demo call this week.\n\nBest regards,\nCRM Sales Team`);
-    } else if (templateName === 'proposal') {
-      setEmailSubject(`Pricing Quotation & Specs Proposal: ${selectedContact.company}`);
-      setEmailBody(`Hi ${selectedContact.name},\n\nFollowing up on our discussions, please find attached the requested lab instrumentation datasheet and pricing quotation.\n\nWe provide 24/7 technical support and customizable specs configurations to match your operations.\n\nBest regards,\nCRM Sales Team`);
+  // Send Proposal / Quotation Submit
+  async function handleSendProposal(e: React.FormEvent) {
+    e.preventDefault();
+    if (!currentCustomer) return;
+    setSubmitting(true);
+    try {
+      await new Promise(r => setTimeout(r, 600)); // simulate quick dispatch
+      toast.success(`${proposalType} sent to ${currentCustomer.email}`);
+      setIsSendOpen(false);
+    } finally {
+      setSubmitting(false);
     }
   }
 
-  const formatTimer = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
+  // Send Email Submit
+  function handleSendEmail(e: React.FormEvent) {
+    e.preventDefault();
+    if (!currentCustomer) return;
+    window.open(`mailto:${currentCustomer.email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`);
+    setIsEmailOpen(false);
+    toast.success('Email client opened');
+  }
+
+  // Open WhatsApp
+  function handleOpenWhatsApp(phone: string, name: string) {
+    if (!phone) {
+      toast.error('No phone number available');
+      return;
+    }
+    const cleanPhone = phone.replace(/\D/g, '');
+    const msg = encodeURIComponent(`Hello ${name}, this is from LabZenix Industries. How may we assist you today?`);
+    window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
+  }
+
+  // Toggle Favorite
+  async function toggleFavorite(customer: any) {
+    try {
+      const newFav = !customer.isFavorite;
+      await fetch('/api/admin/crm/contacts', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: customer._id, isFavorite: newFav })
+      });
+      toast.success(newFav ? 'Added to Favorites' : 'Removed from Favorites');
+      fetchCustomers();
+      setActiveMenuId(null);
+    } catch (err) {
+      toast.error('Error updating favorite');
+    }
+  }
+
+  // Toggle Deactivate / Activate
+  async function toggleStatus(customer: any) {
+    try {
+      const newStatus = customer.status === 'Deactive' ? 'Active' : 'Deactive';
+      await fetch('/api/admin/crm/contacts', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: customer._id, status: newStatus })
+      });
+      toast.success(`Customer marked as ${newStatus}`);
+      fetchCustomers();
+      setActiveMenuId(null);
+    } catch (err) {
+      toast.error('Error updating status');
+    }
+  }
+
+  // Update Rating
+  async function updateRating(id: string, rating: number) {
+    try {
+      setCustomers(prev => prev.map(c => c._id === id ? { ...c, rating } : c));
+      await fetch('/api/admin/crm/contacts', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, rating })
+      });
+      toast.success('Rating updated');
+    } catch (err) {
+      toast.error('Failed to update rating');
+    }
+  }
+
+  // Delete Single Customer
+  async function handleDeleteSingle(id: string) {
+    if (!confirm('Are you sure you want to delete this customer?')) return;
+    try {
+      const res = await fetch('/api/admin/crm/contacts', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+      if (res.ok) {
+        toast.success('Customer deleted');
+        fetchCustomers();
+      } else {
+        toast.error('Failed to delete customer');
+      }
+    } catch (err) {
+      toast.error('Error deleting');
+    }
+    setActiveMenuId(null);
+  }
+
+  // Bulk Delete
+  async function handleBulkDelete() {
+    if (selectedCustomerIds.length === 0) {
+      toast('Please select customers to delete', { icon: '⚠️' });
+      return;
+    }
+    if (!confirm(`Delete ${selectedCustomerIds.length} customer(s)?`)) return;
+
+    try {
+      const res = await fetch('/api/admin/crm/contacts', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: selectedCustomerIds })
+      });
+      if (res.ok) {
+        toast.success(`${selectedCustomerIds.length} customer(s) deleted`);
+        setSelectedCustomerIds([]);
+        fetchCustomers();
+      } else {
+        toast.error('Failed to delete');
+      }
+    } catch (err) {
+      toast.error('Error during deletion');
+    }
+  }
+
+  // CSV Import handler
+  async function handleFileImport(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const text = event.target?.result as string;
+        const rows = text.split('\n').filter(r => r.trim().length > 0);
+        if (rows.length < 2) {
+          toast.error('CSV file is empty or missing headers');
+          return;
+        }
+
+        let importedCount = 0;
+        // Parse CSV rows skipping header
+        for (let i = 1; i < rows.length; i++) {
+          const cols = rows[i].split(',').map(c => c.replace(/^["']|["']$/g, '').trim());
+          if (cols.length >= 2 && cols[1].includes('@')) {
+            await fetch('/api/admin/crm/contacts', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: cols[0] || 'Imported Customer',
+                email: cols[1],
+                phone: cols[2] || '',
+                company: cols[3] || '',
+                status: 'Active',
+                source: 'CSV Import'
+              })
+            });
+            importedCount++;
+          }
+        }
+        toast.success(`Imported ${importedCount} customers successfully!`);
+        fetchCustomers();
+      } catch (err) {
+        toast.error('Error parsing CSV file');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 relative min-h-[80vh]">
-      {/* Page Title & Controls */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black text-secondary tracking-tighter uppercase mb-2">Contacts Directory</h1>
-          <p className="text-gray-500 font-medium text-sm">Coordinate lab customers, filter status channels, and track calls/emails.</p>
-        </div>
-        <button
-          onClick={() => setIsCreateOpen(true)}
-          className="bg-primary text-white hover:bg-primary/95 text-xs font-black uppercase tracking-widest px-6 py-3 flex items-center shadow-lg shadow-primary/20"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Create Contact
-        </button>
-      </div>
+    <div className="space-y-4 max-w-[1700px] mx-auto pb-12 font-sans select-none text-slate-800">
+      
+      {/* Hidden File Input for CSV Import */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".csv"
+        onChange={handleFileImport}
+        className="hidden"
+      />
 
-      {/* Advanced Search & Filtering Toolbar */}
-      <div className="bg-white border border-gray-200 p-4 flex flex-col md:flex-row gap-4 justify-between items-center shadow-sm">
-        <div className="relative w-full md:w-96">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search by name, company, email..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 text-xs border border-gray-200 focus:border-primary focus:outline-none placeholder-gray-400 font-medium"
-          />
+      {/* Top Header Bar Matching Screenshot 3 */}
+      <div className="bg-white rounded-xl border border-slate-200/80 px-3.5 sm:px-5 py-3 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+        
+        {/* Title */}
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Active Customer</h1>
         </div>
 
-        <div className="flex gap-4 w-full md:w-auto">
-          <div className="flex items-center space-x-2 w-full md:w-auto">
-            <Filter className="w-4 h-4 text-gray-400" />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="border border-gray-200 px-3 py-2 text-xs focus:border-primary focus:outline-none font-medium text-gray-500 w-full md:w-auto"
-            >
-              <option value="">All Statuses</option>
-              <option value="Lead">Lead</option>
-              <option value="Opportunity">Opportunity</option>
-              <option value="Customer">Customer</option>
-              <option value="Inactive">Inactive</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Contacts Table List */}
-      <div className="bg-white border border-gray-200 shadow-sm overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-gray-50 border-b border-gray-100 text-[10px] font-black uppercase tracking-wider text-gray-400">
-              <th className="p-4 pl-6">Client Name</th>
-              <th className="p-4">Company</th>
-              <th className="p-4">Contact Info</th>
-              <th className="p-4">Status</th>
-              <th className="p-4 text-right pr-6">Action</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {loading ? (
-              [...Array(6)].map((_, idx) => (
-                <tr key={idx} className="animate-pulse">
-                  <td className="p-6 pl-6"><div className="h-4 w-28 bg-gray-100" /></td>
-                  <td className="p-6"><div className="h-4 w-36 bg-gray-100" /></td>
-                  <td className="p-6"><div className="h-4 w-40 bg-gray-100" /></td>
-                  <td className="p-6"><div className="h-6 w-16 bg-gray-100" /></td>
-                  <td className="p-6"><div className="h-4 w-12 bg-gray-100 ml-auto" /></td>
-                </tr>
-              ))
-            ) : contacts.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="p-20 text-center text-gray-400 text-xs font-bold">
-                  No contacts found in CRM matching current queries.
-                </td>
-              </tr>
-            ) : (
-              contacts.map((contact) => (
-                <tr 
-                  key={contact._id} 
-                  className="hover:bg-gray-50/50 cursor-pointer group transition-colors"
-                  onClick={() => setSelectedContact(contact)}
-                >
-                  <td className="p-4 pl-6">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-secondary text-white font-black text-xs flex items-center justify-center">
-                        {contact.name[0]?.toUpperCase()}
-                      </div>
-                      <div>
-                        <p className="text-xs font-black text-secondary group-hover:text-primary transition-colors">{contact.name}</p>
-                        <p className="text-[10px] text-gray-400">{contact.jobTitle || 'No Title'}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex items-center text-xs text-gray-500 font-bold">
-                      <Building2 className="w-3.5 h-3.5 mr-1.5 text-gray-300" />
-                      {contact.company || 'Private Buyer'}
-                    </div>
-                  </td>
-                  <td className="p-4 space-y-1">
-                    <p className="text-[10px] text-gray-400 font-bold flex items-center">
-                      <Mail className="w-3.5 h-3.5 mr-1.5 text-gray-300" />
-                      {contact.email}
-                    </p>
-                    {contact.phone && (
-                      <p className="text-[10px] text-gray-400 font-bold flex items-center">
-                        <Phone className="w-3.5 h-3.5 mr-1.5 text-gray-300" />
-                        {contact.phone}
-                      </p>
-                    )}
-                  </td>
-                  <td className="p-4">
-                    <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 border ${
-                      contact.status === 'Customer' 
-                        ? 'bg-green-50 border-green-200 text-green-700' 
-                        : contact.status === 'Opportunity'
-                        ? 'bg-amber-50 border-amber-200 text-amber-700'
-                        : contact.status === 'Inactive'
-                        ? 'bg-red-50 border-red-200 text-red-700'
-                        : 'bg-blue-50 border-blue-200 text-blue-700'
-                    }`}>
-                      {contact.status}
-                    </span>
-                  </td>
-                  <td className="p-4 text-right pr-6" onClick={(e) => e.stopPropagation()}>
-                    <button 
-                      onClick={() => setSelectedContact(contact)}
-                      className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline"
-                    >
-                      Log Activity
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination Footer */}
-      {!loading && contacts.length > 0 && (
-        <div className="flex items-center justify-between border-t border-gray-100 pt-4">
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-            Showing {(page - 1) * limit + 1} - {Math.min(page * limit, total)} of {total} Contacts
-          </span>
-          <div className="flex items-center space-x-2">
+        {/* Right Action Buttons */}
+        <div className="flex items-center flex-wrap gap-2">
+          
+          {/* Search Trigger */}
+          {isSearchOpen ? (
+            <div className="flex items-center relative w-full sm:w-auto">
+              <input
+                type="text"
+                autoFocus
+                placeholder="Search customers..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && fetchCustomers()}
+                className="text-xs px-3 py-1.5 pr-8 border border-slate-300 rounded-lg w-full sm:w-52 focus:outline-hidden focus:border-indigo-500"
+              />
+              <button 
+                onClick={() => { setIsSearchOpen(false); setSearch(''); }} 
+                className="absolute right-2 text-slate-400 hover:text-slate-600"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
             <button
-              onClick={() => setPage(prev => Math.max(prev - 1, 1))}
+              onClick={() => setIsSearchOpen(true)}
+              className="p-2 text-slate-500 hover:text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-lg transition"
+              title="Search"
+            >
+              <Search className="w-4 h-4" />
+            </button>
+          )}
+
+          {/* + Add Customer Button Matching Screenshot 3 */}
+          <button
+            onClick={() => setIsAddOpen(true)}
+            className="inline-flex items-center px-3 sm:px-4 py-1.5 text-xs font-bold text-white bg-[#372b7b] hover:bg-[#2e236b] rounded-lg shadow-xs transition"
+          >
+            <Plus className="w-4 h-4 mr-1" />
+            <span>Add Customer</span>
+          </button>
+
+          {/* Filter Dropdown */}
+          <button 
+            onClick={() => fetchCustomers()}
+            className="inline-flex items-center px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-lg transition"
+          >
+            <FilterIcon className="w-3.5 h-3.5 mr-1 text-slate-500" />
+            <span>Filter</span>
+            <ChevronDown className="w-3 h-3 ml-1 text-slate-400" />
+          </button>
+
+        </div>
+      </div>
+
+      {/* Sub-Tabs & Action Toolbar Matching Screenshot 3 */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+        
+        {/* Left Tabs: Active, Deactive, Favorite, Duplicate */}
+        <div className="flex items-center space-x-4 sm:space-x-6 overflow-x-auto pb-1.5 scroll-smooth border-b border-transparent">
+          <button
+            onClick={() => { setActiveTab('active'); setPage(1); }}
+            className={`pb-1.5 text-sm font-semibold transition relative flex items-center space-x-1.5 shrink-0 whitespace-nowrap ${
+              activeTab === 'active' ? 'text-[#372b7b]' : 'text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            <span>Active</span>
+            <span className="bg-[#ede9fe] text-[#5b21b6] text-xs px-2 py-0.2 rounded-full font-bold">
+              {tabCounts.active}
+            </span>
+            {activeTab === 'active' && (
+              <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#372b7b] rounded-full" />
+            )}
+          </button>
+
+          <button
+            onClick={() => { setActiveTab('deactive'); setPage(1); }}
+            className={`pb-1.5 text-sm font-semibold transition relative flex items-center space-x-1.5 shrink-0 whitespace-nowrap ${
+              activeTab === 'deactive' ? 'text-[#372b7b]' : 'text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            <span>Deactive</span>
+            <span className="bg-slate-100 text-slate-600 text-xs px-2 py-0.2 rounded-full font-bold">
+              {tabCounts.deactive}
+            </span>
+            {activeTab === 'deactive' && (
+              <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#372b7b] rounded-full" />
+            )}
+          </button>
+
+          <button
+            onClick={() => { setActiveTab('favorite'); setPage(1); }}
+            className={`pb-1.5 text-sm font-semibold transition relative flex items-center space-x-1.5 shrink-0 whitespace-nowrap ${
+              activeTab === 'favorite' ? 'text-[#372b7b]' : 'text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            <span>Favorite</span>
+            <span className="bg-slate-100 text-slate-600 text-xs px-2 py-0.2 rounded-full font-bold">
+              {tabCounts.favorite}
+            </span>
+            {activeTab === 'favorite' && (
+              <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#372b7b] rounded-full" />
+            )}
+          </button>
+
+          <button
+            onClick={() => { setActiveTab('duplicate'); setPage(1); }}
+            className={`pb-1.5 text-sm font-semibold transition relative flex items-center space-x-1.5 shrink-0 whitespace-nowrap ${
+              activeTab === 'duplicate' ? 'text-[#372b7b]' : 'text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            <span>Duplicate</span>
+            <span className="bg-slate-100 text-slate-600 text-xs px-2 py-0.2 rounded-full font-bold">
+              {tabCounts.duplicate}
+            </span>
+            {activeTab === 'duplicate' && (
+              <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#372b7b] rounded-full" />
+            )}
+          </button>
+        </div>
+
+        {/* Right Action Icons Toolbar Matching Screenshot 3 */}
+        <div className="flex items-center space-x-1 bg-white border border-slate-200/80 p-1 rounded-lg shadow-2xs overflow-x-auto max-w-full shrink-0">
+          
+          {/* Cloud Upload (Import CSV) */}
+          <button 
+            onClick={() => fileInputRef.current?.click()}
+            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition" 
+            title="Import Customers from CSV"
+          >
+            <Upload className="w-4 h-4" />
+          </button>
+
+          {/* Cloud Download (Export) */}
+          <button 
+            onClick={() => {
+              const csvContent = "data:text/csv;charset=utf-8," + ["Name,Email,Phone,Company,ConvertedDate"].concat(customers.map(c => `"${c.name}","${c.email}","${c.phone || ''}","${c.company || ''}","${c.convertedDate || ''}"`)).join("\n");
+              const encodedUri = encodeURI(csvContent);
+              const link = document.createElement("a");
+              link.setAttribute("href", encodedUri);
+              link.setAttribute("download", `customers_${new Date().toISOString().split('T')[0]}.csv`);
+              document.body.appendChild(link);
+              link.click();
+              toast.success('Customers exported to CSV');
+            }}
+            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition" 
+            title="Export Customers"
+          >
+            <Download className="w-4 h-4" />
+          </button>
+
+          {/* Bulk Assign user */}
+          <button 
+            onClick={() => {
+              if (selectedCustomerIds.length === 0) {
+                toast('Select customer(s) to assign', { icon: 'ℹ️' });
+                return;
+              }
+              setCurrentCustomer(null);
+              setIsAssignOpen(true);
+            }}
+            className="p-1.5 text-rose-500 hover:bg-rose-50 rounded transition" 
+            title="Assign Executive to Selected"
+          >
+            <UserPlus className="w-4 h-4" />
+          </button>
+
+          {/* Bulk Delete */}
+          <button 
+            onClick={handleBulkDelete}
+            className="p-1.5 text-rose-600 hover:bg-rose-50 rounded transition" 
+            title="Delete Selected"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+
+          {/* Mail */}
+          <button 
+            onClick={() => {
+              if (selectedCustomerIds.length === 0 && customers.length > 0) {
+                setCurrentCustomer(customers[0]);
+              } else if (selectedCustomerIds.length > 0) {
+                setCurrentCustomer(customers.find(c => c._id === selectedCustomerIds[0]));
+              }
+              setIsEmailOpen(true);
+            }}
+            className="p-1.5 text-purple-600 hover:bg-purple-50 rounded transition" 
+            title="Send Email"
+          >
+            <Mail className="w-4 h-4" />
+          </button>
+
+          {/* Note */}
+          <button 
+            onClick={() => {
+              if (selectedCustomerIds.length === 0 && customers.length > 0) {
+                setCurrentCustomer(customers[0]);
+              } else if (selectedCustomerIds.length > 0) {
+                setCurrentCustomer(customers.find(c => c._id === selectedCustomerIds[0]));
+              }
+              setIsNoteOpen(true);
+            }}
+            className="p-1.5 text-amber-600 hover:bg-amber-50 rounded transition" 
+            title="Add Note"
+          >
+            <FileText className="w-4 h-4" />
+          </button>
+
+          {/* WhatsApp */}
+          <button 
+            onClick={() => {
+              const target = selectedCustomerIds.length > 0 
+                ? customers.find(c => c._id === selectedCustomerIds[0]) 
+                : customers[0];
+              if (target) {
+                handleOpenWhatsApp(target.phone, target.name);
+              } else {
+                toast.error('No customer selected');
+              }
+            }}
+            className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded transition" 
+            title="Open WhatsApp"
+          >
+            <MessageSquare className="w-4 h-4" />
+          </button>
+
+          {/* Refresh / 3-dots */}
+          <button 
+            onClick={() => fetchCustomers()}
+            className="p-1.5 text-slate-500 hover:bg-slate-100 rounded transition" 
+            title="Refresh Customers"
+          >
+            <MoreVertical className="w-4 h-4" />
+          </button>
+        </div>
+
+      </div>
+
+      {/* Main Customers Table Matching Screenshot 3 */}
+      <div className="bg-white rounded-xl border border-slate-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.02)] overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs border-collapse">
+            
+            {/* Deep Navy/Purple Table Header */}
+            <thead className="bg-[#2b2553] text-white">
+              <tr>
+                <th className="py-3 px-3 w-10 text-center">
+                  <input
+                    type="checkbox"
+                    checked={customers.length > 0 && selectedCustomerIds.length === customers.length}
+                    onChange={toggleSelectAll}
+                    className="rounded border-slate-400 text-indigo-600 focus:ring-0 cursor-pointer"
+                  />
+                </th>
+                <th className="py-3 px-2 w-8 text-center">
+                  <ChevronDown className="w-4 h-4 mx-auto text-slate-300" />
+                </th>
+                <th className="py-3 px-3 w-12 text-center font-bold">No.</th>
+                <th className="py-3 px-4 font-bold">Actions</th>
+                <th className="py-3 px-4 font-bold">Customer Name</th>
+                <th className="py-3 px-4 font-bold">Email</th>
+                <th className="py-3 px-4 font-bold">Phone</th>
+                <th className="py-3 px-4 font-bold">Converted Date</th>
+                <th className="py-3 px-4 font-bold">Converted By</th>
+                <th className="py-3 px-4 font-bold">Rating</th>
+              </tr>
+            </thead>
+
+            {/* Table Body */}
+            <tbody className="divide-y divide-slate-100">
+              {customers.length === 0 ? (
+                <tr>
+                  <td colSpan={10} className="py-16 text-center text-slate-400">
+                    No active customers to display
+                  </td>
+                </tr>
+              ) : (
+                customers.map((c, index) => {
+                  const isExpanded = !!expandedRows[c._id];
+                  const isSelected = selectedCustomerIds.includes(c._id);
+                  const isMenuOpen = activeMenuId === c._id;
+
+                  return (
+                    <Fragment key={c._id}>
+                      {/* Main Customer Row */}
+                      <tr className={`hover:bg-slate-50/80 transition ${isSelected ? 'bg-indigo-50/30' : ''}`}>
+                        {/* Checkbox */}
+                        <td className="py-3.5 px-3 text-center">
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => toggleSelectCustomer(c._id)}
+                            className="rounded border-slate-300 text-indigo-600 focus:ring-0 cursor-pointer"
+                          />
+                        </td>
+
+                        {/* Expand Accordion Toggle */}
+                        <td className="py-3.5 px-2 text-center cursor-pointer" onClick={() => toggleRow(c._id)}>
+                          {isExpanded ? (
+                            <ChevronUp className="w-4 h-4 text-slate-500 mx-auto" />
+                          ) : (
+                            <ChevronDown className="w-4 h-4 text-slate-500 mx-auto" />
+                          )}
+                        </td>
+
+                        {/* Row Index */}
+                        <td className="py-3.5 px-3 text-center text-slate-700 font-semibold">
+                          {(page - 1) * limit + index + 1}
+                        </td>
+
+                        {/* Actions Row Matching Screenshot 3 */}
+                        <td className="py-3.5 px-4 relative">
+                          <div className="flex items-center space-x-1.5 text-slate-400">
+                            
+                            {/* Edit (Orange Pencil) */}
+                            <button 
+                              onClick={() => handleOpenEdit(c)}
+                              className="text-amber-500 hover:text-amber-600 hover:scale-110 transition p-1" 
+                              title="Edit Customer Details"
+                            >
+                              <Edit className="w-3.5 h-3.5" />
+                            </button>
+
+                            {/* Assign Executive (User+) */}
+                            <button 
+                              onClick={() => {
+                                setCurrentCustomer(c);
+                                setAssigneeName(c.convertedBy || 'Pooja Sharma');
+                                setIsAssignOpen(true);
+                              }}
+                              className="text-rose-500 hover:text-rose-600 hover:scale-110 transition p-1" 
+                              title="Assign Executive"
+                            >
+                              <UserPlus className="w-3.5 h-3.5" />
+                            </button>
+
+                            {/* Send Email */}
+                            <button 
+                              onClick={() => {
+                                setCurrentCustomer(c);
+                                setEmailSubject(`LabZenix - Following up with ${c.name}`);
+                                setIsEmailOpen(true);
+                              }}
+                              className="text-purple-600 hover:text-purple-700 hover:scale-110 transition p-1" 
+                              title="Send Email"
+                            >
+                              <Mail className="w-3.5 h-3.5" />
+                            </button>
+
+                            {/* WhatsApp (Green) */}
+                            <button 
+                              onClick={() => handleOpenWhatsApp(c.phone, c.name)}
+                              className="text-emerald-600 hover:text-emerald-700 hover:scale-110 transition p-1" 
+                              title="Chat on WhatsApp"
+                            >
+                              <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
+                            </button>
+
+                            {/* Send Proposal / Message */}
+                            <button 
+                              onClick={() => {
+                                setCurrentCustomer(c);
+                                setIsSendOpen(true);
+                              }}
+                              className="text-blue-500 hover:text-blue-600 hover:scale-110 transition p-1" 
+                              title="Send Quotation / Proposal"
+                            >
+                              <Send className="w-3.5 h-3.5" />
+                            </button>
+
+                            {/* Stack/Layers icon (Manage Tags) */}
+                            <button 
+                              onClick={() => {
+                                setCurrentCustomer(c);
+                                setIsTagOpen(true);
+                              }}
+                              className="text-indigo-500 hover:text-indigo-600 hover:scale-110 transition p-1" 
+                              title="Manage Tags"
+                            >
+                              <Layers className="w-3.5 h-3.5" />
+                            </button>
+
+                            {/* Notification Bell (Set Task Reminder) */}
+                            <button 
+                              onClick={() => {
+                                setCurrentCustomer(c);
+                                setReminderTitle(`Followup with ${c.name} regarding order`);
+                                setIsReminderOpen(true);
+                              }}
+                              className="text-amber-500 hover:text-amber-600 hover:scale-110 transition p-1" 
+                              title="Schedule Reminder Task"
+                            >
+                              <Bell className="w-3.5 h-3.5" />
+                            </button>
+
+                            {/* 3-dots Menu Button */}
+                            <div className="relative">
+                              <button 
+                                onClick={() => setActiveMenuId(isMenuOpen ? null : c._id)}
+                                className="text-slate-400 hover:text-slate-600 hover:scale-110 transition p-1" 
+                                title="More Actions"
+                              >
+                                <MoreVertical className="w-3.5 h-3.5" />
+                              </button>
+
+                              {/* Dropdown Menu */}
+                              {isMenuOpen && (
+                                <div className="absolute left-0 top-full mt-1 w-44 bg-white rounded-lg shadow-xl border border-slate-200 z-30 py-1 text-xs animate-in fade-in zoom-in-95">
+                                  <button
+                                    onClick={() => handleOpenEdit(c)}
+                                    className="w-full text-left px-3 py-1.5 hover:bg-slate-50 flex items-center text-slate-700"
+                                  >
+                                    <Edit className="w-3.5 h-3.5 mr-2 text-amber-500" />
+                                    Edit Customer
+                                  </button>
+                                  <button
+                                    onClick={() => toggleFavorite(c)}
+                                    className="w-full text-left px-3 py-1.5 hover:bg-slate-50 flex items-center text-slate-700"
+                                  >
+                                    <Bookmark className="w-3.5 h-3.5 mr-2 text-indigo-500" />
+                                    {c.isFavorite ? 'Remove Favorite' : 'Mark as Favorite'}
+                                  </button>
+                                  <button
+                                    onClick={() => toggleStatus(c)}
+                                    className="w-full text-left px-3 py-1.5 hover:bg-slate-50 flex items-center text-slate-700"
+                                  >
+                                    <CheckCircle2 className="w-3.5 h-3.5 mr-2 text-emerald-500" />
+                                    {c.status === 'Deactive' ? 'Mark as Active' : 'Deactivate'}
+                                  </button>
+                                  <div className="border-t border-slate-100 my-1" />
+                                  <button
+                                    onClick={() => handleDeleteSingle(c._id)}
+                                    className="w-full text-left px-3 py-1.5 hover:bg-rose-50 flex items-center text-rose-600 font-semibold"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5 mr-2 text-rose-500" />
+                                    Delete Customer
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+
+                          </div>
+                        </td>
+
+                        {/* Customer Name (Blue Clickable Link) */}
+                        <td 
+                          onClick={() => toggleRow(c._id)}
+                          className="py-3.5 px-4 font-semibold text-blue-600 hover:underline cursor-pointer"
+                        >
+                          {c.name}
+                        </td>
+
+                        {/* Email */}
+                        <td className="py-3.5 px-4 text-slate-600 max-w-[180px] truncate">
+                          {c.email}
+                        </td>
+
+                        {/* Phone */}
+                        <td className="py-3.5 px-4 text-slate-700 font-medium">
+                          {c.phone || '-'}
+                        </td>
+
+                        {/* Converted Date */}
+                        <td className="py-3.5 px-4 text-slate-600">
+                          {new Date(c.convertedDate || c.createdAt).toLocaleDateString()}{' '}
+                          {new Date(c.convertedDate || c.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </td>
+
+                        {/* Converted By */}
+                        <td className="py-3.5 px-4 text-slate-700 font-medium">
+                          {c.convertedBy || 'Pooja Sharma'}
+                        </td>
+
+                        {/* Rating (5 Stars) */}
+                        <td className="py-3.5 px-4">
+                          <div className="flex items-center space-x-0.5">
+                            {[1, 2, 3, 4, 5].map(star => (
+                              <button
+                                key={star}
+                                type="button"
+                                onClick={() => updateRating(c._id, star === c.rating ? 0 : star)}
+                                className="hover:scale-110 transition"
+                              >
+                                <Star 
+                                  className={`w-3.5 h-3.5 ${
+                                    star <= (c.rating || 0)
+                                      ? 'text-amber-400 fill-amber-400'
+                                      : 'text-slate-200'
+                                  }`} 
+                                />
+                              </button>
+                            ))}
+                          </div>
+                        </td>
+                      </tr>
+
+                      {/* Expandable 2-Column Accordion Card Matching Screenshot 3 */}
+                      {isExpanded && (
+                        <tr className="bg-slate-50/70 border-b border-slate-200">
+                          <td colSpan={10} className="p-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-8 text-xs text-slate-700 max-w-4xl">
+                              
+                              {/* Left Column */}
+                              <div className="space-y-2">
+                                <p><span className="font-semibold text-slate-900 w-36 inline-block">Customer Name :</span> {c.name}</p>
+                                <p><span className="font-semibold text-slate-900 w-36 inline-block">Company Name :</span> {c.company || '-'}</p>
+                                <p><span className="font-semibold text-slate-900 w-36 inline-block">Email :</span> {c.email}</p>
+                                <p><span className="font-semibold text-slate-900 w-36 inline-block">Phone :</span> {c.phone || '-'}</p>
+                                <p><span className="font-semibold text-slate-900 w-36 inline-block">GST No :</span> {c.gstNo || '-'}</p>
+                                <p><span className="font-semibold text-slate-900 w-36 inline-block">Address :</span> {c.address || '-'}</p>
+                              </div>
+
+                              {/* Right Column */}
+                              <div className="space-y-2">
+                                <p><span className="font-semibold text-slate-900 w-36 inline-block">Date Of Birth :</span> {c.dob || '-'}</p>
+                                <p><span className="font-semibold text-slate-900 w-36 inline-block">Anniversary Date :</span> {c.anniversaryDate || '-'}</p>
+                                <p><span className="font-semibold text-slate-900 w-36 inline-block">Created By :</span> {c.owner?.name || 'LabZenix Industries'}</p>
+                                <p><span className="font-semibold text-slate-900 w-36 inline-block">Converted By :</span> {c.convertedBy || 'Pooja Sharma'}</p>
+                                <p><span className="font-semibold text-slate-900 w-36 inline-block">Converted Date :</span> {new Date(c.convertedDate || c.createdAt).toLocaleDateString()} {new Date(c.convertedDate || c.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                                <p><span className="font-semibold text-slate-900 w-36 inline-block">Assign Tag :</span> {c.tags?.join(', ') || '-'}</p>
+                              </div>
+
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Table Pagination Footer Matching Screenshot 3 */}
+        <div className="px-5 py-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-500 gap-3">
+          <div className="flex items-center space-x-2">
+            <span>Rows per page:</span>
+            <select
+              value={limit}
+              onChange={e => { setLimit(parseInt(e.target.value)); setPage(1); }}
+              className="border border-slate-200 rounded px-2 py-0.5 bg-white text-slate-700 focus:outline-hidden"
+            >
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+            </select>
+            <span className="ml-4">
+              {total > 0 ? `${(page - 1) * limit + 1} - ${Math.min(page * limit, total)} of ${total}` : '0 - 0 of 0'}
+            </span>
+          </div>
+
+          <div className="flex items-center space-x-1">
+            <button
+              onClick={() => setPage(1)}
               disabled={page === 1}
-              className="p-2 border border-gray-200 disabled:opacity-40"
+              className="p-1 rounded hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent"
+            >
+              <ChevronsLeft className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="p-1 rounded hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
+            <span className="px-2 font-semibold text-slate-800">
+              {page} of {Math.max(1, Math.ceil(total / limit))}
+            </span>
             <button
-              onClick={() => setPage(prev => Math.min(prev + 1, Math.ceil(total / limit)))}
+              onClick={() => setPage(p => Math.min(Math.ceil(total / limit), p + 1))}
               disabled={page >= Math.ceil(total / limit)}
-              className="p-2 border border-gray-200 disabled:opacity-40"
+              className="p-1 rounded hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
+            <button
+              onClick={() => setPage(Math.ceil(total / limit))}
+              disabled={page >= Math.ceil(total / limit)}
+              className="p-1 rounded hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent"
+            >
+              <ChevronsRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
-      )}
 
-      {/* CREATE CONTACT SLIDEOVER MODAL */}
-      {isCreateOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden">
-          <div className="absolute inset-0 bg-secondary/50 backdrop-blur-sm" onClick={() => setIsCreateOpen(false)} />
-          <div className="absolute right-0 top-0 bottom-0 w-full md:w-[450px] bg-white shadow-2xl flex flex-col p-6 animate-in slide-in-from-right duration-300">
-            <div className="flex justify-between items-center border-b border-gray-100 pb-4 mb-6">
-              <h2 className="text-lg font-black text-secondary tracking-tight uppercase">New LabZenix Contact</h2>
-              <button onClick={() => setIsCreateOpen(false)} className="p-1 text-gray-400 hover:text-secondary">
+      </div>
+
+      {/* 1. Add Customer Modal */}
+      {isAddOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 border border-slate-100 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+              <h3 className="text-lg font-bold text-slate-900">Add New Active Customer</h3>
+              <button onClick={() => setIsAddOpen(false)} className="text-slate-400 hover:text-slate-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateContact} className="flex-1 overflow-y-auto space-y-4 pr-1">
-              <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase text-gray-400 tracking-wider">Full Name *</label>
+            <form onSubmit={handleAddCustomer} className="space-y-3.5 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Customer Name *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Vinod Kumar N"
+                    value={formData.name}
+                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Company Name *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Rakshini Colour Coats"
+                    value={formData.company}
+                    onChange={e => setFormData({ ...formData, company: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Email Address *</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="e.g. vinod@rakshinicoats.com"
+                    value={formData.email}
+                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Phone Number *</label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="e.g. 919916583133"
+                    value={formData.phone}
+                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">GST Number</label>
+                  <input
+                    type="text"
+                    placeholder="29AAAAA0000A1Z5"
+                    value={formData.gstNo}
+                    onChange={e => setFormData({ ...formData, gstNo: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Converted By</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Pooja Sharma"
+                    value={formData.convertedBy}
+                    onChange={e => setFormData({ ...formData, convertedBy: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">Full Address</label>
                 <input
                   type="text"
-                  required
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  className="w-full p-2.5 text-xs border border-gray-200 focus:border-primary focus:outline-none"
-                  placeholder="e.g. Dr. Sarah Jenkins"
+                  placeholder="No. 7/12, 15th Cross, Magadi Road, Bengaluru, Karnataka"
+                  value={formData.address}
+                  onChange={e => setFormData({ ...formData, address: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500"
                 />
               </div>
 
-              <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase text-gray-400 tracking-wider">Email Address *</label>
-                <input
-                  type="email"
-                  required
-                  value={newEmail}
-                  onChange={(e) => setNewEmail(e.target.value)}
-                  className="w-full p-2.5 text-xs border border-gray-200 focus:border-primary focus:outline-none"
-                  placeholder="e.g. sjenkins@labs.org"
-                />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Date Of Birth</label>
+                  <input
+                    type="date"
+                    value={formData.dob}
+                    onChange={e => setFormData({ ...formData, dob: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Anniversary Date</label>
+                  <input
+                    type="date"
+                    value={formData.anniversaryDate}
+                    onChange={e => setFormData({ ...formData, anniversaryDate: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500"
+                  />
+                </div>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase text-gray-400 tracking-wider">Phone Number</label>
-                <input
-                  type="text"
-                  value={newPhone}
-                  onChange={(e) => setNewPhone(e.target.value)}
-                  className="w-full p-2.5 text-xs border border-gray-200 focus:border-primary focus:outline-none"
-                  placeholder="e.g. +1 555-0199"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase text-gray-400 tracking-wider">Company / Institution</label>
-                <input
-                  type="text"
-                  value={newCompany}
-                  onChange={(e) => setNewCompany(e.target.value)}
-                  className="w-full p-2.5 text-xs border border-gray-200 focus:border-primary focus:outline-none"
-                  placeholder="e.g. Apex Diagnostics"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase text-gray-400 tracking-wider">Job Title</label>
-                <input
-                  type="text"
-                  value={newJobTitle}
-                  onChange={(e) => setNewJobTitle(e.target.value)}
-                  className="w-full p-2.5 text-xs border border-gray-200 focus:border-primary focus:outline-none"
-                  placeholder="e.g. Purchasing Manager"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase text-gray-400 tracking-wider">CRM Lifecycle Status</label>
-                <select
-                  value={newStatus}
-                  onChange={(e: any) => setNewStatus(e.target.value)}
-                  className="w-full p-2.5 text-xs border border-gray-200 focus:border-primary focus:outline-none text-gray-600"
+              <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsAddOpen(false)}
+                  className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg font-medium"
                 >
-                  <option value="Lead">Lead</option>
-                  <option value="Opportunity">Opportunity</option>
-                  <option value="Customer">Customer</option>
-                  <option value="Inactive">Inactive</option>
-                </select>
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="px-5 py-2 text-white bg-[#372b7b] hover:bg-[#2e236b] rounded-lg font-semibold shadow-xs disabled:opacity-50"
+                >
+                  {submitting ? 'Saving...' : 'Add Customer'}
+                </button>
               </div>
-
-              <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase text-gray-400 tracking-wider">Internal Lead Notes</label>
-                <textarea
-                  value={newNotes}
-                  onChange={(e) => setNewNotes(e.target.value)}
-                  rows={3}
-                  className="w-full p-2.5 text-xs border border-gray-200 focus:border-primary focus:outline-none"
-                  placeholder="Enter notes about instruments interest or contact history..."
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-primary text-white hover:bg-primary/95 text-xs font-black uppercase tracking-widest py-3 mt-4"
-              >
-                Register CRM Contact
-              </button>
             </form>
           </div>
         </div>
       )}
 
-      {/* CONTACT DETAILS DRAWER WITH MAIL & DIALER */}
-      {selectedContact && (
-        <div className="fixed inset-0 z-50 overflow-hidden flex justify-end">
-          <div className="absolute inset-0 bg-secondary/30 backdrop-blur-sm" onClick={() => setSelectedContact(null)} />
-          <div className="relative w-full md:w-[600px] bg-white h-full shadow-2xl flex flex-col p-6 animate-in slide-in-from-right duration-300 z-10 overflow-y-auto">
-            {/* Drawer Header */}
-            <div className="flex justify-between items-start border-b border-gray-100 pb-4 mb-6">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-secondary text-white font-black flex items-center justify-center">
-                  {selectedContact.name[0]?.toUpperCase()}
-                </div>
-                <div>
-                  <h2 className="text-base font-black text-secondary tracking-tight">{selectedContact.name}</h2>
-                  <p className="text-xs text-gray-400 font-bold">{selectedContact.jobTitle || 'No Title'} at {selectedContact.company || 'Private buyer'}</p>
-                </div>
-              </div>
-              <button onClick={() => setSelectedContact(null)} className="p-1 text-gray-400 hover:text-secondary">
+      {/* 2. Edit Customer Modal */}
+      {isEditOpen && currentCustomer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 border border-slate-100 animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+              <h3 className="text-lg font-bold text-slate-900">Edit Customer: {currentCustomer.name}</h3>
+              <button onClick={() => setIsEditOpen(false)} className="text-slate-400 hover:text-slate-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Quick Actions Panel: Dialer, Email, Notes */}
-            <div className="space-y-4 mb-6">
-              {/* Active simulated Dialer */}
-              {isDialing ? (
-                <div className="bg-red-50 border border-red-200 p-4 space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-red-700 flex items-center">
-                      <PhoneCall className="w-3.5 h-3.5 mr-1.5 animate-pulse" />
-                      Live Outbound Call: {formatTimer(callTimer)}
-                    </span>
-                    <button 
-                      onClick={hangUpAndLog}
-                      className="bg-red-600 hover:bg-red-700 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1.5"
-                    >
-                      Hang Up & Log
-                    </button>
-                  </div>
+            <form onSubmit={handleSaveEdit} className="space-y-3.5 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Customer Name *</label>
                   <input
                     type="text"
-                    placeholder="Enter call details/notes..."
-                    value={callNotes}
-                    onChange={(e) => setCallNotes(e.target.value)}
-                    className="w-full p-2 text-xs border border-red-200 focus:outline-none bg-white font-medium"
-                  />
-                  <div className="flex items-center space-x-2">
-                    <span className="text-[9px] font-bold text-gray-400 uppercase">Call Outcome:</span>
-                    <select
-                      value={callOutcome}
-                      onChange={(e) => setCallOutcome(e.target.value)}
-                      className="text-[9px] border border-red-200 px-2 py-1 text-gray-600 focus:outline-none font-bold"
-                    >
-                      <option value="Completed">Completed</option>
-                      <option value="No Answer">No Answer</option>
-                      <option value="Busy">Busy</option>
-                      <option value="Follow-up Required">Follow-up Required</option>
-                    </select>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex gap-2">
-                  <button
-                    onClick={startCall}
-                    className="flex-1 bg-green-600 text-white hover:bg-green-700 text-xs font-black uppercase tracking-widest py-3 flex items-center justify-center"
-                  >
-                    <Phone className="w-4 h-4 mr-2" />
-                    Trigger Call
-                  </button>
-                  <button
-                    onClick={() => setIsComposingEmail(!isComposingEmail)}
-                    className="flex-1 bg-primary text-white hover:bg-primary/95 text-xs font-black uppercase tracking-widest py-3 flex items-center justify-center"
-                  >
-                    <Mail className="w-4 h-4 mr-2" />
-                    Compose Email
-                  </button>
-                </div>
-              )}
-
-              {/* simulated Zoho-like Email panel */}
-              {isComposingEmail && (
-                <form onSubmit={sendEmailAndLog} className="bg-gray-50 border border-gray-200 p-4 space-y-3">
-                  <div className="flex justify-between items-center border-b border-gray-200 pb-2">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">Outbound Email Composer</span>
-                    <div className="flex gap-2">
-                      <button 
-                        type="button"
-                        onClick={() => applyEmailTemplate('intro')}
-                        className="text-[9px] font-black uppercase tracking-widest text-primary border border-primary/20 px-2 py-1 bg-white"
-                      >
-                        Intro Template
-                      </button>
-                      <button 
-                        type="button"
-                        onClick={() => applyEmailTemplate('proposal')}
-                        className="text-[9px] font-black uppercase tracking-widest text-primary border border-primary/20 px-2 py-1 bg-white"
-                      >
-                        Proposal Template
-                      </button>
-                    </div>
-                  </div>
-
-                  <input
-                    type="text"
-                    placeholder="Subject Line"
                     required
-                    value={emailSubject}
-                    onChange={(e) => setEmailSubject(e.target.value)}
-                    className="w-full p-2 text-xs border border-gray-200 focus:outline-none bg-white font-semibold"
+                    value={formData.name}
+                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500"
                   />
-                  <textarea
-                    placeholder="Compose message body..."
-                    required
-                    rows={4}
-                    value={emailBody}
-                    onChange={(e) => setEmailBody(e.target.value)}
-                    className="w-full p-2 text-xs border border-gray-200 focus:outline-none bg-white font-medium"
-                  />
-                  <div className="flex justify-end gap-2">
-                    <button 
-                      type="button" 
-                      onClick={() => setIsComposingEmail(false)}
-                      className="text-[10px] font-bold uppercase tracking-wider text-gray-400 px-3 py-1.5"
-                    >
-                      Cancel
-                    </button>
-                    <button 
-                      type="submit"
-                      className="bg-primary text-white text-[10px] font-black uppercase tracking-widest px-4 py-2"
-                    >
-                      Send & Log Mail
-                    </button>
-                  </div>
-                </form>
-              )}
-
-              {/* Note logger */}
-              {!isComposingEmail && !isDialing && (
-                <form onSubmit={logNote} className="flex gap-2">
+                </div>
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Company Name *</label>
                   <input
                     type="text"
-                    placeholder="Append internal deal note..."
-                    value={noteContent}
-                    onChange={(e) => setNoteContent(e.target.value)}
-                    className="flex-1 p-2.5 text-xs border border-gray-200 focus:border-primary focus:outline-none"
+                    required
+                    value={formData.company}
+                    onChange={e => setFormData({ ...formData, company: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500"
                   />
-                  <button
-                    type="submit"
-                    className="bg-secondary text-white hover:bg-secondary/95 text-xs font-black uppercase tracking-widest px-4"
-                  >
-                    Save Note
-                  </button>
-                </form>
-              )}
-            </div>
-
-            {/* Interaction Feed Timeline */}
-            <div className="space-y-4">
-              <h3 className="text-xs font-black text-secondary uppercase tracking-widest flex items-center border-b border-gray-100 pb-2">
-                <Activity className="w-4 h-4 mr-2 text-primary animate-pulse" />
-                Nurture Timeline Logs
-              </h3>
-
-              <div className="space-y-4 mt-4">
-                {activitiesLoading ? (
-                  <p className="text-xs text-gray-400 animate-pulse">Loading activity history...</p>
-                ) : activities.length === 0 ? (
-                  <p className="text-xs text-gray-400">No communication logs recorded for this contact.</p>
-                ) : (
-                  activities.map((act) => (
-                    <div key={act._id} className="relative border-l-2 border-gray-100 pl-4 pb-4 last:pb-0">
-                      <div className="absolute -left-[6px] top-1.5 w-2.5 h-2.5 rounded-full bg-primary" />
-                      <div className="bg-gray-50/50 border border-gray-100 p-3 shadow-inner rounded-none">
-                        <div className="flex items-center justify-between">
-                          <span className={`text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 border ${
-                            act.type === 'Call'
-                              ? 'bg-blue-50 border-blue-100 text-blue-700'
-                              : act.type === 'Email'
-                              ? 'bg-amber-50 border-amber-100 text-amber-700'
-                              : 'bg-green-50 border-green-100 text-green-700'
-                          }`}>
-                            {act.type} {act.duration ? `(${formatTimer(act.duration)})` : ''}
-                          </span>
-                          <span className="text-[10px] text-gray-400 font-medium">
-                            {new Date(act.date).toLocaleDateString()} {new Date(act.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                          </span>
-                        </div>
-                        <p className="text-xs font-black text-secondary uppercase tracking-tighter mt-2">{act.subject}</p>
-                        <p className="text-xs text-gray-500 mt-1 whitespace-pre-line font-medium leading-relaxed">{act.description}</p>
-                        <p className="text-[8px] text-gray-400 font-bold uppercase mt-2">Operator: {act.createdBy?.name || 'System'}</p>
-                      </div>
-                    </div>
-                  ))
-                )}
+                </div>
               </div>
-            </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Email Address *</label>
+                  <input
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Phone Number</label>
+                  <input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">GST Number</label>
+                  <input
+                    type="text"
+                    value={formData.gstNo}
+                    onChange={e => setFormData({ ...formData, gstNo: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Converted By</label>
+                  <input
+                    type="text"
+                    value={formData.convertedBy}
+                    onChange={e => setFormData({ ...formData, convertedBy: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">Full Address</label>
+                <input
+                  type="text"
+                  value={formData.address}
+                  onChange={e => setFormData({ ...formData, address: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Status</label>
+                  <select
+                    value={formData.status}
+                    onChange={e => setFormData({ ...formData, status: e.target.value as any })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500 bg-white"
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Deactive">Deactive</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Rating (1-5)</label>
+                  <select
+                    value={formData.rating}
+                    onChange={e => setFormData({ ...formData, rating: parseInt(e.target.value) || 0 })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500 bg-white"
+                  >
+                    <option value="0">No Rating</option>
+                    <option value="1">1 Star</option>
+                    <option value="2">2 Stars</option>
+                    <option value="3">3 Stars</option>
+                    <option value="4">4 Stars</option>
+                    <option value="5">5 Stars</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsEditOpen(false)}
+                  className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="px-5 py-2 text-white bg-[#372b7b] hover:bg-[#2e236b] rounded-lg font-semibold shadow-xs disabled:opacity-50"
+                >
+                  {submitting ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
+
+      {/* 3. Assign Executive Modal */}
+      {isAssignOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-6 border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
+            <h3 className="text-base font-bold text-slate-900 mb-3">Assign Executive</h3>
+            <p className="text-xs text-slate-500 mb-4">
+              Assign {currentCustomer ? currentCustomer.name : `${selectedCustomerIds.length} selected customer(s)`} to an account manager:
+            </p>
+
+            <form onSubmit={handleAssignExecutive} className="space-y-4 text-xs">
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">Executive Name</label>
+                <select
+                  value={assigneeName}
+                  onChange={e => setAssigneeName(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500 bg-white"
+                >
+                  <option value="Pooja Sharma">Pooja Sharma (Senior Executive)</option>
+                  <option value="LabZenix Industries">LabZenix Industries (HQ Operations)</option>
+                  <option value="Alok Kumar">Alok Kumar (Field Service Lead)</option>
+                  <option value="Rajesh Gupta">Rajesh Gupta (Account Manager)</option>
+                </select>
+              </div>
+
+              <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsAssignOpen(false)}
+                  className="px-3 py-1.5 text-slate-600 hover:bg-slate-100 rounded-lg"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="px-4 py-1.5 text-white bg-[#372b7b] hover:bg-[#2e236b] rounded-lg font-semibold"
+                >
+                  {submitting ? 'Assigning...' : 'Confirm Assignment'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 4. Tag Customer Modal */}
+      {isTagOpen && currentCustomer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-6 border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
+            <h3 className="text-base font-bold text-slate-900 mb-2">Manage Customer Tags</h3>
+            <p className="text-xs text-slate-500 mb-3">Add tags to categorize {currentCustomer.name}:</p>
+
+            {/* Existing tags */}
+            <div className="flex flex-wrap gap-1.5 mb-4">
+              {currentCustomer.tags?.length > 0 ? (
+                currentCustomer.tags.map((t: string, i: number) => (
+                  <span key={i} className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-indigo-50 text-indigo-700 font-medium">
+                    {t}
+                  </span>
+                ))
+              ) : (
+                <span className="text-xs text-slate-400">No tags assigned yet.</span>
+              )}
+            </div>
+
+            <form onSubmit={handleSaveTag} className="space-y-4 text-xs">
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">New Tag Name</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. VIP, Wholesale, Priority"
+                  value={tagInput}
+                  onChange={e => setTagInput(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500"
+                />
+              </div>
+
+              <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsTagOpen(false)}
+                  className="px-3 py-1.5 text-slate-600 hover:bg-slate-100 rounded-lg"
+                >
+                  Close
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="px-4 py-1.5 text-white bg-[#372b7b] hover:bg-[#2e236b] rounded-lg font-semibold"
+                >
+                  {submitting ? 'Adding...' : 'Add Tag'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 5. Schedule Reminder Task Modal */}
+      {isReminderOpen && currentCustomer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
+            <h3 className="text-base font-bold text-slate-900 mb-1">Schedule Reminder / Task</h3>
+            <p className="text-xs text-slate-500 mb-4">Linked to: <strong className="text-slate-800">{currentCustomer.name}</strong> ({currentCustomer.company})</p>
+
+            <form onSubmit={handleSetReminder} className="space-y-3.5 text-xs">
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">Reminder Action *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Followup call regarding spectrophotometer pricing"
+                  value={reminderTitle}
+                  onChange={e => setReminderTitle(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Due Date</label>
+                  <input
+                    type="date"
+                    required
+                    value={reminderDate}
+                    onChange={e => setReminderDate(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Priority</label>
+                  <select
+                    value={reminderPriority}
+                    onChange={e => setReminderPriority(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500 bg-white"
+                  >
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsReminderOpen(false)}
+                  className="px-3 py-1.5 text-slate-600 hover:bg-slate-100 rounded-lg"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="px-4 py-1.5 text-white bg-[#372b7b] hover:bg-[#2e236b] rounded-lg font-semibold"
+                >
+                  {submitting ? 'Scheduling...' : 'Set Reminder'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 6. Send Proposal Modal */}
+      {isSendOpen && currentCustomer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-6 border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
+            <h3 className="text-base font-bold text-slate-900 mb-1">Dispatch Proposal / Quotation</h3>
+            <p className="text-xs text-slate-500 mb-4">Send document to <strong className="text-slate-800">{currentCustomer.name}</strong> ({currentCustomer.email})</p>
+
+            <form onSubmit={handleSendProposal} className="space-y-4 text-xs">
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">Document Type</label>
+                <select
+                  value={proposalType}
+                  onChange={e => setProposalType(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500 bg-white"
+                >
+                  <option value="Standard Product Quotation">Standard Product Quotation (PDF)</option>
+                  <option value="AMC & Calibration Agreement">AMC & Calibration Agreement</option>
+                  <option value="Lab Equipment Technical Datasheet">Lab Equipment Technical Datasheet</option>
+                  <option value="Commercial Invoice Draft">Commercial Invoice Draft</option>
+                </select>
+              </div>
+
+              <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsSendOpen(false)}
+                  className="px-3 py-1.5 text-slate-600 hover:bg-slate-100 rounded-lg"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="px-4 py-1.5 text-white bg-[#372b7b] hover:bg-[#2e236b] rounded-lg font-semibold"
+                >
+                  {submitting ? 'Dispatching...' : 'Send Document'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 7. Quick Email Modal */}
+      {isEmailOpen && currentCustomer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
+            <h3 className="text-base font-bold text-slate-900 mb-1">Email {currentCustomer.name}</h3>
+            <p className="text-xs text-slate-500 mb-4">Recipient: <strong className="text-slate-800">{currentCustomer.email}</strong></p>
+
+            <form onSubmit={handleSendEmail} className="space-y-3.5 text-xs">
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">Subject</label>
+                <input
+                  type="text"
+                  required
+                  value={emailSubject}
+                  onChange={e => setEmailSubject(e.target.value)}
+                  placeholder="e.g. LabZenix Product Inquiries & Support"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">Message Body</label>
+                <textarea
+                  rows={4}
+                  value={emailBody}
+                  onChange={e => setEmailBody(e.target.value)}
+                  placeholder="Write your email message..."
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500"
+                />
+              </div>
+
+              <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsEmailOpen(false)}
+                  className="px-3 py-1.5 text-slate-600 hover:bg-slate-100 rounded-lg"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-1.5 text-white bg-[#372b7b] hover:bg-[#2e236b] rounded-lg font-semibold"
+                >
+                  Open Email Client
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 8. Quick Note Modal */}
+      {isNoteOpen && currentCustomer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-6 border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
+            <h3 className="text-base font-bold text-slate-900 mb-1">Add Note for {currentCustomer.name}</h3>
+            <p className="text-xs text-slate-500 mb-3">Logs an internal timeline note on this customer record.</p>
+
+            <form onSubmit={handleAddNote} className="space-y-3.5 text-xs">
+              <div>
+                <textarea
+                  rows={4}
+                  required
+                  value={noteContent}
+                  onChange={e => setNoteContent(e.target.value)}
+                  placeholder="e.g. Client requested customized spectrophotometer fixtures for Q4."
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500"
+                />
+              </div>
+
+              <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsNoteOpen(false)}
+                  className="px-3 py-1.5 text-slate-600 hover:bg-slate-100 rounded-lg"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="px-4 py-1.5 text-white bg-[#372b7b] hover:bg-[#2e236b] rounded-lg font-semibold"
+                >
+                  {submitting ? 'Saving...' : 'Save Note'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

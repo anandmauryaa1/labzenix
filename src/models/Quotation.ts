@@ -30,8 +30,8 @@ if (mongoose.models && mongoose.models.Quotation) {
 
 const QuotationSchema = new mongoose.Schema<IQuotation>({
   quotationNumber: { type: String, required: true, unique: true },
-  company: { type: mongoose.Schema.Types.ObjectId, ref: 'Company', required: true },
-  contact: { type: mongoose.Schema.Types.ObjectId, ref: 'Contact', required: true },
+  company: { type: mongoose.Schema.Types.ObjectId, ref: 'CrmContact', required: true },
+  contact: { type: mongoose.Schema.Types.ObjectId, ref: 'CrmContact', required: true },
   items: [{
     product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
     quantity: { type: Number, required: true, default: 1 },

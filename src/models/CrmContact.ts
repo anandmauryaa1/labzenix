@@ -6,11 +6,20 @@ export interface ICrmContact extends mongoose.Document {
   phone?: string;
   company?: string;
   jobTitle?: string;
-  status: 'Lead' | 'Opportunity' | 'Customer' | 'Inactive';
+  status: 'Active' | 'Deactive' | 'Lead' | 'Opportunity' | 'Customer' | 'Inactive';
   owner?: mongoose.Types.ObjectId;
   source: string;
   notes?: string;
   tags?: string[];
+  rating?: number;
+  convertedDate?: Date;
+  convertedBy?: string;
+  address?: string;
+  gstNo?: string;
+  dob?: string;
+  anniversaryDate?: string;
+  isFavorite?: boolean;
+  isDuplicate?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -27,14 +36,23 @@ const CrmContactSchema = new mongoose.Schema<ICrmContact>({
   jobTitle: { type: String, trim: true },
   status: { 
     type: String, 
-    enum: ['Lead', 'Opportunity', 'Customer', 'Inactive'], 
-    default: 'Lead',
+    enum: ['Active', 'Deactive', 'Lead', 'Opportunity', 'Customer', 'Inactive'], 
+    default: 'Active',
     required: true 
   },
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   source: { type: String, default: 'Manual Entry' },
   notes: { type: String },
   tags: { type: [String], default: [] },
+  rating: { type: Number, default: 0 },
+  convertedDate: { type: Date, default: Date.now },
+  convertedBy: { type: String, default: 'LabZenix Industries' },
+  address: { type: String },
+  gstNo: { type: String },
+  dob: { type: String },
+  anniversaryDate: { type: String },
+  isFavorite: { type: Boolean, default: false },
+  isDuplicate: { type: Boolean, default: false },
 }, { 
   timestamps: true 
 });

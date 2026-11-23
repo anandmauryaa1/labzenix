@@ -43,7 +43,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         if (updatedCampaign.slug === 'bursting-strength-tester') {
           revalidatePath('/campaign/bursting-strength-tester');
         }
-      } catch (_) {}
+      } catch (_) { }
     }
 
     return NextResponse.json(updatedCampaign, { status: 200 });
@@ -69,7 +69,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
       await delCache(`campaign:${deletedCampaign.slug}`);
       try {
         revalidatePath(`/campaign/${deletedCampaign.slug}`);
-      } catch (_) {}
+      } catch (_) { }
     }
 
     return NextResponse.json({ message: 'Campaign deleted successfully' }, { status: 200 });

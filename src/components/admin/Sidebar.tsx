@@ -26,7 +26,9 @@ import {
   Quote,
   Scale,
   Wrench,
-  Megaphone
+  Megaphone,
+  Filter,
+  Inbox
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -246,13 +248,6 @@ export default function Sidebar() {
       group: 'CRM & Leads',
       items: [
         { 
-          title: 'Inquiries', 
-          href: '/admin/inquiries', 
-          icon: MessageSquare,
-          roles: ['admin', 'marketing'],
-          permission: 'inquiries'
-        },
-        { 
           title: 'CRM Dashboard', 
           href: '/admin/crm', 
           icon: LayoutDashboard,
@@ -260,16 +255,30 @@ export default function Sidebar() {
           permission: 'inquiries'
         },
         { 
-          title: 'Contacts', 
+          title: 'Form Entries', 
+          href: '/admin/inquiries', 
+          icon: Inbox,
+          roles: ['admin', 'marketing'],
+          permission: 'inquiries'
+        },
+        { 
+          title: 'Leads', 
+          href: '/admin/crm/leads', 
+          icon: Filter,
+          roles: ['admin', 'marketing'],
+          permission: 'inquiries'
+        },
+        { 
+          title: 'Active Customers', 
           href: '/admin/crm/contacts', 
           icon: UserCircle,
           roles: ['admin', 'marketing'],
           permission: 'inquiries'
         },
         { 
-          title: 'Deals Board', 
-          href: '/admin/crm/deals', 
-          icon: Handshake,
+          title: 'Tasks', 
+          href: '/admin/crm/tasks', 
+          icon: Quote,
           roles: ['admin', 'marketing'],
           permission: 'inquiries'
         },
@@ -291,13 +300,6 @@ export default function Sidebar() {
           title: 'AMC & Calibration', 
           href: '/admin/crm/amc', 
           icon: ShieldCheck,
-          roles: ['admin', 'marketing'],
-          permission: 'inquiries'
-        },
-        { 
-          title: 'CRM Tasks', 
-          href: '/admin/crm/tasks', 
-          icon: Quote,
           roles: ['admin', 'marketing'],
           permission: 'inquiries'
         },

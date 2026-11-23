@@ -37,17 +37,17 @@ const nextConfig: NextConfig = {
     // Build the Content-Security-Policy directives
     const ContentSecurityPolicy = [
       `default-src 'self'`,
-      // Next.js requires unsafe-inline + unsafe-eval; Tawk.to loads from embed.tawk.to; YouTube player scripts
-      `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://embed.tawk.to https://*.tawk.to https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com https://www.youtube.com https://s.ytimg.com`,
+      // Next.js requires unsafe-inline + unsafe-eval; Tawk.to loads from embed.tawk.to; YouTube player scripts; Google Maps
+      `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://embed.tawk.to https://*.tawk.to https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com https://www.youtube.com https://s.ytimg.com https://maps.googleapis.com https://*.google.com`,
       `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.tawk.to`,
-      // Cloudinary images + YouTube thumbnails (i.ytimg.com) + Tawk.to agent avatars
-      `img-src 'self' data: blob: https://res.cloudinary.com https://images.pexels.com https://images.unsplash.com https://*.tawk.to https://www.googletagmanager.com https://i.ytimg.com https://*.youtube.com`,
+      // Cloudinary images + YouTube thumbnails (i.ytimg.com) + Tawk.to agent avatars + Google Maps tiles
+      `img-src 'self' data: blob: https://res.cloudinary.com https://images.pexels.com https://images.unsplash.com https://*.tawk.to https://www.googletagmanager.com https://i.ytimg.com https://*.youtube.com https://*.google.com https://*.googleapis.com https://*.gstatic.com https://maps.gstatic.com`,
       `font-src 'self' https://fonts.gstatic.com https://*.tawk.to`,
-      // Tawk.to uses wss:// WebSocket for real-time chat; YouTube player APIs
-      `connect-src 'self' https://*.tawk.to wss://*.tawk.to https://www.google-analytics.com https://stats.g.doubleclick.net https://www.youtube.com`,
+      // Tawk.to uses wss:// WebSocket for real-time chat; YouTube player APIs; Google APIs
+      `connect-src 'self' https://*.tawk.to wss://*.tawk.to https://www.google-analytics.com https://stats.g.doubleclick.net https://www.youtube.com https://*.google.com https://maps.googleapis.com`,
       `media-src 'self' https://res.cloudinary.com https://*.tawk.to`,
-      // Tawk.to widget renders inside an iframe — must allow it, plus YouTube for product videos (including privacy-enhanced nocookie URLs)
-      `frame-src 'self' https://tawk.to https://*.tawk.to https://www.youtube.com https://youtube.com https://*.youtube.com https://www.youtube-nocookie.com https://youtube-nocookie.com https://*.youtube-nocookie.com`,
+      // Tawk.to widget renders inside an iframe — must allow it, plus YouTube for product videos and Google Maps embeds
+      `frame-src 'self' https://tawk.to https://*.tawk.to https://www.youtube.com https://youtube.com https://*.youtube.com https://www.youtube-nocookie.com https://youtube-nocookie.com https://*.youtube-nocookie.com https://www.google.com https://google.com https://*.google.com https://maps.google.com https://*.googleusercontent.com`,
       // Prevent THIS site from being embedded inside other sites (anti-clickjacking)
       // Note: 'none' here means no external site can embed us — Tawk.to embeds itself, not us
       `frame-ancestors 'self'`,

@@ -2,11 +2,12 @@ import dbConnect from '@/lib/dbConnect';
 import Blog from '@/models/Blog';
 import { logger } from '@/lib/logger';
 import { notFound } from 'next/navigation';
-import { Calendar, User, ArrowRight, Share2, Globe, MessageSquare, Link as LinkIcon, Mail, Eye, Sparkles, TrendingUp } from 'lucide-react';
+import { Calendar, User, ArrowRight, Eye, Sparkles, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Button from '@/components/ui/Button';
 import SidebarContactForm from '@/components/blogs/SidebarContactForm';
+import BlogShareButtons from '@/components/blogs/BlogShareButtons';
 import PageBanner from '@/components/ui/PageBanner';
 import { cachedFetch } from '@/lib/cache';
 import { getOptimizedImageUrl } from '@/lib/image';
@@ -239,22 +240,8 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
                     <div>
                       <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-500 mb-4">Share this Article</h4>
-                      <div className="flex items-center space-x-3">
-                        <button className="w-10 h-10 flex items-center justify-center bg-gray-100 text-secondary hover:bg-primary hover:text-white transition-all duration-300 rounded">
-                          <Globe className="w-4 h-4" />
-                        </button>
-                        <button className="w-10 h-10 flex items-center justify-center bg-gray-100 text-secondary hover:bg-primary hover:text-white transition-all duration-300 rounded">
-                          <MessageSquare className="w-4 h-4" />
-                        </button>
-                        <button className="w-10 h-10 flex items-center justify-center bg-gray-100 text-secondary hover:bg-primary hover:text-white transition-all duration-300 rounded">
-                          <LinkIcon className="w-4 h-4" />
-                        </button>
-                        <button className="w-10 h-10 flex items-center justify-center bg-gray-100 text-secondary hover:bg-primary hover:text-white transition-all duration-300 rounded">
-                          <Mail className="w-4 h-4" />
-                        </button>
-                      </div>
+                      <BlogShareButtons title={blog.title} slug={blog.slug} />
                     </div>
-
                   </div>
                 </div>
               </article>

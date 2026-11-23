@@ -120,7 +120,7 @@ export default function AmcTracker() {
                     <td className="p-4">
                       <div className="flex items-center text-xs text-gray-500 font-bold">
                         <Building2 className="w-3.5 h-3.5 mr-1.5 text-gray-300" />
-                        {rec.company?.name || 'Customer Account'}
+                        {rec.company?.company || rec.company?.name || 'Customer Account'}
                       </div>
                     </td>
                     <td className="p-4 text-xs font-bold text-gray-500">

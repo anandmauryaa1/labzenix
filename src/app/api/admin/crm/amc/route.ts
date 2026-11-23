@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
     }
 
     const records = await AMCRecord.find(query)
-      .populate('company', 'name website address')
+      .populate('company', 'name company email phone address')
       .sort({ calibrationDueDate: 1 });
 
     // Automated Alert Evaluation (System Cron simulator)

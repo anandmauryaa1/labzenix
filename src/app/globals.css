@@ -282,6 +282,27 @@
   animation: scan 4s linear infinite;
 }
 
+/* Continuous Infinite Marquee Loop */
+@keyframes infinite-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-infinite-scroll {
+  display: flex;
+  width: max-content;
+  animation: infinite-scroll 45s linear infinite;
+  will-change: transform;
+}
+
+.animate-infinite-scroll:hover {
+  animation-play-state: paused;
+}
+
 /* Custom scrollbar for admin sidebar nav */
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;

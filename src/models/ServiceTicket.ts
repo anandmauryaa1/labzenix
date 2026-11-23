@@ -17,7 +17,7 @@ if (mongoose.models && mongoose.models.ServiceTicket) {
 }
 
 const ServiceTicketSchema = new mongoose.Schema<IServiceTicket>({
-  company: { type: mongoose.Schema.Types.ObjectId, ref: 'Company', required: true },
+  company: { type: mongoose.Schema.Types.ObjectId, ref: 'CrmContact', required: true },
   machineSerialNumber: { type: String, required: true, trim: true },
   productInterest: { type: String },
   problemDescription: { type: String, required: true },

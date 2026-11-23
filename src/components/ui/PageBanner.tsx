@@ -26,8 +26,24 @@ export default function PageBanner({
 }: PageBannerProps) {
   const HeadingTag = as;
   return (
-    <section className="bg-primary py-3 sm:py-4 md:py-6">
-      <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4 flex flex-col md:flex-row md:items-center justify-between gap-2.5 sm:gap-4 md:gap-6">
+    <section className="relative overflow-hidden bg-gradient-to-r from-[#031b4e] via-[#004aad] to-[#005cd6] text-white py-3 sm:py-4 md:py-6">
+      {/* Modern Dot Matrix Texture Overlay */}
+      <div 
+        className="absolute inset-0 pointer-events-none opacity-20"
+        style={{
+          backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.4) 1.5px, transparent 1.5px)',
+          backgroundSize: '24px 24px',
+          maskImage: 'radial-gradient(ellipse at 50% 50%, black 70%, transparent 100%)',
+          WebkitMaskImage: 'radial-gradient(ellipse at 50% 50%, black 70%, transparent 100%)'
+        }}
+      />
+
+      {/* Subtle Precision Rings & Glow */}
+      <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full border border-white/10 pointer-events-none" />
+      <div className="absolute -bottom-12 -left-12 w-48 h-48 rounded-full border border-white/10 pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-72 h-full bg-sky-300/10 blur-2xl pointer-events-none" />
+
+      <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4 flex flex-col md:flex-row md:items-center justify-between gap-2.5 sm:gap-4 md:gap-6 relative z-10">
         {/* Title & Back Button */}
         <div className="flex-1 flex items-center gap-2.5 sm:gap-3.5 md:gap-4 min-w-0">
           {showBackButton && (

@@ -60,8 +60,8 @@ export default async function Home() {
       ProductRangeModel.find({ active: true }).sort({ order: 1 }).lean().exec(),
       Product.find({})
         .select('title slug modelNumber images category description views createdAt')
-        .sort({ views: -1, createdAt: 1, _id: 1 })
-        .limit(6)
+        .sort({ createdAt: -1, _id: -1 })
+        .limit(10)
         .lean()
         .exec(),
       AboutContent.find({}).limit(1).lean().exec(),

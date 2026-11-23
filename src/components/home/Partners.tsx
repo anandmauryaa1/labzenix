@@ -65,34 +65,42 @@ export default function Partners({ initialPartners }: { initialPartners?: Partne
           )}
         </div>
 
-        <div className="relative min-h-[300px] md:min-h-[400px]">
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 md:gap-10 transition-opacity duration-300">
-            {currentPartners.map((partner) => (
+        <div className="relative">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-4 md:gap-5 transition-opacity duration-300">
+            {currentPartners.map((partner, idx) => (
               <a
                 key={partner._id}
-                href={partner.website || '#'}
+                href={partner.website || undefined}
                 target={partner.website ? "_blank" : undefined}
-                rel="noopener noreferrer"
-                className="relative aspect-[5/2] flex flex-col mb-6 items-center justify-center transition-all duration-300 group bg-gray-50/50 hover:bg-white border border-transparent hover:border-gray-100 p-4"
+                rel={partner.website ? "noopener noreferrer" : undefined}
+                className={`flex flex-col items-center justify-between p-3 sm:p-4 bg-white rounded-xl sm:rounded-2xl border border-blue-200/90 shadow-sm hover:border-primary hover:shadow-xl hover:shadow-blue-900/12 hover:-translate-y-1 transition-all duration-300 group h-36 sm:h-40 md:h-44 ${partner.website ? 'cursor-pointer' : 'cursor-default'}`}
               >
-                <Image
-                  src={getOptimizedImageUrl(partner.logo, { width: 300, height: 120, crop: 'fit' })}
-                  alt={partner.name}
-                  fill
-                  loading="lazy"
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                  className="object-contain p-2 transform group-hover:scale-105 transition-transform duration-300"
-                />
-                <p className="absolute -bottom-10 left-1/2 -translate-x-1/2 text-sm sm:text-base font-semibold text-secondary uppercase tracking-tight">
-                  {partner.name}
-                </p>
+                {/* Logo Container */}
+                <div className="relative w-full flex-1 flex items-center justify-center min-h-0">
+                  <Image
+                    src={getOptimizedImageUrl(partner.logo, { width: 300, height: 160, crop: 'fit' })}
+                    alt={partner.name}
+                    fill
+                    priority={currentPage === 0 && idx < 5}
+                    unoptimized
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
+                    className="object-contain p-1.5 transform group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+
+                {/* Partner Name inside the card */}
+                <div className="pt-1.5 sm:pt-2 text-center w-full">
+                  <span className="text-xs sm:text-[13px] md:text-sm font-bold text-primary uppercase tracking-wider group-hover:text-[#003882] transition-colors line-clamp-1">
+                    {partner.name}
+                  </span>
+                </div>
               </a>
             ))}
             
             {/* Fillers to maintain grid if fewer than 10 partners on last page */}
             {currentPartners.length < partnersPerPage && totalPages > 1 && 
               Array.from({ length: partnersPerPage - currentPartners.length }).map((_, i) => (
-                <div key={`filler-${i}`} className="aspect-[5/2] hidden lg:block" />
+                <div key={`filler-${i}`} className="hidden lg:block h-36 sm:h-40 md:h-44" />
               ))
             }
           </div>

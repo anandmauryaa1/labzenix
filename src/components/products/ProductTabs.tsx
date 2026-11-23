@@ -140,8 +140,8 @@ export default function ProductTabs({ product }: ProductTabsProps) {
     <div className="w-full">
       {/* Tab Nav - Google-indexable crawlable links with role="tablist" */}
       <div 
-        style={{ top: 'var(--header-height, 80px)' }}
-        className="overflow-x-auto sticky top-[80px] sm:top-[100px] md:top-[110px] lg:top-[116px] xl:top-[120px] z-20 bg-white border-b border-gray-200 shadow-sm"
+        style={{ top: 'var(--header-height, 104px)' }}
+        className="overflow-x-auto sticky top-[104px] sm:top-[118px] md:top-[124px] lg:top-[130px] xl:top-[134px] z-20 bg-white border-b border-gray-200 shadow-sm"
       >
         <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4">
           <nav className="flex min-w-max" role="tablist" aria-label="Product Sections">

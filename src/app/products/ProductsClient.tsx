@@ -224,28 +224,37 @@ function ProductsContent() {
         />
         
         {/* Hero */}
-        <section className="bg-gray-50 py-10 sm:py-16 md:py-24 border-b border-gray-100 bg-gradient-to-b from-gray-200 to-white-50">
-          <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4">
+        <section className="relative overflow-hidden bg-gradient-to-r from-[#031b4e] via-[#004aad] to-[#005cd6] text-white py-10 sm:py-16 md:py-24 border-b border-gray-100">
+          {/* Dot Matrix Texture Overlay */}
+          <div 
+            className="absolute inset-0 pointer-events-none opacity-20"
+            style={{
+              backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.4) 1.5px, transparent 1.5px)',
+              backgroundSize: '24px 24px'
+            }}
+          />
+
+          <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4 relative z-10">
             <div className="flex flex-col md:flex-row justify-between items-center gap-8 md:gap-12">
               <FadeIn direction="right" className="max-w-2xl">
-                <span className="text-primary font-black tracking-[0.3em] uppercase text-[10px] mb-3 sm:mb-4 block">
+                <span className="text-blue-200 font-black tracking-[0.3em] uppercase text-[10px] mb-3 sm:mb-4 block">
                   Industrial Catalog
                 </span>
-                <h1 className="text-3xl sm:text-5xl md:text-7xl font-black text-secondary uppercase tracking-tighter leading-none mb-4 sm:mb-6">
-                  Precision <span className="text-primary">Testing</span> Mastery
+                <h1 className="text-3xl sm:text-5xl md:text-7xl font-black text-white uppercase tracking-tighter leading-none mb-4 sm:mb-6">
+                  Precision <span className="text-blue-200">Testing</span> Mastery
                 </h1>
-                <p className="text-base sm:text-lg md:text-xl text-gray-700 leading-relaxed font-medium mb-6 sm:mb-8">
+                <p className="text-base sm:text-lg md:text-xl text-blue-100 leading-relaxed font-medium mb-6 sm:mb-8">
                   Explore our range of ISO certified, technologically advanced laboratory instruments
                   designed for reliability, reproducibility, and precision.
                 </p>
               </FadeIn>
               <FadeIn direction="left" className="hidden md:block w-full max-w-sm">
-                <div className="aspect-[4/5] bg-gray-100 border-2 border-primary/20 p-4 relative shadow-2xl">
+                <div className="aspect-[4/5] bg-white border-2 border-primary/20 p-4 relative shadow-2xl">
                   <Image
                     src={certificateImage || "https://images.unsplash.com/photo-1579313101805-39180766150e?auto=format&fit=crop&q=80&w=800"}
                     alt="LabZenix Certified"
                     fill
-                    className="object-cover brightness-90 transition-all duration-700"
+                    className="object-cover brightness-95 transition-all duration-700"
                     priority
                   />
                   <div className="absolute top-8 -right-12 bg-primary text-white p-6 font-black text-xs uppercase tracking-[0.2em] -rotate-90 origin-bottom-right shadow-xl">

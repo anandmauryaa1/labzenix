@@ -86,16 +86,16 @@ export default function Hero({ initialSlides }: { initialSlides?: HeroSlide[] })
             <button 
               onClick={prevSlide} 
               aria-label="Previous slide"
-              className="w-8 h-8 md:w-12 md:h-12 flex items-center justify-center border border-black/10 text-black/40 hover:bg-primary hover:text-white transition-all"
+              className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center border border-black/10 text-black/40 hover:bg-primary hover:text-white transition-all"
             >
-              <ChevronLeft className="w-4 h-4 md:w-6 md:h-6" />
+              <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
             </button>
             <button 
               onClick={nextSlide} 
               aria-label="Next slide"
-              className="w-8 h-8 md:w-12 md:h-12 flex items-center justify-center border border-black/10 text-black/40 hover:bg-primary hover:text-white transition-all"
+              className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center border border-black/10 text-black/40 hover:bg-primary hover:text-white transition-all"
             >
-              <ChevronRight className="w-4 h-4 md:w-6 md:h-6" />
+              <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
             </button>
           </div>
         </div>

@@ -21,7 +21,7 @@ if (mongoose.models && mongoose.models.Order) {
 const OrderSchema = new mongoose.Schema<IOrder>({
   orderNumber: { type: String, required: true, unique: true },
   quotation: { type: mongoose.Schema.Types.ObjectId, ref: 'Quotation', required: true },
-  company: { type: mongoose.Schema.Types.ObjectId, ref: 'Company', required: true },
+  company: { type: mongoose.Schema.Types.ObjectId, ref: 'CrmContact', required: true },
   totalAmount: { type: Number, required: true },
   stage: { 
     type: String, 

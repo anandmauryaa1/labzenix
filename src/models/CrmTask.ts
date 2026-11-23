@@ -4,7 +4,7 @@ export interface ICrmTask extends mongoose.Document {
   title: string;
   description?: string;
   dueDate: Date;
-  status: 'Pending' | 'Completed' | 'Overdue';
+  status: 'New' | 'In Feedback' | 'Completed' | 'Rejected' | 'Processing' | 'Pending' | 'Overdue';
   priority: 'Low' | 'Medium' | 'High';
   assignedTo?: mongoose.Types.ObjectId;
   contact?: mongoose.Types.ObjectId;
@@ -23,8 +23,8 @@ const CrmTaskSchema = new mongoose.Schema<ICrmTask>({
   dueDate: { type: Date, required: true },
   status: { 
     type: String, 
-    enum: ['Pending', 'Completed', 'Overdue'], 
-    default: 'Pending',
+    enum: ['New', 'In Feedback', 'Completed', 'Rejected', 'Processing', 'Pending', 'Overdue'], 
+    default: 'New',
     required: true 
   },
   priority: { 

@@ -64,7 +64,7 @@ export default function ServiceTickets() {
 
       if (companiesRes.ok) {
         const data = await companiesRes.json();
-        setCompanies(data.companies || []);
+        setCompanies(Array.isArray(data) ? data : (data.contacts || []));
       }
 
       if (usersRes.ok) {
@@ -219,7 +219,7 @@ export default function ServiceTickets() {
                   <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-dashed border-gray-100 pt-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
                     <span className="flex items-center text-primary">
                       <Building2 className="w-3.5 h-3.5 mr-1.5" />
-                      Client: {ticket.company?.name}
+                      Client: {ticket.company?.company || ticket.company?.name || 'Customer'}
                     </span>
                     {ticket.assignedEngineer && (
                       <span className="flex items-center text-secondary">
@@ -274,7 +274,7 @@ export default function ServiceTickets() {
                 >
                   <option value="">Select B2B client...</option>
                   {companies.map(c => (
-                    <option key={c._id} value={c._id}>{c.name}</option>
+                    <option key={c._id} value={c._id}>{c.company ? `${c.company} (${c.name})` : c.name}</option>
                   ))}
                 </select>
               </div>

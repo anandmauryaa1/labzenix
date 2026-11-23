@@ -56,7 +56,31 @@ export default function WhyChooseUs({ initialReasons }: { initialReasons?: CoreV
 
   return (
     <section className="py-10 sm:py-14 px-[5px] sm:px-4 bg-gray-50 border-y border-gray-100 relative overflow-hidden">
-      <div className="absolute inset-0 bg-primary/5 pattern-grid opacity-10 pointer-events-none" />
+      {/* Top Left Corner Dot Pattern */}
+      <div
+        className="absolute top-0 left-0 w-48 sm:w-72 h-48 sm:h-72 pointer-events-none opacity-40 z-0"
+        style={{
+          backgroundImage: 'radial-gradient(circle, #004aad 1.5px, transparent 1.5px)',
+          backgroundSize: '20px 20px',
+          maskImage: 'radial-gradient(ellipse at 0% 0%, black 55%, transparent 85%)',
+          WebkitMaskImage: 'radial-gradient(ellipse at 0% 0%, black 55%, transparent 85%)',
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Bottom Right Corner Dot Pattern */}
+      <div
+        className="absolute bottom-0 right-0 w-48 sm:w-72 h-48 sm:h-72 pointer-events-none opacity-40 z-0"
+        style={{
+          backgroundImage: 'radial-gradient(circle, #004aad 1.5px, transparent 1.5px)',
+          backgroundSize: '20px 20px',
+          maskImage: 'radial-gradient(ellipse at 100% 100%, black 55%, transparent 85%)',
+          WebkitMaskImage: 'radial-gradient(ellipse at 100% 100%, black 55%, transparent 85%)',
+        }}
+        aria-hidden="true"
+      />
+
+      <div className="absolute inset-0 bg-primary/5 pattern-grid opacity-5 pointer-events-none" />
       <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4 relative z-10">
         <div className="text-center mb-8 sm:mb-16">
           <span className="block text-primary font-medium tracking-[0.3em] uppercase text-xs sm:text-sm mb-2 sm:mb-4">Core Values</span>

@@ -128,7 +128,7 @@ export default function LeadCapturePopup() {
         aria-labelledby="popup-title"
         className="fixed inset-0 z-[1000] flex items-center justify-center p-4"
       >
-        <div className="relative w-full max-w-lg bg-white shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-500">
           {/* Accent top border */}
           <div className="h-1 w-full bg-gradient-to-r from-primary via-primary/70 to-primary/30" />
 

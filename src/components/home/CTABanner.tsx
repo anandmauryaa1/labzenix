@@ -29,7 +29,7 @@ export default function CTABanner() {
             Our technical experts are standing by to provide you with the most advanced testing solutions for your specific industry requirements.
           </p>
           <Link href="/contact" className="inline-block">
-            <span className="inline-block px-12 py-5 bg-white text-black hover:bg-primary hover:text-white transition-all duration-300 font-black uppercase tracking-widest text-sm shadow-2xl hover:scale-105 active:scale-95">
+            <span className="inline-block px-6 sm:px-12 py-4 sm:py-5 bg-white text-black hover:bg-primary hover:text-white transition-all duration-300 font-black uppercase tracking-widest text-xs sm:text-sm shadow-2xl hover:scale-105 active:scale-95">
               Request a Custom Quote
             </span>
           </Link>

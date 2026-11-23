@@ -21,7 +21,7 @@ if (mongoose.models && mongoose.models.AMCRecord) {
 }
 
 const AMCRecordSchema = new mongoose.Schema<IAMCRecord>({
-  company: { type: mongoose.Schema.Types.ObjectId, ref: 'Company', required: true },
+  company: { type: mongoose.Schema.Types.ObjectId, ref: 'CrmContact', required: true },
   machineSerialNumber: { type: String, required: true, unique: true, trim: true },
   productName: { type: String, required: true },
   installationDate: { type: Date, required: true },

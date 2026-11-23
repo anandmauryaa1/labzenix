@@ -11,7 +11,7 @@ const taskSchema = z.object({
   title: z.string().min(1, 'Title is required').trim(),
   description: z.string().optional(),
   dueDate: z.string().min(1, 'Due date is required'),
-  status: z.enum(['Pending', 'Completed', 'Overdue']).default('Pending'),
+  status: z.enum(['New', 'In Feedback', 'Completed', 'Rejected', 'Processing', 'Pending', 'Overdue']).default('New'),
   priority: z.enum(['Low', 'Medium', 'High']).default('Medium'),
   contact: z.string().optional().nullable(),
   deal: z.string().optional().nullable(),

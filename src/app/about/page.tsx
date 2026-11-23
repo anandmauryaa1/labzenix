@@ -1,11 +1,10 @@
 import Button from '@/components/ui/Button';
-import { Target, Users, Award, Shield } from 'lucide-react';
+import { Target, Users, Award, Shield, Globe, Clock, Sparkles } from 'lucide-react';
 import { getPageMetadata } from '@/lib/seo';
 import FadeIn from '@/components/ui/FadeIn';
 import AnimatedCounter from '@/components/ui/AnimatedCounter';
 import Link from 'next/link';
 import Image from 'next/image';
-import PageBanner from '@/components/ui/PageBanner';
 
 import dbConnect from '@/lib/dbConnect';
 import CompanyStat from '@/models/CompanyStat';
@@ -87,27 +86,46 @@ export default async function AboutPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
 
-      <PageBanner 
-        title="About Us" 
-        breadcrumbs={[
-          { label: 'Home', href: '/' },
-          { label: 'About Us' }
-        ]} 
-      />
-      {/* Hero Section */}
-      <section className="bg-gray-50 py-10 sm:py-16 md:py-24 border-b border-gray-100 overflow-hidden px-[5px] sm:px-4">
-        <div className="w-full sm:w-[90%] mx-auto px-[5px] sm:px-4">
+      {/* ─── Hero Banner with Royal Blue Gradient & Tech Dot Matrix Pattern ── */}
+      <section className="relative overflow-hidden bg-gradient-to-r from-[#031b4e] via-[#004aad] to-[#005cd6] text-white pt-12 sm:pt-16 md:pt-20 pb-16 sm:pb-20 md:pb-24">
+        {/* Modern Dot Matrix Texture Overlay */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-25"
+          style={{
+            backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.4) 1.5px, transparent 1.5px)',
+            backgroundSize: '24px 24px',
+            maskImage: 'radial-gradient(ellipse at 50% 50%, black 70%, transparent 100%)',
+            WebkitMaskImage: 'radial-gradient(ellipse at 50% 50%, black 70%, transparent 100%)'
+          }}
+        />
+
+        {/* Precision Geometric Concentric Rings */}
+        <div className="absolute -top-32 -right-32 w-[520px] h-[520px] rounded-full border border-white/10 pointer-events-none" />
+        <div className="absolute -top-16 -right-16 w-[380px] h-[380px] rounded-full border border-white/15 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-[240px] h-[240px] rounded-full border border-white/10 pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-[360px] h-[360px] rounded-full border border-white/10 pointer-events-none" />
+        <div className="absolute -bottom-44 -left-44 w-[520px] h-[520px] rounded-full border border-white/5 pointer-events-none" />
+
+        {/* Ambient Glows */}
+        <div className="absolute -top-24 right-1/4 w-96 h-96 bg-sky-300/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-20 left-1/3 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="w-full sm:w-[90%] max-w-7xl mx-auto px-4 text-center relative z-10">
           <FadeIn direction="up">
-            <div className="text-center max-w-3xl mx-auto">
-              <span className="text-primary font-black tracking-[0.3em] uppercase text-[10px] mb-3 sm:mb-4 block">Our Legacy</span>
-              <h1 className="text-3xl sm:text-4xl md:text-6xl font-black text-secondary mb-4 sm:mb-8 uppercase tracking-tighter leading-none">
-                Precision in <br />
-                <span className="text-primary italic">Quality Testing</span>
-              </h1>
-              <p className="text-sm sm:text-base md:text-xl text-gray-600 leading-relaxed font-medium">
-                LabZenix is a pioneer in manufacturing high-quality laboratory testing instruments. With a commitment to excellence and innovation, we help industries achieve zero-defect production.
-              </p>
-            </div>
+            {/* Breadcrumb */}
+            <nav aria-label="Breadcrumb" className="inline-flex items-center space-x-2 text-xs font-semibold text-blue-200/90 mb-4 bg-white/10 px-3.5 py-1 rounded-full border border-white/15 backdrop-blur-xs">
+              <Link href="/" className="hover:text-white transition-colors">Home</Link>
+              <span className="text-blue-300/60">/</span>
+              <span className="text-white">About Us</span>
+            </nav>
+
+            <span className="block text-blue-200 font-black tracking-[0.3em] uppercase text-xs mb-3">Our Legacy & Philosophy</span>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4 sm:mb-6 uppercase tracking-tight leading-tight sm:leading-none">
+              Precision In <span className="text-blue-200">Quality Testing</span>
+            </h1>
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-blue-100/90 max-w-3xl mx-auto font-normal leading-relaxed">
+              LabZenix is a pioneer in manufacturing high-precision laboratory testing instruments. With a commitment to excellence and engineering innovation, we help industries achieve zero-defect production.
+            </p>
           </FadeIn>
         </div>
       </section>
@@ -160,43 +178,66 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      {/* Premium Stats Section */}
-      <section className="relative py-14 sm:py-20 md:py-28 overflow-hidden bg-secondary group">
-        {/* Dynamic Background */}
-        <div className="absolute inset-0 z-0">
-          <Image 
-            src="https://images.pexels.com/photos/3825586/pexels-photo-3825586.jpeg" 
-            className="object-cover opacity-30 group-hover:scale-110 transition-transform duration-[3000ms]"
-            alt="Laboratory background"
-            fill
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-secondary via-secondary/80 to-secondary z-10" />
-          <div className="absolute inset-x-0 h-[2px] bg-primary/20 top-0 animate-scan z-20" />
-        </div>
+      {/* ─── Premium Stats Section ─────────────────────────────────────── */}
+      <section className="relative py-16 sm:py-20 md:py-24 overflow-hidden bg-gradient-to-r from-[#031b4e] via-[#004aad] to-[#005cd6] text-white">
+        {/* Modern Dot Matrix Texture Overlay */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-20"
+          style={{
+            backgroundImage: 'radial-gradient(circle, rgba(255, 255, 255, 0.4) 1.5px, transparent 1.5px)',
+            backgroundSize: '24px 24px',
+            maskImage: 'radial-gradient(ellipse at 50% 50%, black 70%, transparent 100%)',
+            WebkitMaskImage: 'radial-gradient(ellipse at 50% 50%, black 70%, transparent 100%)'
+          }}
+        />
 
-        <div className="relative z-30 w-full sm:w-[90%] mx-auto px-[5px] sm:px-4">
+        {/* Precision Concentric Rings */}
+        <div className="absolute -top-32 -right-32 w-[520px] h-[520px] rounded-full border border-white/10 pointer-events-none" />
+        <div className="absolute -top-16 -right-16 w-[380px] h-[380px] rounded-full border border-white/15 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-[240px] h-[240px] rounded-full border border-white/10 pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-[360px] h-[360px] rounded-full border border-white/10 pointer-events-none" />
+
+        {/* Ambient Glows */}
+        <div className="absolute -top-24 right-1/4 w-96 h-96 bg-sky-300/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-20 left-1/3 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 w-full sm:w-[90%] max-w-7xl mx-auto px-4">
           <FadeIn direction="up">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-10">
-              {stats.map((stat) => (
-                <div key={stat.label} className="relative group/card">
-                  <div className="h-full p-6 sm:p-8 bg-white/[0.03] backdrop-blur-md border border-white/10 hover:border-primary/50 transition-all duration-500 relative overflow-hidden group-hover/card:-translate-y-2">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-full -mr-12 -mt-12 group-hover/card:scale-150 transition-transform duration-700" />
-                    
-                    <div className="relative z-10">
-                      <div className="text-3xl sm:text-4xl md:text-5xl font-black text-primary tracking-tighter mb-3 flex items-baseline">
-                        <AnimatedCounter 
-                          value={parseInt(stat.value.replace(/\+/g, ''))} 
-                          suffix={stat.value.includes('+') ? '+' : ''}
-                        />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-6 lg:gap-8">
+              {stats.map((stat) => {
+                const iconMap: Record<string, any> = {
+                  'countries served': Globe,
+                  'instruments built': Award,
+                  'happy clients': Users,
+                  'years experience': Clock,
+                };
+                const IconComponent = iconMap[stat.label.toLowerCase().trim()] || Sparkles;
+
+                return (
+                  <div key={stat.label} className="relative group/card">
+                    <div className="h-full p-6 sm:p-7 md:p-8 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 border-t-[3px] border-t-white/80 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] hover:bg-white/15 hover:border-white/35 hover:shadow-[0_12px_40px_0_rgba(0,0,0,0.3)] hover:-translate-y-1.5 transition-all duration-300 relative overflow-hidden flex flex-col justify-between">
+                      <div>
+                        <div className="w-12 h-12 rounded-xl bg-white/15 text-white border border-white/20 flex items-center justify-center mb-5 group-hover/card:bg-white group-hover/card:text-primary transition-all duration-300 shadow-inner">
+                          <IconComponent className="w-6 h-6 stroke-[1.8]" />
+                        </div>
+                        
+                        <div className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight mb-2 flex items-baseline drop-shadow-sm">
+                          <AnimatedCounter 
+                            value={parseInt(stat.value.replace(/[^0-9]/g, '')) || 0} 
+                            suffix={stat.value.includes('+') ? '+' : ''}
+                          />
+                        </div>
+
+                        <div className="w-10 h-1 bg-white/30 rounded-full mb-3 group-hover/card:w-16 group-hover/card:bg-white transition-all duration-300" />
                       </div>
-                      <div className="w-10 sm:w-12 h-[2px] bg-primary/30 mb-4 sm:mb-6 group-hover/card:w-full transition-all duration-700" />
-                      <p className="text-xs md:text-sm text-gray-400 uppercase tracking-[0.2em] font-black leading-relaxed">
+
+                      <p className="text-xs md:text-sm text-blue-100 uppercase tracking-wider font-bold leading-relaxed">
                         {stat.label}
                       </p>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </FadeIn>
         </div>

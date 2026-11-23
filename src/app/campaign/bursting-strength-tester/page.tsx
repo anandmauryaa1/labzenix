@@ -4,16 +4,16 @@ import Campaign from '@/models/Campaign';
 import CampaignStickyNav from '@/components/campaigns/CampaignStickyNav';
 import HeroSection from '@/components/campaigns/HeroSection';
 import VideoSection from '@/components/campaigns/VideoSection';
-import { 
-  FeaturesSection, SpecificationsSection, ComparisonSection, 
-  FeedbackSection, ApplicationsSection, FAQSection 
+import {
+  FeaturesSection, SpecificationsSection, ComparisonSection,
+  FeedbackSection, ApplicationsSection, FAQSection
 } from '@/components/campaigns/Sections';
 import CampaignEnquiryForm from '@/components/campaigns/CampaignEnquiryForm';
 import { formatTitle, SectionHeader } from '@/components/campaigns/Typography';
 import FadeIn from '@/components/ui/FadeIn';
-import { 
-  CheckCircle2, ShieldCheck, Wrench, Factory, Save, Activity, 
-  Beaker, BookOpen, Phone, Mail, Download 
+import {
+  CheckCircle2, ShieldCheck, Wrench, Factory, Save, Activity,
+  Beaker, BookOpen, Phone, Mail, Download
 } from 'lucide-react';
 
 export const metadata = {
@@ -127,12 +127,12 @@ export default async function BurstingStrengthTesterCampaign() {
   const heroDataRaw = sections.find(s => s.type === 'Hero')?.data;
   const heroData = heroDataRaw
     ? {
-        ...FALLBACK_HERO,
-        ...heroDataRaw,
-        tabs: (Array.isArray(heroDataRaw.tabs) && heroDataRaw.tabs.length > 0)
-          ? heroDataRaw.tabs
-          : (heroDataRaw.tabs === undefined ? FALLBACK_HERO.tabs : heroDataRaw.tabs)
-      }
+      ...FALLBACK_HERO,
+      ...heroDataRaw,
+      tabs: (Array.isArray(heroDataRaw.tabs) && heroDataRaw.tabs.length > 0)
+        ? heroDataRaw.tabs
+        : (heroDataRaw.tabs === undefined ? FALLBACK_HERO.tabs : heroDataRaw.tabs)
+    }
     : FALLBACK_HERO;
   const featData = sections.find(s => s.type === 'FeaturesWithImage' || s.type === 'TextWithImage')?.data || { title: 'Uncompromising Engineering Precision', features: FALLBACK_FEATURES, image: FALLBACK_HERO.images[0] };
   const specsData = sections.find(s => s.type === 'Specifications')?.data || { title: 'Technical Specifications', specs: FALLBACK_SPECS };
@@ -141,7 +141,7 @@ export default async function BurstingStrengthTesterCampaign() {
 
   return (
     <div className="bg-slate-50 min-h-screen text-slate-800 font-sans selection:bg-primary selection:text-white">
-      
+
 
       {/* Hero Section */}
       <HeroSection data={heroData} campaignTitle="Servo Hydraulic Bursting Strength Tester" />
@@ -153,16 +153,16 @@ export default async function BurstingStrengthTesterCampaign() {
       <section className="py-24 bg-slate-50 relative font-display border-t border-slate-200">
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="flex flex-col lg:flex-row gap-16 items-center">
-            
+
             <div className="lg:w-1/2">
               <FadeIn direction="right">
-                <SectionHeader 
-                  title="Testing Principle & Process" 
+                <SectionHeader
+                  title="Testing Principle & Process"
                   subtitle="How automated hydraulic diaphragm testing delivers reproducible quality control results."
                   topText="METHODOLOGY"
                   align="left"
                 />
-                
+
                 <div className="space-y-6 mt-8">
                   {[
                     { title: '1. Pneumatic Sample Clamping', desc: 'Specimen is securely clamped over a circular elastic diaphragm with uniform pressure.' },
@@ -188,11 +188,11 @@ export default async function BurstingStrengthTesterCampaign() {
               <FadeIn direction="left">
                 <div className="bg-white p-8 border-2 border-slate-200 shadow-2xl relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 -z-0 rounded-full blur-2xl"></div>
-                  
+
                   <h3 className="text-xl font-black text-slate-900 mb-6 uppercase tracking-wider flex items-center">
                     <ShieldCheck className="w-6 h-6 text-primary mr-3" /> Built-in Machine Construction
                   </h3>
-                  
+
                   <div className="grid grid-cols-2 gap-4 text-xs font-semibold text-slate-700">
                     {[
                       'Heavy Rigid Frame', 'Servo Hydraulic Pump',
@@ -235,8 +235,8 @@ export default async function BurstingStrengthTesterCampaign() {
       <section id="applications" className="py-24 bg-white font-display border-t border-slate-200">
         <div className="container mx-auto px-4 max-w-7xl">
           <FadeIn>
-            <SectionHeader 
-              title="Supported Standards & Key Industries" 
+            <SectionHeader
+              title="Supported Standards & Key Industries"
               subtitle="Tested and certified to comply with global international standard test protocols."
               topText="COMPLIANCE & USE CASES"
             />
@@ -278,7 +278,7 @@ export default async function BurstingStrengthTesterCampaign() {
       <section id="enquiry" className="py-24 bg-slate-50 relative overflow-hidden font-display border-t border-slate-200">
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-6xl mx-auto bg-white border-2 border-slate-200 shadow-2xl overflow-hidden flex flex-col lg:flex-row rounded-none">
-            
+
             {/* Left Info Panel */}
             <div className="lg:w-2/5 bg-slate-900 text-white p-10 md:p-12 flex flex-col justify-between border-r border-slate-800">
               <div>
@@ -289,11 +289,11 @@ export default async function BurstingStrengthTesterCampaign() {
                 <h3 className="text-3xl md:text-4xl font-black uppercase tracking-tight mb-4 text-white">
                   Request Official Quotation
                 </h3>
-                
+
                 <p className="text-slate-400 mb-8 leading-relaxed text-sm">
                   Need a reliable Servo Hydraulic Bursting Strength Tester? Contact the LabZenix engineering team for custom pressure ranges and factory pricing.
                 </p>
-                
+
                 <div className="space-y-4">
                   <div className="flex items-center p-3 bg-slate-800 border border-slate-700">
                     <div className="w-10 h-10 bg-primary/20 border border-primary/30 flex items-center justify-center mr-4 text-primary shrink-0">
@@ -322,7 +322,7 @@ export default async function BurstingStrengthTesterCampaign() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="mt-8 pt-6 border-t border-slate-700">
                 <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-3">Instant Technical Downloads</h4>
                 <div className="grid grid-cols-2 gap-2 text-xs">
